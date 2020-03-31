@@ -1,0 +1,25 @@
+  
+{
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "extends": "airbnb",
+    "parserOptions": {
+        "allowImportExportEverywhere": true,
+        "ecmaVersion": 9
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx"]}]
+    },
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "paths": ["./src"]
+            }
+        }
+    }
+}

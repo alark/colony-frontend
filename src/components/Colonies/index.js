@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
 import { Redirect } from 'react-router-dom';
 
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { Button, TextField, Container, CssBaseline, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
@@ -19,6 +21,13 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Share from '@material-ui/icons/Share';
 import Add from '@material-ui/icons/Add';
+import SendIcon from '@material-ui/icons/Send';
+import DraftsIcon from '@material-ui/icons/Drafts';
+import InboxIcon from '@material-ui/icons/MoveToInbox';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+
+import { useEffect } from 'react';
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -51,7 +60,9 @@ function TablePaginationActions(props) {
   };
 
   return (
+
     <div className={classes.root}>
+      
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
@@ -88,9 +99,39 @@ const tableStyle = makeStyles({
   },
 });
 
+const StyledMenu = withStyles({
+  paper: {
+    border: '1px solid #d3d4d5',
+  },
+})((props) => (
+  <Menu
+    elevation={0}
+    getContentAnchorEl={null}
+    anchorOrigin={{
+      vertical: 'bottom',
+      horizontal: 'center',
+    }}
+    transformOrigin={{
+      vertical: 'top',
+      horizontal: 'center',
+    }}
+    {...props}
+  />
+));
+
+const StyledMenuItem = withStyles((theme) => ({
+  root: {
+    '&:focus': {
+      backgroundColor: theme.palette.primary.main,
+      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
+        color: theme.palette.common.white,
+      },
+    },
+  },
+}))(MenuItem);
+
 const Colonies = () => {
-  const { state: { ownedColonies } } = useProfileProvider();
-  const { addColony, getAnimals } = useProfileProvider();
+  const { addColony, getAnimals, sortList, sortAlpha, state: { ownedColonies } } = useProfileProvider();
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
   const classes = tableStyle();
@@ -98,6 +139,11 @@ const Colonies = () => {
   const rowsPerPage = 10;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [addColonyOpen, setaddColonyOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  useEffect(()=> {
+      console.log("LATEST LIST: ", ownedColonies);
+  });
 
   const handleClickDialogOpen = () => {
     setaddColonyOpen(true);
@@ -114,13 +160,12 @@ const Colonies = () => {
 
   const uploadFile = async () => {
     const reader = new FileReader();
-
     reader.readAsText(file);
 
     reader.onload = async () => {
       const load = reader.result;
       const data = { payload: load, name: fileName };
-      await addColony(data);
+      const colonies = await addColony(data);     
     };
 
     reader.onerror = () => {
@@ -148,30 +193,68 @@ const Colonies = () => {
     setPage(newPage);
   };
 
-  const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
+  const handleCellClick = async (colonyId, colonySize, rowsPerPage, page) => {
     const request = {
-      colonyId, colonyName, colonySize, rowsPerPage, page,
+      colonyId, colonySize, rowsPerPage, page,
     };
     await getAnimals(request);
     setRedirectToAnimals(true);
   };
+  
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
 
+    const handleSort = (key) => {
+      sortList(key);
+      handleClose();
+    };
+
+    const handleAlpha = (key) => {
+      sortAlpha(key);
+      handleClose();
+    }
 
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
   }
-
+  
   return (
     <Container component="main">
       <CssBaseline />
       <h1>Your Colonies</h1>
+
       <div className="uploadFile" style={{ textAlign: 'right' }}>
+
+      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick} variant="outlined" color="primary">
+        Sort
+      </Button>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={() => {
+          handleAlpha("colonyName");
+        }}>Sort By Name (A-Z)</MenuItem>
+
+        <MenuItem onClick={() => {
+          handleSort("size");
+        }}>Sort by Size (Smallest to Greatest)</MenuItem>
+      </Menu>
+
         <Button variant="outlined" color="primary" startIcon={<Add />} onClick={handleClickDialogOpen}>
           Add Colony
         </Button>
         <Dialog open={addColonyOpen} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
-          <DialogContent>
+          <DialogContent> 
             <DialogContentText>
               Upload an animal colony along with its name.
             </DialogContentText>
@@ -198,7 +281,7 @@ const Colonies = () => {
                   style={{ cursor: 'pointer' }}
                   component="th"
                   scope="row"
-                  onClick={async () => await handleCellClick(ownedColony.colonyId, ownedColony.colonyName, ownedColony.size, rowsPerPage, page)}
+                  onClick={async () => await handleCellClick(ownedColony.colonyId, ownedColony.size, rowsPerPage, page)}
                 >
                   <div style={{ fontWeight: 'bold', fontSize: 18 }}>{ownedColony.colonyName}</div>
                   <p style={{ color: '#333333' }}>Size: {ownedColony.size}</p>

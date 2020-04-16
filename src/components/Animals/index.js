@@ -136,11 +136,13 @@ const Animals = () => {
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals } = useProfileProvider();
-  const { animals, colonyId, colonyName, colonySize } = state;
+  const { animals, colonyId, colonySize } = state;
+
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
 
   const handleChangePage = async (event, newPage) => {
     const request = {
-      colonyId, colonyName, colonySize, rowsPerPage, page: newPage,
+      colonyId, colonySize, rowsPerPage, page: newPage,
     };
     await getAnimals(request);
     setPage(newPage);
@@ -169,7 +171,7 @@ const Animals = () => {
   return (
     <Container component="main" style={{ padding: 8 }}>
       <CssBaseline />
-      <h1>{colonyName}</h1>
+      <h1>Colony X</h1>
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
           <TableRow>

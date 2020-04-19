@@ -131,7 +131,7 @@ const StyledMenuItem = withStyles((theme) => ({
 }))(MenuItem);
 
 const Colonies = () => {
-  const { addColony, getAnimals, sortList, sortAlpha, state: { ownedColonies } } = useProfileProvider();
+  const { addColony, deleteColony, getAnimals, sortList, sortAlpha, state: { ownedColonies } } = useProfileProvider();
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
   const classes = tableStyle();
@@ -160,21 +160,43 @@ const Colonies = () => {
 
   const uploadFile = async () => {
     const reader = new FileReader();
-    reader.readAsText(file);
+          
+    if (file != null && file.size > 0){
+      reader.readAsText(file);
+    }
+    else {
+      alert("Please input a file!");
+    }
+
+    let check = true;
 
     reader.onload = async () => {
       const load = reader.result;
       const data = { payload: load, name: fileName };
-      const colonies = await addColony(data);     
+      if (!isBlank(fileName.trim())) {
+        const colonies = await addColony(data);
+      }
+      else {
+        check = false;
+        alert("Name can not be blank or just spaces!");
+      }
     };
 
     reader.onerror = () => {
       console.log(reader.onerror);
     };
 
-    handleDialogClose();
+    if (check) {
+        handleDialogClose();
+    }
   };
 
+  const isBlank = function(input) {
+    if (input.length === 0) {
+      return true;
+    }
+    return false;
+  }
   /**
  * Updates input for file name.
  *
@@ -182,14 +204,14 @@ const Colonies = () => {
  * @param value
  */
   const updateInput = ({ target: { value } }) => {
-    setFileName(value);
+      setFileName(value);
   };
 
   /* Pagination handler */
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, ownedColonies.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
-    console.log(newPage);
+    console.log(newPage); 
     setPage(newPage);
   };
 
@@ -197,6 +219,7 @@ const Colonies = () => {
     const request = {
       colonyId, colonySize, rowsPerPage, page,
     };
+
     await getAnimals(request);
     setRedirectToAnimals(true);
   };
@@ -230,24 +253,17 @@ const Colonies = () => {
 
       <div className="uploadFile" style={{ textAlign: 'right' }}>
 
-      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick} variant="outlined" color="primary">
-        Sort
-      </Button>
-      <Menu
-        id="simple-menu"
-        anchorEl={anchorEl}
-        keepMounted
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
-        <MenuItem onClick={() => {
+        <Button variant="outlined" color="primary" onClick={() => {
           handleAlpha("colonyName");
-        }}>Sort By Name (A-Z)</MenuItem>
+        }}>
+          Sort by Name
+        </Button>
 
-        <MenuItem onClick={() => {
+        <Button variant="outlined" color="primary" onClick={() => {
           handleSort("size");
-        }}>Sort by Size (Smallest to Greatest)</MenuItem>
-      </Menu>
+        }}>
+          Sort by Size
+        </Button>
 
         <Button variant="outlined" color="primary" startIcon={<Add />} onClick={handleClickDialogOpen}>
           Add Colony
@@ -288,6 +304,11 @@ const Colonies = () => {
                 </TableCell>
                 <TableCell align="right">
                   <Button variant="contained" color="primary" startIcon={<Share />}>Share</Button>
+                  <Button variant="outlined" color="primary" onClick={() => {
+                      deleteColony(ownedColony.colonyId);
+                      }}>
+                      Delete Colony
+                    </Button>
                 </TableCell>
               </TableRow>
             ))}

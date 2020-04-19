@@ -16,6 +16,7 @@ const COLONY = 'COLONY';
 const ANIMALS = 'ANIMALS';
 const SORT = 'SORT';
 const ALPHASORT = 'ALPHASORT'
+const DELETE = 'DELETE'
 
 axios.defaults.withCredentials = true;
 
@@ -38,6 +39,15 @@ const ProfileProvider = ({ children }) => {
       case COLONY: {
         const colonies = [payload, ...prevState.ownedColonies]
         return { ...prevState, ownedColonies: colonies };
+      }
+
+      case DELETE: {
+        const colonies = [...prevState.ownedColonies]
+        const newList = colonies.filter((item, index) => {
+          return item.colonyId !== payload
+        });
+        console.log("deleted Colony ID: ", payload);
+        return { ...prevState, ownedColonies: newList };
       }
 
       case SORT: {
@@ -112,13 +122,17 @@ const useProfileProvider = () => {
       dispatch({ type: COLONY, payload: data });
     });
 
-
   const getAnimals = async pageInfo => axios
     .post(`${BASE_URL}/colony/animals`, pageInfo)
     .then(({ data }) => {
       dispatch({ type: ANIMALS, payload: data });
     });
 
+    const deleteColony = colonyID => axios
+    .post(`${BASE_URL}/colony/delete`, {colonyId: colonyID})  //passing colony id to the colony id object
+    .then(({ data }) => {
+      dispatch({ type: DELETE, payload: colonyID });
+    });
 
     const sortList = (sortBy) => {
       dispatch({ type: SORT, payload: sortBy });
@@ -139,6 +153,7 @@ const useProfileProvider = () => {
     getAnimals,
     sortList,
     sortAlpha,
+    deleteColony,
   };
 };
 

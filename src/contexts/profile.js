@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { createContext, useReducer, useContext } from 'react';
 
 const initialState = { loggedIn: false, name: {} };
-const store  = createContext(initialState);
+const store = createContext(initialState);
 
 const { Provider } = store;
 
@@ -52,8 +52,8 @@ const ProfileProvider = ({ children }) => {
 
       case SORT: {
         const colonies = [...prevState.ownedColonies]
-        colonies.sort((a,b) => { 
-          if (a[payload] < b[payload])  {
+        colonies.sort((a, b) => {
+          if (a[payload] < b[payload]) {
             return -1;  //locations swap
           }
           if (a[payload] > b[payload]) {
@@ -61,21 +61,21 @@ const ProfileProvider = ({ children }) => {
           }
           return 0;
         });
-        return { ...prevState, ownedColonies: colonies};
+        return { ...prevState, ownedColonies: colonies };
       }
 
       case ALPHASORT: {
         const colonies = [...prevState.ownedColonies]
-        colonies.sort((a,b) => {
-          if(a[payload].toLowerCase() < b[payload].toLowerCase()) {
+        colonies.sort((a, b) => {
+          if (a[payload].toLowerCase() < b[payload].toLowerCase()) {
             return -1;
-          } 
-          if(a[payload].toLowerCase() > b[payload].toLowerCase()) {
+          }
+          if (a[payload].toLowerCase() > b[payload].toLowerCase()) {
             return 1;
-          } 
+          }
           return 0;
         });
-        return { ...prevState, ownedColonies: colonies};
+        return { ...prevState, ownedColonies: colonies };
       }
 
       case ANIMALS: {
@@ -122,25 +122,28 @@ const useProfileProvider = () => {
       dispatch({ type: COLONY, payload: data });
     });
 
+  const shareColony = shareInfo => axios
+    .post(`${BASE_URL}/colony/share`, shareInfo);
+
   const getAnimals = async pageInfo => axios
     .post(`${BASE_URL}/colony/animals`, pageInfo)
     .then(({ data }) => {
       dispatch({ type: ANIMALS, payload: data });
     });
 
-    const deleteColony = colonyID => axios
-    .post(`${BASE_URL}/colony/delete`, {colonyId: colonyID})  //passing colony id to the colony id object
+  const deleteColony = colonyID => axios
+    .post(`${BASE_URL}/colony/delete`, { colonyId: colonyID })  //passing colony id to the colony id object
     .then(({ data }) => {
       dispatch({ type: DELETE, payload: colonyID });
     });
 
-    const sortList = (sortBy) => {
-      dispatch({ type: SORT, payload: sortBy });
-    };
+  const sortList = (sortBy) => {
+    dispatch({ type: SORT, payload: sortBy });
+  };
 
-    const sortAlpha = (sortBy) => {
-      dispatch({ type: ALPHASORT, payload: sortBy });
-    };
+  const sortAlpha = (sortBy) => {
+    dispatch({ type: ALPHASORT, payload: sortBy });
+  };
 
 
   return {
@@ -154,6 +157,7 @@ const useProfileProvider = () => {
     sortList,
     sortAlpha,
     deleteColony,
+    shareColony
   };
 };
 

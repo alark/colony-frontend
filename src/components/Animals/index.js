@@ -31,7 +31,6 @@ function TablePaginationActions(props) {
   const {
     page, count, rowsPerPage, onChangePage,
   } = props;
-  console.log('cpount from table', count);
 
   const handleFirstPageButtonClick = (event) => {
     onChangePage(event, 0);
@@ -137,7 +136,6 @@ const Animals = () => {
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals } = useProfileProvider();
   const { animals, colonyId, colonySize } = state;
-
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
 
   const handleChangePage = async (event, newPage) => {

@@ -62,7 +62,7 @@ function TablePaginationActions(props) {
   return (
 
     <div className={classes.root}>
-      
+
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
@@ -131,27 +131,39 @@ const StyledMenuItem = withStyles((theme) => ({
 }))(MenuItem);
 
 const Colonies = () => {
-  const { addColony, deleteColony, getAnimals, sortList, sortAlpha, state: { ownedColonies } } = useProfileProvider();
+  const { addColony, deleteColony, shareColony, getAnimals, sortList, sortAlpha, state: { ownedColonies } } = useProfileProvider();
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
   const classes = tableStyle();
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
-  const [addColonyOpen, setaddColonyOpen] = React.useState(false);
+  const [addDialog, setAddDialogOpen] = React.useState(false);
+  const [shareDialog, setShareDialogOpen] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [shareOpen, setShareOpen] = React.useState(false);
+  const [sharedUser, setSharedUserEmail] = useState('');
 
-  useEffect(()=> {
-      console.log("LATEST LIST: ", ownedColonies);
+  useEffect(() => {
+    console.log("LATEST LIST: ", ownedColonies);
   });
 
-  const handleClickDialogOpen = () => {
-    setaddColonyOpen(true);
+  const openAddDialog = () => {
+    setAddDialogOpen(true);
   };
 
-  const handleDialogClose = () => {
-    setaddColonyOpen(false);
+  const closeAddDialog = () => {
+    setAddDialogOpen(false);
   };
+
+  const openShareDialog = () => {
+    setShareDialogOpen(true);
+  };
+
+  const closeShareDialog = () => {
+    setShareDialogOpen(false);
+  };
+
 
   /* Uploading File. */
   const chooseFile = (event) => {
@@ -160,8 +172,8 @@ const Colonies = () => {
 
   const uploadFile = async () => {
     const reader = new FileReader();
-          
-    if (file != null && file.size > 0){
+
+    if (file != null && file.size > 0) {
       reader.readAsText(file);
     }
     else {
@@ -187,11 +199,11 @@ const Colonies = () => {
     };
 
     if (check) {
-        handleDialogClose();
+      closeShareDialog();
     }
   };
 
-  const isBlank = function(input) {
+  const isBlank = function (input) {
     if (input.length === 0) {
       return true;
     }
@@ -203,15 +215,24 @@ const Colonies = () => {
  * @param name
  * @param value
  */
-  const updateInput = ({ target: { value } }) => {
-      setFileName(value);
+  const updateInputFileName = ({ target: { value } }) => {
+    setFileName(value);
   };
+
+  const updateInputSharedUser = ({target: { value } }) => {
+    setSharedUserEmail(value);
+  }
+
+  const share = (colonyId) => {
+    const data = { email: sharedUser, colonyId: colonyId};
+    shareColony(data);
+  }
 
   /* Pagination handler */
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, ownedColonies.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
-    console.log(newPage); 
+    console.log(newPage);
     setPage(newPage);
   };
 
@@ -223,29 +244,29 @@ const Colonies = () => {
     await getAnimals(request);
     setRedirectToAnimals(true);
   };
-  
-    const handleClick = (event) => {
-      setAnchorEl(event.currentTarget);
-    };
-  
-    const handleClose = () => {
-      setAnchorEl(null);
-    };
 
-    const handleSort = (key) => {
-      sortList(key);
-      handleClose();
-    };
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-    const handleAlpha = (key) => {
-      sortAlpha(key);
-      handleClose();
-    }
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleSort = (key) => {
+    sortList(key);
+    handleClose();
+  };
+
+  const handleAlpha = (key) => {
+    sortAlpha(key);
+    handleClose();
+  }
 
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
   }
-  
+
   return (
     <Container component="main">
       <CssBaseline />
@@ -265,18 +286,18 @@ const Colonies = () => {
           Sort by Size
         </Button>
 
-        <Button variant="outlined" color="primary" startIcon={<Add />} onClick={handleClickDialogOpen}>
+        <Button variant="outlined" color="primary" startIcon={<Add />} onClick={openAddDialog}>
           Add Colony
         </Button>
-        <Dialog open={addColonyOpen} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
+        <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
-          <DialogContent> 
+          <DialogContent>
             <DialogContentText>
               Upload an animal colony along with its name.
             </DialogContentText>
             <input type="file" name="file" onChange={chooseFile} />
             <div>
-              <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInput} />
+              <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
             </div>
           </DialogContent>
           <DialogActions>
@@ -291,23 +312,37 @@ const Colonies = () => {
             {(rowsPerPage > 0
               ? ownedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               : ownedColonies
-            ).map(ownedColony => (
-              <TableRow key={ownedColony.colonyId}>
+            ).map(colony => (
+              <TableRow key={colony.colonyId}>
                 <TableCell
                   style={{ cursor: 'pointer' }}
                   component="th"
                   scope="row"
-                  onClick={async () => await handleCellClick(ownedColony.colonyId, ownedColony.size, rowsPerPage, page)}
+                  onClick={async () => await handleCellClick(colony.colonyId, colony.size, rowsPerPage, page)}
                 >
-                  <div style={{ fontWeight: 'bold', fontSize: 18 }}>{ownedColony.colonyName}</div>
-                  <p style={{ color: '#333333' }}>Size: {ownedColony.size}</p>
+                  <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
+                  <p style={{ color: '#333333' }}>Size: {colony.size}</p>
                 </TableCell>
                 <TableCell align="right">
-                  <Button variant="contained" color="primary" startIcon={<Share />}>Share</Button>
+                  <Button variant="contained" color="primary" startIcon={<Share />} onClick={openShareDialog}>Share</Button>
+                  <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Share animal colony with another user.
+                      </DialogContentText>
+                      <div>
+                        <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
+                      </div>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={share(colony.colonyId)} variant="outlined" color="default">Share</Button>
+                    </DialogActions>
+                  </Dialog>
                   <Button variant="outlined" color="primary" onClick={() => {
-                      deleteColony(ownedColony.colonyId);
-                      }}>
-                      Delete Colony
+                    deleteColony(colony.colonyId);
+                  }}>
+                    Delete Colony
                     </Button>
                 </TableCell>
               </TableRow>

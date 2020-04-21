@@ -315,12 +315,6 @@ const Colonies = () => {
       <h1>Your Colonies</h1>
 
       <div className={classes.root}>
-        <AppBar position="static">
-          <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
-            <Tab label="Your Colonies" {...a11yProps(0)} />
-            <Tab label="Shared Colonies" {...a11yProps(1)} />
-          </Tabs>
-        </AppBar>
         <TabPanel value={tab} index={0}>
           <div className="uploadFile" style={{ textAlign: 'right' }}>
             <Button variant="outlined" color="primary" onClick={() => {
@@ -354,6 +348,12 @@ const Colonies = () => {
             </Dialog>
           </div>
 
+        <AppBar position="static">
+          <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
+            <Tab label="Your Colonies" {...a11yProps(0)} />
+            <Tab label="Shared Colonies" {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
           <TableContainer className={classes.table} component={Paper}>
             <Table className={classes.table} aria-label="custom pagination table">
               <TableBody>
@@ -416,6 +416,7 @@ const Colonies = () => {
             </Table>
           </TableContainer>
         </TabPanel>
+
         <TabPanel value={tab} index={1}>
         <div className="uploadFile" style={{ textAlign: 'right' }}>
             <Button variant="outlined" color="primary" onClick={() => {
@@ -449,6 +450,12 @@ const Colonies = () => {
             </Dialog>
           </div>
 
+        <AppBar position="static">
+          <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
+            <Tab label="Your Colonies" {...a11yProps(0)} />
+            <Tab label="Shared Colonies" {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
           <TableContainer className={classes.table} component={Paper}>
             <Table className={classes.table} aria-label="custom pagination table">
               <TableBody>

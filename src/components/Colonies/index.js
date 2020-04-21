@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
 import { Redirect } from 'react-router-dom';
-
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import { Button, TextField, Container, CssBaseline, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import { AppBar, Button, Box, TextField, Container, CssBaseline, Menu, MenuItem, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableRow, Typography, Paper } from '@material-ui/core';
 import { makeStyles, useTheme, withStyles } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -33,6 +31,43 @@ const paginationStyle = makeStyles(theme => ({
   root: {
     flexShrink: 0,
     marginLeft: theme.spacing(2.5),
+  },
+}));
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </Typography>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+const tabStyle = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.paper,
   },
 }));
 
@@ -131,7 +166,7 @@ const StyledMenuItem = withStyles((theme) => ({
 }))(MenuItem);
 
 const Colonies = () => {
-  const { addColony, deleteColony, shareColony, getAnimals, sortList, sortAlpha, state: { ownedColonies } } = useProfileProvider();
+  const { addColony, deleteColony, shareColony, getAnimals, sortList, sortAlpha, state: { ownedColonies, sharedColonies } } = useProfileProvider();
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
   const classes = tableStyle();
@@ -143,6 +178,13 @@ const Colonies = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [shareOpen, setShareOpen] = React.useState(false);
   const [sharedUser, setSharedUserEmail] = useState('');
+  const tabClasses = tabStyle();
+  const [tab, setTab] = React.useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
+    setPage(0);
+  };
 
   useEffect(() => {
     console.log("LATEST LIST: ", ownedColonies);
@@ -219,12 +261,12 @@ const Colonies = () => {
     setFileName(value);
   };
 
-  const updateInputSharedUser = ({target: { value } }) => {
+  const updateInputSharedUser = ({ target: { value } }) => {
     setSharedUserEmail(value);
   }
 
   const share = (colonyId) => {
-    const data = { email: sharedUser, colonyId: colonyId};
+    const data = { email: sharedUser, colonyId: colonyId };
     shareColony(data);
   }
 
@@ -272,109 +314,204 @@ const Colonies = () => {
       <CssBaseline />
       <h1>Your Colonies</h1>
 
-      <div className="uploadFile" style={{ textAlign: 'right' }}>
+      <div className={classes.root}>
+        <AppBar position="static">
+          <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
+            <Tab label="Your Colonies" {...a11yProps(0)} />
+            <Tab label="Shared Colonies" {...a11yProps(1)} />
+          </Tabs>
+        </AppBar>
+        <TabPanel value={tab} index={0}>
+          <div className="uploadFile" style={{ textAlign: 'right' }}>
+            <Button variant="outlined" color="primary" onClick={() => {
+              handleAlpha("colonyName");
+            }}>
+              Sort by Name
+                </Button>
 
-        <Button variant="outlined" color="primary" onClick={() => {
-          handleAlpha("colonyName");
-        }}>
-          Sort by Name
-        </Button>
+            <Button variant="outlined" color="primary" onClick={() => {
+              handleSort("size");
+            }}>
+              Sort by Size
+                </Button>
+            <Button variant="outlined" color="primary" startIcon={<Add />} onClick={openAddDialog}>
+              Add Colony
+                </Button>
+            <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
+              <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Upload an animal colony along with its name.
+                    </DialogContentText>
+                <input type="file" name="file" onChange={chooseFile} />
+                <div>
+                  <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
+                </div>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={uploadFile} variant="outlined" color="default" startIcon={<CloudUploadIcon />}>Upload</Button>
+              </DialogActions>
+            </Dialog>
+          </div>
 
-        <Button variant="outlined" color="primary" onClick={() => {
-          handleSort("size");
-        }}>
-          Sort by Size
-        </Button>
+          <TableContainer className={classes.table} component={Paper}>
+            <Table className={classes.table} aria-label="custom pagination table">
+              <TableBody>
+                {(rowsPerPage > 0
+                  ? ownedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : ownedColonies
+                ).map(colony => (
+                  <TableRow key={colony.colonyId}>
+                    <TableCell
+                      style={{ cursor: 'pointer' }}
+                      component="th"
+                      scope="row"
+                      onClick={async () => await handleCellClick(colony.colonyId, colony.size, rowsPerPage, page)}
+                    >
+                      <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
+                      <p style={{ color: '#333333' }}>Size: {colony.size}</p>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Button variant="contained" color="primary" startIcon={<Share />} onClick={openShareDialog}>Share</Button>
+                      <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
+                        <DialogContent>
+                          <DialogContentText>
+                            Share animal colony with another user.
+                              </DialogContentText>
+                          <div>
+                            <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
+                          </div>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={share(colony.colonyId)} variant="outlined" color="default">Share</Button>
+                        </DialogActions>
+                      </Dialog>
+                      <Button variant="outlined" color="primary" onClick={() => {
+                        deleteColony(colony.colonyId);
+                      }}>
+                        Delete Colony
+                          </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[]}
+                    colSpan={3}
+                    count={ownedColonies.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      inputProps: { 'aria-label': 'rows per page' },
+                      native: true,
+                    }}
+                    onChangePage={handleChangePage}
+                    ActionsComponent={TablePaginationActions}
+                  />
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </TableContainer>
+        </TabPanel>
+        <TabPanel value={tab} index={1}>
+        <div className="uploadFile" style={{ textAlign: 'right' }}>
+            <Button variant="outlined" color="primary" onClick={() => {
+              handleAlpha("colonyName");
+            }}>
+              Sort by Name
+                </Button>
 
-        <Button variant="outlined" color="primary" startIcon={<Add />} onClick={openAddDialog}>
-          Add Colony
-        </Button>
-        <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Upload an animal colony along with its name.
-            </DialogContentText>
-            <input type="file" name="file" onChange={chooseFile} />
-            <div>
-              <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
-            </div>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={uploadFile} variant="outlined" color="default" startIcon={<CloudUploadIcon />}>Upload</Button>
-          </DialogActions>
-        </Dialog>
+            <Button variant="outlined" color="primary" onClick={() => {
+              handleSort("size");
+            }}>
+              Sort by Size
+                </Button>
+            <Button variant="outlined" color="primary" startIcon={<Add />} onClick={openAddDialog}>
+              Add Colony
+                </Button>
+            <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
+              <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Upload an animal colony along with its name.
+                    </DialogContentText>
+                <input type="file" name="file" onChange={chooseFile} />
+                <div>
+                  <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
+                </div>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={uploadFile} variant="outlined" color="default" startIcon={<CloudUploadIcon />}>Upload</Button>
+              </DialogActions>
+            </Dialog>
+          </div>
+
+          <TableContainer className={classes.table} component={Paper}>
+            <Table className={classes.table} aria-label="custom pagination table">
+              <TableBody>
+                {(rowsPerPage > 0
+                  ? sharedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  : sharedColonies
+                ).map(colony => (
+                  <TableRow key={colony.colonyId}>
+                    <TableCell
+                      style={{ cursor: 'pointer' }}
+                      component="th"
+                      scope="row"
+                      onClick={async () => await handleCellClick(colony.colonyId, colony.size, rowsPerPage, page)}
+                    >
+                      <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
+                      <p style={{ color: '#333333' }}>Size: {colony.size}</p>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Button variant="contained" color="primary" startIcon={<Share />} onClick={openShareDialog}>Share</Button>
+                      <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
+                        <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
+                        <DialogContent>
+                          <DialogContentText>
+                            Share animal colony with another user.
+                              </DialogContentText>
+                          <div>
+                            <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
+                          </div>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={share(colony.colonyId)} variant="outlined" color="default">Share</Button>
+                        </DialogActions>
+                      </Dialog>
+                      <Button variant="outlined" color="primary" onClick={() => {
+                        deleteColony(colony.colonyId);
+                      }}>
+                        Delete Colony
+                          </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[]}
+                    colSpan={3}
+                    count={ownedColonies.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    SelectProps={{
+                      inputProps: { 'aria-label': 'rows per page' },
+                      native: true,
+                    }}
+                    onChangePage={handleChangePage}
+                    ActionsComponent={TablePaginationActions}
+                  />
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </TableContainer>
+      </TabPanel>
       </div>
-
-      <TableContainer className={classes.table} component={Paper}>
-        <Table className={classes.table} aria-label="custom pagination table">
-          <TableBody>
-            {(rowsPerPage > 0
-              ? ownedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : ownedColonies
-            ).map(colony => (
-              <TableRow key={colony.colonyId}>
-                <TableCell
-                  style={{ cursor: 'pointer' }}
-                  component="th"
-                  scope="row"
-                  onClick={async () => await handleCellClick(colony.colonyId, colony.size, rowsPerPage, page)}
-                >
-                  <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
-                  <p style={{ color: '#333333' }}>Size: {colony.size}</p>
-                </TableCell>
-                <TableCell align="right">
-                  <Button variant="contained" color="primary" startIcon={<Share />} onClick={openShareDialog}>Share</Button>
-                  <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
-                    <DialogContent>
-                      <DialogContentText>
-                        Share animal colony with another user.
-                      </DialogContentText>
-                      <div>
-                        <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
-                      </div>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={share(colony.colonyId)} variant="outlined" color="default">Share</Button>
-                    </DialogActions>
-                  </Dialog>
-                  <Button variant="outlined" color="primary" onClick={() => {
-                    deleteColony(colony.colonyId);
-                  }}>
-                    Delete Colony
-                    </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-            {/*
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6}><p style= {{ color: 'rgba(224, 224, 224, 1)' ,fontWeight: 'bold', fontSize: 18, textAlign: 'center'}}>No Colonies</p></TableCell>
-              </TableRow>
-            )}
-            */}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[]}
-                colSpan={3}
-                count={ownedColonies.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                SelectProps={{
-                  inputProps: { 'aria-label': 'rows per page' },
-                  native: true,
-                }}
-                onChangePage={handleChangePage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
-
     </Container >
   );
 };

@@ -384,7 +384,7 @@ const Colonies = () => {
                           </div>
                         </DialogContent>
                         <DialogActions>
-                          <Button onClick={share(colony.colonyId)} variant="outlined" color="default">Share</Button>
+                          <Button onClick={() => share(colony.colonyId)} variant="outlined" color="default">Share</Button>
                         </DialogActions>
                       </Dialog>
                       <Button variant="outlined" color="primary" onClick={() => {
@@ -486,7 +486,7 @@ const Colonies = () => {
                           </div>
                         </DialogContent>
                         <DialogActions>
-                          <Button onClick={share(colony.colonyId)} variant="outlined" color="default">Share</Button>
+                          <Button onClick={() => share(colony.colonyId)} variant="outlined" color="default">Share</Button>
                         </DialogActions>
                       </Dialog>
                       <Button variant="outlined" color="primary" onClick={() => {

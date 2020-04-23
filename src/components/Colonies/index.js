@@ -3,7 +3,7 @@ import ColoniesTable from 'components/ColoniesTable';
 import SharedColoniesTable from 'components/SharedColoniesTable';
 import { useProfileProvider } from 'contexts/profile';
 import PropTypes from 'prop-types';
-import { AppBar, Toolbar, Button, Box, TextField, Container, CssBaseline, Menu, MenuItem, Tabs, Tab, Typography } from '@material-ui/core';
+import { AppBar, Toolbar, Button, Box, TextField, Container, CssBaseline, Grid, Tabs, Tab, Typography } from '@material-ui/core';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Dialog from '@material-ui/core/Dialog';
@@ -155,27 +155,39 @@ const Colonies = () => {
 
       <div className={tabClasses.root}>
         <AppBar position="static">
-          <Toolbar>
             <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
-              <Tab label="Your Colonies" {...a11yProps(0)} />
-              <Tab label="Shared Colonies" {...a11yProps(1)} />
+              <Tab label="My Colonies" {...a11yProps(0)} />
+              <Tab label="Shared With Me" {...a11yProps(1)} />
             </Tabs>
 
-            <Button color="inherit" onClick={() => {
-              handleAlpha("colonyName");
-            }}>
-              Sort by Name
-            </Button>
+          <Grid
+            justify="flex-end" // Add it here :)
+            container 
+            spacing={12}
+            alignItems="flex-end"
+          >
+            <Grid item>
+              <Button color="inherit" variant="outlined" onClick={() => {
+                handleAlpha("colonyName");
+              }}>
+                Sort by Name
+              </Button>
+            </Grid>
 
-            <Button color="inherit" onClick={() => {
-              handleSort("size");
-            }}>
-              Sort by Size
-            </Button>
+            <Grid item>
+              <Button color="inherit" variant="outlined" onClick={() => {
+                handleSort("size");
+              }}>
+                Sort by Size
+              </Button>
 
-            <Button startIcon={<Add />} color="inherit" onClick={openAddDialog}>
-              Add Colony
-            </Button>
+            </Grid>
+            <Grid item>
+              <Button startIcon={<Add />} color="inherit" variant="outlined" onClick={openAddDialog}>
+                Add Colony
+              </Button>
+            </Grid>
+          </Grid>
 
             <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
               <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
@@ -192,7 +204,6 @@ const Colonies = () => {
                 <Button onClick={uploadFile} startIcon={<CloudUploadIcon />}>Upload</Button>
               </DialogActions>
             </Dialog>
-          </Toolbar>
 
         <TabPanel value={tab} index={0}>
           <ColoniesTable />

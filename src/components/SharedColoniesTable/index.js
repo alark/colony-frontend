@@ -120,9 +120,9 @@ const SharedColoniesTable = () => {
     setPage(newPage);
   };
 
-  const handleCellClick = async (colonyId, colonySize, rowsPerPage, page) => {
+  const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
     const request = {
-      colonyId, colonySize, rowsPerPage, page,
+      colonyId, colonyName, colonySize, rowsPerPage, page,
     };
 
     await getAnimals(request);
@@ -146,7 +146,7 @@ const SharedColoniesTable = () => {
                 style={{ cursor: 'pointer' }}
                 component="th"
                 scope="row"
-                onClick={async () => await handleCellClick(colony.colonyId, colony.size, rowsPerPage, page)}
+                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, rowsPerPage, page)}
               >
                 <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>

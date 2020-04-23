@@ -151,7 +151,7 @@ const Colonies = () => {
   return (
     <Container component="main">
       <CssBaseline />
-      <h1>Your Colonies</h1>
+      <h1 style={{fontFamily:'Courier New'}}>Home</h1>
 
       <div className={tabClasses.root}>
         <AppBar position="static">
@@ -166,7 +166,7 @@ const Colonies = () => {
             spacing={12}
             alignItems="flex-end"
           >
-            <Grid item>
+            <Grid style={{paddingRight: 10}} item>
               <Button color="inherit" variant="outlined" onClick={() => {
                 handleAlpha("colonyName");
               }}>
@@ -174,7 +174,7 @@ const Colonies = () => {
               </Button>
             </Grid>
 
-            <Grid item>
+            <Grid style={{paddingRight: 10}} item>
               <Button color="inherit" variant="outlined" onClick={() => {
                 handleSort("size");
               }}>
@@ -182,7 +182,7 @@ const Colonies = () => {
               </Button>
 
             </Grid>
-            <Grid item>
+            <Grid style={{paddingRight: 25}} item>
               <Button startIcon={<Add />} color="inherit" variant="outlined" onClick={openAddDialog}>
                 Add Colony
               </Button>

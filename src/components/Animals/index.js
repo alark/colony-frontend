@@ -168,7 +168,8 @@ const Animals = () => {
   return (
     <Container component="main" style={{ padding: 8 }}>
       <CssBaseline />
-      <h1>Colony: {colonyName}</h1>
+      <h1 style={{fontFamily:'Courier New'}}>Colony: {colonyName}</h1>
+
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
           <TableRow>

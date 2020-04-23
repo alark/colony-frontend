@@ -33,7 +33,7 @@ use it to sync packages for the project.
 
 To install the dependencies do
 ```bash
-cd animal-colony-frontend
+cd colony-frontend
 npm install
 ```
 

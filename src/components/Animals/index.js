@@ -4,7 +4,6 @@ import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
@@ -136,7 +135,7 @@ const Animals = () => {
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals } = useProfileProvider();
   const { animals, colonyId, colonySize } = state;
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
+  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
 
   const handleChangePage = async (event, newPage) => {
     const request = {

@@ -3,7 +3,7 @@ import ColoniesTable from 'components/ColoniesTable';
 import SharedColoniesTable from 'components/SharedColoniesTable';
 import { useProfileProvider } from 'contexts/profile';
 import PropTypes from 'prop-types';
-import { AppBar, Button, Box, TextField, Container, CssBaseline, Menu, MenuItem, Tabs, Tab, Typography } from '@material-ui/core';
+import { AppBar, Toolbar, Button, Box, TextField, Container, CssBaseline, Menu, MenuItem, Tabs, Tab, Typography } from '@material-ui/core';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Dialog from '@material-ui/core/Dialog';
@@ -49,37 +49,6 @@ const tabStyle = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
   },
 }));
-
-const StyledMenu = withStyles({
-  paper: {
-    border: '1px solid #d3d4d5',
-  },
-})((props) => (
-  <Menu
-    elevation={0}
-    getContentAnchorEl={null}
-    anchorOrigin={{
-      vertical: 'bottom',
-      horizontal: 'center',
-    }}
-    transformOrigin={{
-      vertical: 'top',
-      horizontal: 'center',
-    }}
-    {...props}
-  />
-));
-
-const StyledMenuItem = withStyles((theme) => ({
-  root: {
-    '&:focus': {
-      backgroundColor: theme.palette.primary.main,
-      '& .MuiListItemIcon-root, & .MuiListItemText-primary': {
-        color: theme.palette.common.white,
-      },
-    },
-  },
-}))(MenuItem);
 
 const Colonies = () => {
   const { addColony, sortList, sortAlpha, state: { ownedColonies, sharedColonies } } = useProfileProvider();
@@ -186,27 +155,28 @@ const Colonies = () => {
 
       <div className={tabClasses.root}>
         <AppBar position="static">
-          <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
-            <Tab label="Your Colonies" {...a11yProps(0)} />
-            <Tab label="Shared Colonies" {...a11yProps(1)} />
-          </Tabs>
-        </AppBar>
+          <Toolbar>
+            <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
+              <Tab label="Your Colonies" {...a11yProps(0)} />
+              <Tab label="Shared Colonies" {...a11yProps(1)} />
+            </Tabs>
 
-        <TabPanel value={tab} index={0}>
-          <div className="uploadFile" style={{ textAlign: 'right' }}>
-            <Button variant="outlined" color="primary" onClick={() => {
+            <Button color="inherit" onClick={() => {
               handleAlpha("colonyName");
             }}>
               Sort by Name
             </Button>
-            <Button variant="outlined" color="primary" onClick={() => {
+
+            <Button color="inherit" onClick={() => {
               handleSort("size");
             }}>
               Sort by Size
             </Button>
-            <Button variant="outlined" color="primary" startIcon={<Add />} onClick={openAddDialog}>
+
+            <Button startIcon={<Add />} color="inherit" onClick={openAddDialog}>
               Add Colony
             </Button>
+
             <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
               <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
               <DialogContent>
@@ -219,43 +189,20 @@ const Colonies = () => {
                 </div>
               </DialogContent>
               <DialogActions>
-                <Button onClick={uploadFile} variant="outlined" color="default" startIcon={<CloudUploadIcon />}>Upload</Button>
+                <Button onClick={uploadFile} startIcon={<CloudUploadIcon />}>Upload</Button>
               </DialogActions>
             </Dialog>
-          </div>
+          </Toolbar>
+
+        <TabPanel value={tab} index={0}>
           <ColoniesTable />
         </TabPanel>
 
         <TabPanel value={tab} index={1}>
-          <div className="uploadFile" style={{ textAlign: 'right' }}>
-            <Button variant="outlined" color="primary" onClick={() => {
-              handleAlpha("colonyName");
-            }}>
-              Sort by Name
-            </Button>
-            <Button variant="outlined" color="primary" onClick={() => {
-              handleSort("size");
-            }}>
-              Sort by Size
-            </Button>
-            <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
-              <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  Upload an animal colony along with its name.
-                    </DialogContentText>
-                <input type="file" name="file" onChange={chooseFile} />
-                <div>
-                  <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
-                </div>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={uploadFile} variant="outlined" color="default" startIcon={<CloudUploadIcon />}>Upload</Button>
-              </DialogActions>
-            </Dialog>
-          </div>
           <SharedColoniesTable />
         </TabPanel>
+        </AppBar>
+
       </div>
     </Container >
   );

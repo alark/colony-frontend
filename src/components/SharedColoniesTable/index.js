@@ -167,7 +167,7 @@ const SharedColoniesTable = () => {
                     <Button onClick={() => share(colony.colonyId)} variant="contained" color="default">Share</Button>
                   </DialogActions>
                 </Dialog>
-                <Button variant="contained" color="secondary" onClick={() => {
+                <Button variant="contained" color="primary" onClick={() => {
                   deleteColony(colony.colonyId);
                 }}>
                   Remove

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Avatar } from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Avatar, AppBar } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -134,12 +134,12 @@ const Animals = () => {
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals } = useProfileProvider();
-  const { animals, colonyId, colonySize } = state;
+  const { animals, colonyId, colonySize, colonyName } = state;
   // const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
 
   const handleChangePage = async (event, newPage) => {
     const request = {
-      colonyId, colonySize, rowsPerPage, page: newPage,
+      colonyId, colonyName, colonySize, rowsPerPage, page: newPage,
     };
     await getAnimals(request);
     setPage(newPage);
@@ -168,7 +168,7 @@ const Animals = () => {
   return (
     <Container component="main" style={{ padding: 8 }}>
       <CssBaseline />
-      <h1>Colony X</h1>
+      <h1>Colony: {colonyName}</h1>
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
           <TableRow>
@@ -225,13 +225,6 @@ const Animals = () => {
                 </TableCell>
               </TableRow>
             ))}
-            {/*
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
-  */}
           </TableBody>
 
           <TableFooter>

@@ -7,7 +7,17 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-import {useProfileProvider} from 'contexts/profile';
+import { useProfileProvider } from 'contexts/profile';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
 const useStyles2 = makeStyles(theme => ({
   table: {
@@ -52,7 +62,8 @@ const useStyles2 = makeStyles(theme => ({
 
 const SingleAnimal = (props) => {
   const { id } = useParams();
-  const classes = useStyles2();
+  const classes = useStyles();
+  const classesTwo = useStyles2();
   const { logout } = useProfileProvider();
   const [currentAnimal, setCurrentAnimal] = useState(props.location.state.animal);
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
@@ -89,120 +100,120 @@ const SingleAnimal = (props) => {
 
   return (
     <div>
-      <div style={{ textAlign: 'left' }}>
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
-          Logout
+      <div className={classes.root} style={{ textAlign: 'left' }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
+          <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
+            Logout
         </Link>
-        <Link color="inherit" onClick={() => setRedirectToColonies(true)}>
-          Colonies
+          <Link color="inherit" onClick={() => setRedirectToColonies(true)}>
+            Colonies
         </Link>
-        <Link color="inherit" onClick={() => setRedirectToAnimals(true)}>
-          Colony
+          <Link color="inherit" onClick={() => setRedirectToAnimals(true)}>
+            Colony
         </Link>
-        <Link
-        color="textPrimary"
-        aria-current="page"
-        >
-          Current Animal
+          <Link
+            color="textPrimary"
+            aria-current="page"
+          >
+            Current Animal
         </Link>
-      </Breadcrumbs>
+        </Breadcrumbs>
       </div>
-    <Container component="main">
-      <CssBaseline />
-      <div className={classes.paper}>
+      <Container component="main">
+        <CssBaseline />
+        <div className={classesTwo.paper}>
 
-        <Card className={classes.root}>
-          <CardMedia
-            className={classes.cover}
-            image="https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg"
-            title="Rat"
-          />
-          <div className={classes.details}>
-            <CardContent className={classes.content}>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>ID:</strong> {currentAnimal.mouseId}
+          <Card className={classesTwo.root}>
+            <CardMedia
+              className={classesTwo.cover}
+              image="https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg"
+              title="Rat"
+            />
+            <div className={classesTwo.details}>
+              <CardContent className={classesTwo.content}>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>ID:</strong> {currentAnimal.mouseId}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Species:</strong> My Species
               </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Species:</strong> My Species
-              </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Date of birth:</strong> {currentAnimal.dobMonth}/{currentAnimal.dobDay}/{currentAnimal.dobYear}
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Date of birth:</strong> {currentAnimal.dobMonth}/{currentAnimal.dobDay}/{currentAnimal.dobYear}
+                </Typography>
+
+                {
+                  currentAnimal.dodDay > 0 ?
+                    <Typography variant="subtitle1" color="textSecondary">
+                      <strong>Date of death:</strong> {currentAnimal.dodMonth}/{currentAnimal.dodDay}/{currentAnimal.dodYear}
+                    </Typography>
+                    : null
+                }
+
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Litter:</strong> {currentAnimal.litter}
+                </Typography>
+              </CardContent>
+
+              <CardContent className={classesTwo.content}>
+
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Father ID:</strong> {currentAnimal.fatherId}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Mother ID:</strong> {currentAnimal.motherId}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Gene 1</strong> {currentAnimal.gene1}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Gene 2</strong> {currentAnimal.gene2}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Gene 3</strong> Y
               </Typography>
 
-              {
-                currentAnimal.dodDay > 0 ?
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Date of death:</strong> {currentAnimal.dodMonth}/{currentAnimal.dodDay}/{currentAnimal.dodYear}
-                  </Typography>
-              : null
-              }
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Litter:</strong> {currentAnimal.litter}
+                </Typography>
+              </CardContent>
 
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Litter:</strong> {currentAnimal.litter}
-              </Typography>
-            </CardContent>
-
-            <CardContent className={classes.content}>
-
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Father ID:</strong> {currentAnimal.fatherId}
-              </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Mother ID:</strong> {currentAnimal.motherId}
-              </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Gene 1</strong> {currentAnimal.gene1}
-              </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Gene 2</strong> {currentAnimal.gene2}
-              </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Gene 3</strong> Y
-              </Typography>
-
-              <Typography variant="subtitle1" color="textSecondary">
-                <strong>Litter:</strong> {currentAnimal.litter}
-              </Typography>
-            </CardContent>
-
-            <div className={classes.controls}>
-              <Button
-                onClick={() => {
-                setRedirectToAnimals(true);
-              }}
-                variant="outlined"
-                color="primary"
-              >Back
+              <div className={classesTwo.controls}>
+                <Button
+                  onClick={() => {
+                    setRedirectToAnimals(true);
+                  }}
+                  variant="outlined"
+                  color="primary"
+                >Back
               </Button>
+              </div>
+            </div>
+
+          </Card>
+
+          <div className={classesTwo.details} style={{ flexDirection: 'column' }}>
+            <div>
+              <TextField
+                id="filled-full-width"
+                label="Notes"
+                placeholder="Type your notes here"
+                style={{ margin: 8 }}
+                className={classesTwo.textField}
+                fullWidth
+                onChange={onNotesAdded}
+                margin="normal"
+                variant="outlined"
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </div>
+            <div className={classesTwo.controls} style={{ paddingRight: 0 }}>
+              <Button onClick={onSaveNotes} variant="contained" color="primary">Save</Button>
             </div>
           </div>
-
-        </Card>
-
-        <div className={classes.details} style={{ flexDirection: 'column' }}>
-          <div>
-            <TextField
-              id="filled-full-width"
-              label="Notes"
-              placeholder="Type your notes here"
-              style={{ margin: 8 }}
-              className={classes.textField}
-              fullWidth
-              onChange={onNotesAdded}
-              margin="normal"
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </div>
-          <div className={classes.controls} style={{ paddingRight: 0 }}>
-            <Button onClick={onSaveNotes} variant="contained" color="primary">Save</Button>
-          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
     </div>
   );
 };

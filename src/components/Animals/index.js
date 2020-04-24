@@ -15,6 +15,7 @@ import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
 
 import IconButton from '@material-ui/core/IconButton';
+import DeleteIcon from '@material-ui/icons/Delete';
 import { Redirect } from 'react-router-dom';
 
 const paginationStyle = makeStyles(theme => ({
@@ -133,7 +134,7 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
-  const { state, getAnimals } = useProfileProvider();
+  const { state, getAnimals, deleteAnimal } = useProfileProvider();
   const { animals, colonyId, colonySize, colonyName } = state;
   // const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
 
@@ -152,6 +153,13 @@ const Animals = () => {
 
   const handleCloseModal = () => {
     setOpenModal(false);
+  };
+
+  const deleteChosenAnimal = async (animalId) => {
+    const request = {
+      colonyId, animalId,
+    };
+    await deleteAnimal(request);
   };
 
   if (redirectToDetails) {
@@ -223,6 +231,14 @@ const Animals = () => {
                     }}
                   >Details
                   </Button>
+
+                  <IconButton aria-label="delete" className={classes.margin}>
+                    <DeleteIcon 
+                      onClick={() => {
+                        deleteChosenAnimal(animal.animalUUID);
+                    }}/>
+                  </IconButton>
+                  
                 </TableCell>
               </TableRow>
             ))}

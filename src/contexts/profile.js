@@ -15,8 +15,9 @@ const REGISTER = 'REGISTER';
 const COLONY = 'COLONY';
 const ANIMALS = 'ANIMALS';
 const SORT = 'SORT';
-const ALPHASORT = 'ALPHASORT'
-const DELETE = 'DELETE'
+const ALPHASORT = 'ALPHASORT';
+const DELETE = 'DELETE';
+const DELETEANIMAL = 'DELETEANIMAL';
 
 axios.defaults.withCredentials = true;
 
@@ -48,6 +49,15 @@ const ProfileProvider = ({ children }) => {
         });
         console.log("deleted Colony ID: ", payload);
         return { ...prevState, ownedColonies: newList };
+      }
+
+      case DELETEANIMAL: {
+        const animals = [...prevState.animals]
+        const newList = animals.filter((item, index) => {
+          return item.animalUUID !== payload
+        });
+        console.log("deleted animal ID: ", payload);
+        return { ...prevState, animals: newList };
       }
 
       case SORT: {
@@ -137,6 +147,12 @@ const useProfileProvider = () => {
       dispatch({ type: DELETE, payload: colonyID });
     });
 
+  const deleteAnimal = request => axios
+    .post(`${BASE_URL}/colony/deleteAnimal`, request)  //passing colony id to the colony id object
+    .then(({ data }) => {
+      dispatch({ type: DELETEANIMAL, payload: request.animalId });
+    });
+
   const sortList = (sortBy) => {
     dispatch({ type: SORT, payload: sortBy });
   };
@@ -157,6 +173,7 @@ const useProfileProvider = () => {
     sortList,
     sortAlpha,
     deleteColony,
+    deleteAnimal,
     shareColony
   };
 };

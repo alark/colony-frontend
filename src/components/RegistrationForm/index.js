@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, TextField, Grid, Container, CssBaseline, Typography } from '@material-ui/core';
+import { Button, Breadcrumbs, Link, TextField, Grid, Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 const Register = () => {
@@ -64,13 +64,17 @@ const Register = () => {
   return (
     <div>
       <div style={{ textAlign: 'left' }}>
-        <Button
-          variant="outlined"
-          color="default"
-          onClick={() => setRedirectToLogin(true)}
-        >
-          Back to Login
-        </Button>
+
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
+            Logout
+          </Link>
+          <Link 
+          color="textPrimary"
+          aria-current="page">
+            Register
+          </Link>
+        </Breadcrumbs>
       </div>
       <Container component="main" maxWidth="xs">
         <CssBaseline />

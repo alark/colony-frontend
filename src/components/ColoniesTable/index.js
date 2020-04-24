@@ -109,7 +109,7 @@ const ColoniesTable = () => {
   const [shareDialog, setShareDialogOpen] = React.useState(false);
   const [sharedUser, setSharedUserEmail] = useState('');
   const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
-  const [accessRights, setAccessRights] = React.useState(false);
+  const [accessRightsShare, setAccessRights] = React.useState(false);
 
   const openShareDialog = () => {
     setShareDialogOpen(true);
@@ -132,7 +132,7 @@ const ColoniesTable = () => {
   }
 
   const share = async (colonyId) => {
-    const data = { email: sharedUser, colonyId, accessRights };
+    const data = { email: sharedUser, colonyId, accessRights: accessRightsShare };
     console.log(data);
     await shareColony(data);
   }
@@ -146,7 +146,7 @@ const ColoniesTable = () => {
 
   const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
     const request = {
-      colonyId, colonyName, colonySize, rowsPerPage, page,
+      colonyId, accessRights: true, colonyName, colonySize, rowsPerPage, page,
     };
 
     await getAnimals(request);

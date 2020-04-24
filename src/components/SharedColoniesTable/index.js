@@ -107,7 +107,7 @@ const SharedColoniesTable = () => {
   const handleCellClick = async (colonyId, colonyName, colonySize, accessRights) => {
     console.log(accessRights);
     const request = {
-      colonyId, colonyName, colonySize, rowsPerPage, page, 
+      colonyId, colonyName, accessRights, colonySize, rowsPerPage, page, 
     };
 
     await getAnimals(request);
@@ -142,7 +142,7 @@ const SharedColoniesTable = () => {
                 <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
                 <DialogActions>
                   <Button variant="contained" color="secondary" onClick={() => {
-                    deleteColony(colony.colonyId);
+                      deleteColony(colony.colonyId);
                   }}>
                     Delete
                   </Button>

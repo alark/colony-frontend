@@ -137,17 +137,9 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
-  const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
-  const { animals, colonyId, colonySize, colonyName } = state;
-
-  const openDeleteDialog = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const closeDeleteDialog = () => {
-    setDeleteDialogOpen(false);
-  };
+  const { animals, accessRights, colonyId, colonySize, colonyName } = state;
+  console.log("rights:", accessRights);
 
   const handleChangePage = async (event, newPage) => {
     const request = {

@@ -151,7 +151,7 @@ const Colonies = () => {
   return (
     <Container component="main">
       <CssBaseline />
-      <h1 style={{fontFamily:'Courier New'}}>Home</h1>
+      <h1>Home</h1>
 
       <div className={tabClasses.root}>
         <AppBar position="static">

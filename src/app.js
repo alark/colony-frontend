@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-d
 import { ProfileProvider, useProfileProvider } from 'contexts/profile';
 import HomePage from 'features/HomePage';
 import Dashboard from 'features/Dashboard';
-import Colony from 'features/Colony';
+import ColonyPage from 'features/ColonyPage';
 import Registration from 'features/Registration';
 import Animals from './components/Animals';
 import SingleAnimal from './components/SingleAnimal';
@@ -18,7 +18,7 @@ const App = () => (
     <ProfileProvider>
       <Switch>
         <ProtectedRoute exact path="/dashboard" component={Dashboard} />
-        <ProtectedRoute path="/dashboard/colony" component={Colony} />
+        <ProtectedRoute path="/dashboard/colony" component={ColonyPage} />
         <ProtectedRoute path="/animals/:id" component={Animals} />
         <ProtectedRoute path="/animal/:id" component={SingleAnimal} />
         <Route exact path="/" component={HomePage} />

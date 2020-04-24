@@ -14,10 +14,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Colony = () => {
-  const { logout } = useProfileProvider();
+const ColonyPage = () => {
+  const { logout, state } = useProfileProvider();
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
+  const { colonyName } = state;
 
   const classes = useStyles();
 
@@ -44,7 +45,7 @@ const Colony = () => {
             color="textPrimary"
             aria-current="page"
           >
-            Current Colony
+            {colonyName}
         </Link>
         </Breadcrumbs>
       </div>
@@ -53,4 +54,4 @@ const Colony = () => {
   );
 };
 
-export default Colony;
+export default ColonyPage;

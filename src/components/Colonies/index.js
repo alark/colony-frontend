@@ -163,7 +163,7 @@ const Colonies = () => {
           <Grid
             justify="flex-end" // Add it here :)
             container 
-            spacing={12}
+            spacing={1}
             alignItems="flex-end"
           >
             <Grid style={{paddingRight: 10}} item>
@@ -182,7 +182,7 @@ const Colonies = () => {
               </Button>
 
             </Grid>
-            <Grid style={{paddingRight: 25}} item>
+            <Grid style={{paddingRight: 28}} item>
               <Button startIcon={<Add />} color="inherit" variant="outlined" onClick={openAddDialog}>
                 Add Colony
               </Button>

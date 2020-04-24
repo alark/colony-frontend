@@ -10,6 +10,9 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -87,6 +90,15 @@ const SharedColoniesTable = () => {
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
+  const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
+
+  const openDeleteDialog = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -125,11 +137,17 @@ const SharedColoniesTable = () => {
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>
               </TableCell>
               <TableCell align="right">
-                <Button variant="contained" color="primary" onClick={() => {
-                  deleteColony(colony.colonyId);
-                }}>
-                  Remove
-                </Button>
+              <Button variant="contained" color="primary" onClick={openDeleteDialog}>Remove</Button>
+              <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
+                <DialogActions>
+                  <Button variant="contained" color="secondary" onClick={() => {
+                    deleteColony(colony.colonyId);
+                  }}>
+                    Delete
+                  </Button>
+                </DialogActions>
+              </Dialog>
               </TableCell>
             </TableRow>
           ))}

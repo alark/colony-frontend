@@ -19,9 +19,6 @@ import Share from '@material-ui/icons/Share';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormLabel from '@material-ui/core/FormLabel';
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -111,6 +108,7 @@ const ColoniesTable = () => {
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [shareDialog, setShareDialogOpen] = React.useState(false);
   const [sharedUser, setSharedUserEmail] = useState('');
+  const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
   const [accessRights, setAccessRights] = React.useState(false);
 
   const openShareDialog = () => {
@@ -119,6 +117,14 @@ const ColoniesTable = () => {
 
   const closeShareDialog = () => {
     setShareDialogOpen(false);
+  };
+
+  const openDeleteDialog = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
   };
 
   const updateInputSharedUser = ({ target: { value } }) => {
@@ -191,17 +197,23 @@ const ColoniesTable = () => {
                         <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
                         <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
                       </RadioGroup>
-                      <Button type="submit" variant="outlined" color="primary" className={radioStyle.button} onClick={ async () => await share(colony.colonyId) }>
+                      <Button variant="outlined" color="primary" className={radioStyle.button} onClick={ async () => await share(colony.colonyId) }>
                         Share
                       </Button>
 
                 </DialogActions>
               </Dialog>
-              <Button variant="contained" color="primary" onClick={() => {
-                deleteColony(colony.colonyId);
-              }}>
-                Remove
+              <Button variant="contained" color="primary" onClick={openDeleteDialog}>Remove</Button>
+              <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
+                <DialogActions>
+                  <Button variant="contained" color="secondary" onClick={() => {
+                    deleteColony(colony.colonyId);
+                  }}>
+                    Delete
                   </Button>
+                </DialogActions>
+              </Dialog>
             </TableCell>
           </TableRow>
         ))}

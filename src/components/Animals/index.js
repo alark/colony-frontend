@@ -13,6 +13,9 @@ import { red } from '@material-ui/core/colors';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -134,9 +137,17 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
+  const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
   const { animals, colonyId, colonySize, colonyName } = state;
-  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, animals.length - page * rowsPerPage);
+
+  const openDeleteDialog = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+  };
 
   const handleChangePage = async (event, newPage) => {
     const request = {
@@ -234,10 +245,18 @@ const Animals = () => {
 
                   <IconButton aria-label="delete" className={classes.margin}>
                     <DeleteIcon 
-                      onClick={() => {
-                        deleteChosenAnimal(animal.animalUUID);
-                    }}/>
+                      onClick={openDeleteDialog}/>
                   </IconButton>
+                  <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
+                    <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
+                    <DialogActions>
+                      <Button variant="contained" color="secondary" onClick={() => {
+                        deleteChosenAnimal(animal.animalUUID);
+                      }}>
+                        Delete
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                   
                 </TableCell>
               </TableRow>

@@ -88,8 +88,9 @@ const SingleAnimal = (props) => {
 
 
   return (
-    <Container component="main">
 
+    <Container component="main">
+      <div style={{ textAlign: 'left' }}>
       <Breadcrumbs aria-label="breadcrumb">
         <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
           Logout
@@ -107,6 +108,9 @@ const SingleAnimal = (props) => {
           Current Animal
         </Link>
       </Breadcrumbs>
+      </div>
+
+
       <CssBaseline />
 
       <div className={classes.paper}>
@@ -202,7 +206,7 @@ const SingleAnimal = (props) => {
           </div>
         </div>
       </div>
-    </Container >
+    </Container>
   );
 };
 

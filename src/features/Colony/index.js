@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { Breadcrumbs, Link } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
 import Animals from 'components/Animals';
-import {useProfileProvider} from 'contexts/profile';
+import { useProfileProvider } from 'contexts/profile';
+import { Breadcrumbs, Link, makeStyles } from '@material-ui/core';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
 const Colony = () => {
   const { logout } = useProfileProvider();
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
+
+  const classes = useStyles();
 
   if (redirectToColonies) {
     return <Redirect to="/dashboard" />;
@@ -21,20 +32,22 @@ const Colony = () => {
 
   return (
     <div className="animals">
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
-          Logout
+      <div className={classes.root}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
+          <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
+            Logout
         </Link>
-        <Link color="inherit" onClick={() => setRedirectToColonies(true)}>
-          Colonies
+          <Link color="inherit" onClick={() => setRedirectToColonies(true)}>
+            Colonies
         </Link>
-        <Link
-        color="textPrimary"
-        aria-current="page"
-        >
-          Current Colony
+          <Link
+            color="textPrimary"
+            aria-current="page"
+          >
+            Current Colony
         </Link>
-      </Breadcrumbs>
+        </Breadcrumbs>
+      </div>
       <Animals />
     </div>
   );

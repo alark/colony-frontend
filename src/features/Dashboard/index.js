@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
 import Colonies from 'components/Colonies';
-import { Breadcrumbs, Link } from '@material-ui/core';
 import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
-// import ItemForm from 'components/ItemForm';
-// import Cart from 'components/Cart';
+import { Breadcrumbs, Link, makeStyles } from '@material-ui/core';
+import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    '& > * + *': {
+      marginTop: theme.spacing(2),
+    },
+  },
+}));
 
 const Dashboard = () => {
   const { logout } = useProfileProvider();
   const [redirectToLogin, setRedirectToLogin] = useState(false);
+
+  const classes = useStyles();
 
   if (redirectToLogin) {
     logout();
@@ -17,8 +26,8 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <div style={{ textAlign: 'left' }}>
-        <Breadcrumbs aria-label="breadcrumb">
+      <div className={classes.root} style={{ textAlign: 'left' }}>
+        <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
           <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
             Logout
           </Link>

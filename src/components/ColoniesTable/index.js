@@ -16,6 +16,12 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Share from '@material-ui/icons/Share';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormLabel from '@material-ui/core/FormLabel';
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -79,6 +85,15 @@ function TablePaginationActions(props) {
   );
 }
 
+const useStyles = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(3),
+  },
+  button: {
+    margin: theme.spacing(1, 1, 0, 0),
+  },
+}));
+
 const tableStyle = makeStyles({
   table: {
     width: '100%',
@@ -90,11 +105,13 @@ const tableStyle = makeStyles({
 const ColoniesTable = () => {
   const { deleteColony, shareColony, getAnimals, state: { ownedColonies } } = useProfileProvider();
   const classes = tableStyle();
+  const radioStyle = useStyles();
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [shareDialog, setShareDialogOpen] = React.useState(false);
   const [sharedUser, setSharedUserEmail] = useState('');
+  const [accessRights, setAccessRights] = React.useState(false);
 
   const openShareDialog = () => {
     setShareDialogOpen(true);
@@ -108,9 +125,10 @@ const ColoniesTable = () => {
     setSharedUserEmail(value);
   }
 
-  const share = (colonyId) => {
-    const data = { email: sharedUser, colonyId: colonyId };
-    shareColony(data);
+  const share = async (colonyId) => {
+    const data = { email: sharedUser, colonyId, accessRights };
+    console.log(data);
+    await shareColony(data);
   }
 
   /* Pagination handler */
@@ -127,6 +145,11 @@ const ColoniesTable = () => {
 
     await getAnimals(request);
     setRedirectToAnimals(true);
+  };
+
+
+  const handleRadioChange = (event) => {
+    setAccessRights((event.target.value === 'write') ? true : false );
   };
 
   if (redirectToAnimals) {
@@ -164,7 +187,14 @@ const ColoniesTable = () => {
                   </div>
                 </DialogContent>
                 <DialogActions>
-                  <Button onClick={() => share(colony.colonyId)} variant="contained" color="default">Share</Button>
+                      <FormLabel component="legend">Access Rights</FormLabel>
+                      <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange}>
+                        <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
+                        <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
+                      </RadioGroup>
+                      <Button type="submit" variant="outlined" color="primary" className={radioStyle.button} onClick={ async () => await share(colony.colonyId) }>
+                        Share
+                      </Button>
                 </DialogActions>
               </Dialog>
               <Button variant="contained" color="primary" onClick={() => {

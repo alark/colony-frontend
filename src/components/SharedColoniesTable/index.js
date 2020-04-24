@@ -93,28 +93,6 @@ const SharedColoniesTable = () => {
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
-  const [shareDialog, setShareDialogOpen] = React.useState(false);
-  const [sharedUser, setSharedUserEmail] = useState('');
-
-  const openShareDialog = () => {
-    setShareDialogOpen(true);
-  };
-
-  const closeShareDialog = () => {
-    setShareDialogOpen(false);
-  };
-
-  const updateInputSharedUser = ({ target: { value } }) => {
-    setSharedUserEmail(value);
-  }
-
-  const share = (colonyId) => {
-    const data = { email: sharedUser, colonyId: colonyId };
-    shareColony(data);
-  }
-
-  /* Pagination handler */
-  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, sharedColonies.length - page * rowsPerPage);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -152,26 +130,11 @@ const SharedColoniesTable = () => {
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>
               </TableCell>
               <TableCell align="right">
-                <Button variant="contained" color="primary" startIcon={<Share />} onClick={openShareDialog}>Share</Button>
-                <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
-                  <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      Share animal colony with another user.
-                        </DialogContentText>
-                    <div>
-                      <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
-                    </div>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={() => share(colony.colonyId)} variant="contained" color="default">Share</Button>
-                  </DialogActions>
-                </Dialog>
                 <Button variant="contained" color="primary" onClick={() => {
                   deleteColony(colony.colonyId);
                 }}>
                   Remove
-                    </Button>
+                </Button>
               </TableCell>
             </TableRow>
           ))}

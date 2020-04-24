@@ -245,18 +245,11 @@ const Animals = () => {
 
                   <IconButton aria-label="delete" className={classes.margin}>
                     <DeleteIcon 
-                      onClick={openDeleteDialog}/>
-                  </IconButton>
-                  <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
-                    <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
-                    <DialogActions>
-                      <Button variant="contained" color="secondary" onClick={() => {
+                      onClick={() => {
+
                         deleteChosenAnimal(animal.animalUUID);
-                      }}>
-                        Delete
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
+                      }}/>
+                  </IconButton>
                   
                 </TableCell>
               </TableRow>

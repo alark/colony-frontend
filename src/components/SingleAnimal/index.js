@@ -88,8 +88,7 @@ const SingleAnimal = (props) => {
 
 
   return (
-
-    <Container component="main">
+    <div>
       <div style={{ textAlign: 'left' }}>
       <Breadcrumbs aria-label="breadcrumb">
         <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
@@ -109,10 +108,8 @@ const SingleAnimal = (props) => {
         </Link>
       </Breadcrumbs>
       </div>
-
-
+    <Container component="main">
       <CssBaseline />
-
       <div className={classes.paper}>
 
         <Card className={classes.root}>
@@ -140,7 +137,6 @@ const SingleAnimal = (props) => {
                   </Typography>
               : null
               }
-
 
               <Typography variant="subtitle1" color="textSecondary">
                 <strong>Litter:</strong> {currentAnimal.litter}
@@ -207,6 +203,7 @@ const SingleAnimal = (props) => {
         </div>
       </div>
     </Container>
+    </div>
   );
 };
 

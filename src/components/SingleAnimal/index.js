@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
-import { Button, Container, CssBaseline } from '@material-ui/core';
+import { Button, Breadcrumbs, Link, Container, CssBaseline } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Typography from '@material-ui/core/Typography';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
-
+import {useProfileProvider} from 'contexts/profile';
 
 const useStyles2 = makeStyles(theme => ({
   table: {
@@ -53,8 +53,12 @@ const useStyles2 = makeStyles(theme => ({
 const SingleAnimal = (props) => {
   const { id } = useParams();
   const classes = useStyles2();
+  const { logout } = useProfileProvider();
   const [currentAnimal, setCurrentAnimal] = useState(props.location.state.animal);
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
+  const [redirectToColonies, setRedirectToColonies] = useState(false);
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
+
   const [notes, setNotes] = useState('');
 
   console.log('PROPS: ', props.location.state.animal);
@@ -73,10 +77,36 @@ const SingleAnimal = (props) => {
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
   }
+  else if (redirectToColonies) {
+    return <Redirect to="/dashboard" />;
+  }
+  else if (redirectToLogin) {
+    logout();
+    return <Redirect to="/" />;
+
+  }
 
 
   return (
     <Container component="main">
+
+      <Breadcrumbs aria-label="breadcrumb">
+        <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
+          Logout
+        </Link>
+        <Link color="inherit" onClick={() => setRedirectToColonies(true)}>
+          Colonies
+        </Link>
+        <Link color="inherit" onClick={() => setRedirectToAnimals(true)}>
+          Colony
+        </Link>
+        <Link
+        color="textPrimary"
+        aria-current="page"
+        >
+          Current Animal
+        </Link>
+      </Breadcrumbs>
       <CssBaseline />
 
       <div className={classes.paper}>

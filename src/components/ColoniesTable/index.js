@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
 import { Redirect } from 'react-router-dom';
-import { Button, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
+import { Button, Grid, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -187,14 +187,14 @@ const ColoniesTable = () => {
                   </div>
                 </DialogContent>
                 <DialogActions>
-                      <FormLabel component="legend">Access Rights</FormLabel>
-                      <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange}>
+                      <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange} defaultValue="read_o">
                         <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
                         <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
                       </RadioGroup>
                       <Button type="submit" variant="outlined" color="primary" className={radioStyle.button} onClick={ async () => await share(colony.colonyId) }>
                         Share
                       </Button>
+
                 </DialogActions>
               </Dialog>
               <Button variant="contained" color="primary" onClick={() => {

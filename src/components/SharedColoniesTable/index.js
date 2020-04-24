@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
 import { Redirect } from 'react-router-dom';
-import { Button, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
+import { Button, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -10,12 +10,6 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Share from '@material-ui/icons/Share';
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -88,7 +82,7 @@ const tableStyle = makeStyles({
 });
 
 const SharedColoniesTable = () => {
-  const { deleteColony, shareColony, getAnimals, state: { sharedColonies } } = useProfileProvider();
+  const { deleteColony, getAnimals, state: { sharedColonies } } = useProfileProvider();
   const classes = tableStyle();
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
@@ -98,9 +92,10 @@ const SharedColoniesTable = () => {
     setPage(newPage);
   };
 
-  const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
+  const handleCellClick = async (colonyId, colonyName, colonySize, accessRights) => {
+    console.log(accessRights);
     const request = {
-      colonyId, colonyName, colonySize, rowsPerPage, page,
+      colonyId, colonyName, colonySize, rowsPerPage, page, 
     };
 
     await getAnimals(request);
@@ -124,7 +119,7 @@ const SharedColoniesTable = () => {
                 style={{ cursor: 'pointer' }}
                 component="th"
                 scope="row"
-                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, rowsPerPage, page)}
+                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, colony.accessRights)}
               >
                 <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>

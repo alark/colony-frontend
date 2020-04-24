@@ -114,7 +114,7 @@ const SingleAnimal = (props) => {
             color="textPrimary"
             aria-current="page"
           >
-            Current Animal
+          {currentAnimal.mouseId}
         </Link>
         </Breadcrumbs>
       </div>

@@ -64,11 +64,12 @@ const SingleAnimal = (props) => {
   const { id } = useParams();
   const classes = useStyles();
   const classesTwo = useStyles2();
-  const { logout } = useProfileProvider();
+  const { logout, state } = useProfileProvider();
   const [currentAnimal, setCurrentAnimal] = useState(props.location.state.animal);
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
+  const { colonyName } = state;
 
   const [notes, setNotes] = useState('');
 
@@ -84,7 +85,6 @@ const SingleAnimal = (props) => {
     setNotes(event.target.value);
   };
 
-
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
   }
@@ -97,7 +97,6 @@ const SingleAnimal = (props) => {
 
   }
 
-
   return (
     <div>
       <div className={classes.root} style={{ textAlign: 'left' }}>
@@ -109,7 +108,7 @@ const SingleAnimal = (props) => {
             Colonies
         </Link>
           <Link color="inherit" onClick={() => setRedirectToAnimals(true)}>
-            Colony
+            {colonyName}
         </Link>
           <Link
             color="textPrimary"

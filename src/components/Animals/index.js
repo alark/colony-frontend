@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Avatar, AppBar } from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Avatar } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';

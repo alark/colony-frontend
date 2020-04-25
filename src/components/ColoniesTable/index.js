@@ -108,10 +108,12 @@ const ColoniesTable = () => {
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [shareDialog, setShareDialogOpen] = React.useState(false);
   const [sharedUser, setSharedUserEmail] = useState('');
+  const [sharedColony, setSharedColony] = useState('');
   const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
   const [accessRightsShare, setAccessRights] = React.useState(false);
 
-  const openShareDialog = () => {
+  const openShareDialog = (id) => {
+    setSharedColony(id);
     setShareDialogOpen(true);
   };
 
@@ -131,8 +133,8 @@ const ColoniesTable = () => {
     setSharedUserEmail(value);
   }
 
-  const share = async (colonyId) => {
-    const data = { email: sharedUser, colonyId, accessRights: accessRightsShare };
+  const share = async () => {
+    const data = { email: sharedUser, colonyId: sharedColony, accessRights: accessRightsShare };
     console.log(data);
     await shareColony(data);
   }
@@ -181,7 +183,7 @@ const ColoniesTable = () => {
               <p style={{ color: '#333333' }}>Size: {colony.size}</p>
             </TableCell>
             <TableCell align="right">
-              <Button variant="contained" color="primary" startIcon={<Share />} onClick={openShareDialog}>Share</Button>
+              <Button variant="contained" color="primary" startIcon={<Share />} onClick={() => openShareDialog(colony.colonyId)}>Share</Button>
               <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
                 <DialogContent>
@@ -197,7 +199,7 @@ const ColoniesTable = () => {
                         <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
                         <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
                       </RadioGroup>
-                      <Button variant="outlined" color="primary" className={radioStyle.button} onClick={ async () => await share(colony.colonyId) }>
+                      <Button onClick={ async () => await share()} variant="outlined" color="primary" className={radioStyle.button}>
                         Share
                       </Button>
 

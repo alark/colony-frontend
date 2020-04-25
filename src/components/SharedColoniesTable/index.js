@@ -135,6 +135,7 @@ const SharedColoniesTable = () => {
               >
                 <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>
+                <p style={{ color: '#333333' }}>Permissions: { colony.accessRights ? "Read and Write" : "Read Only" }</p>
               </TableCell>
               <TableCell align="right">
               <Button variant="contained" color="primary" onClick={openDeleteDialog}>Remove</Button>

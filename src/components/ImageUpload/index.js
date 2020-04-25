@@ -62,8 +62,8 @@ const Uploader = (props) => {
             .then(url => {
               setUrl(url);
               setProgress(0);
-              storeImageLink({ colonyId, animalId, url });
             });
+            storeImageLink({ colonyId, animalId, url });
         }
       );
     } else {

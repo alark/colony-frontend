@@ -138,6 +138,9 @@ const Animals = () => {
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
   const { animals, accessRights, colonyId, colonySize, colonyName } = state;
 
+  const permissions = accessRights ? "Read and Write" : "Read Only";
+  console.log('access', accessRights);
+
   const handleChangePage = async (event, newPage) => {
     const request = {
       colonyId, colonyName, colonySize, rowsPerPage, page: newPage,
@@ -177,6 +180,7 @@ const Animals = () => {
     <Container component="main" style={{ padding: 8 }}>
       <CssBaseline />
       <h1>Colony: {colonyName}</h1>
+      <h2>Access:{permissions}</h2>
 
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">

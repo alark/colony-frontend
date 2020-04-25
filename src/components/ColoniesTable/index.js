@@ -137,6 +137,7 @@ const ColoniesTable = () => {
     const data = { email: sharedUser, colonyId: sharedColony, accessRights: accessRightsShare };
     console.log(data);
     await shareColony(data);
+    closeShareDialog();
   }
 
   /* Pagination handler */
@@ -210,7 +211,7 @@ const ColoniesTable = () => {
                 <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
                 <DialogActions>
                   <Button variant="contained" color="secondary" onClick={() => {
-                    deleteColony(colony.colonyId);
+                    deleteColony(colony.colonyId); closeDeleteDialog();
                   }}>
                     Delete
                   </Button>

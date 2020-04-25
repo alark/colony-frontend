@@ -139,7 +139,6 @@ const Animals = () => {
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
   const { animals, accessRights, colonyId, colonySize, colonyName } = state;
-  console.log("rights:", accessRights);
 
   const handleChangePage = async (event, newPage) => {
     const request = {

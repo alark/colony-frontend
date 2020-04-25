@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import Uploader from 'components/ImageUpload';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -211,6 +212,7 @@ const SingleAnimal = (props) => {
               <Button onClick={onSaveNotes} variant="contained" color="primary">Save</Button>
             </div>
           </div>
+          <Uploader animalId={currentAnimal.animalUUID} />
         </div>
       </Container>
     </div>

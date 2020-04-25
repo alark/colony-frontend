@@ -18,6 +18,7 @@ const SORT = 'SORT';
 const ALPHASORT = 'ALPHASORT';
 const DELETE = 'DELETE';
 const DELETEANIMAL = 'DELETEANIMAL';
+const IMAGEUPLOAD = 'IMAGEUPLOAD';
 
 axios.defaults.withCredentials = true;
 
@@ -95,6 +96,10 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
+      case IMAGEUPLOAD: {
+        return { ...prevState };
+      }
+
       case LOGOUT: {
         // Reset state to logged out
         return initialState;
@@ -153,6 +158,12 @@ const useProfileProvider = () => {
       dispatch({ type: DELETEANIMAL, payload: request.animalId });
     });
 
+  const storeImageLink = request => axios
+    .post(`${BASE_URL}/colony/storeImageLink`, request)  //passing colony id to the colony id object
+    .then(({ data }) => {
+      dispatch({ type: IMAGEUPLOAD, payload: request });
+    });
+
   const sortList = (sortBy) => {
     dispatch({ type: SORT, payload: sortBy });
   };
@@ -174,7 +185,8 @@ const useProfileProvider = () => {
     sortAlpha,
     deleteColony,
     deleteAnimal,
-    shareColony
+    shareColony,
+    storeImageLink
   };
 };
 

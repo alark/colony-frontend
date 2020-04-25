@@ -59,31 +59,109 @@ const useStyles2 = makeStyles(theme => ({
   },
 }));
 
+const formStyles = makeStyles(theme => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
+
 
 const SingleAnimal = (props) => {
-  const { id } = useParams();
+  // const { id } = useParams();
   const classes = useStyles();
   const classesTwo = useStyles2();
+  const formClasses = formStyles();
   const { logout, state } = useProfileProvider();
-  const [currentAnimal, setCurrentAnimal] = useState(props.location.state.animal);
+  const currentAnimal = props.location.state.animal;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  const { colonyName } = state;
+  const { colonyName, colonyId } = state;
 
-  const [notes, setNotes] = useState('');
+  /** Traits */
+  const [animalId, setAnimalId] = useState('');
+  const [gender, setGender] = useState('');
+  const [litter, setLitter] = useState('');
+  const [month, setMonth] = useState('');
+  const [day, setDay] = useState('');
+  const [year, setYear] = useState('');
+  const [deathMonth, setDeathMonth] = useState('');
+  const [deathDay, setDeathDay] = useState('');
+  const [deathYear, setDeathYear] = useState('');
+  const [father, setFather] = useState('');
+  const [mother, setMother] = useState('');
+  const [gene1, setGene1] = useState('');
+  const [gene2, setGene2] = useState('');
+  const [gene3, setGene3] = useState('');
+  const [isDefault, setDefault] = useState(false);
+
+  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3) => {
+    setAnimalId(id);
+    setGender(gen);
+    setLitter(litt);
+    setMonth(mo);
+    setDay(da);
+    setYear(yr);
+    setDeathMonth(deathMo);
+    setDeathDay(deathDa);
+    setDeathYear(deathYr);
+    setFather(fth);
+    setMother(mth);
+    setGene1(gn1);
+    setGene2(gn2);
+    setGene3(gn3);
+    setDefault(true);
+  };
+
+  const saveChanges = async (event) => {
+    event.preventDefault();
+    const animal = {
+      mouseId: animalId,
+      gender: gender,
+      litter: litter,
+      dobMonth: month,
+      dobDay: day,
+      dobYear: year,
+      dodMonth: deathMonth,
+      dodDay: deathDay,
+      dodYear: deathYear,
+      fatherId: father,
+      motherId: mother,
+      gene1: gene1,
+      gene2: gene2,
+      gene3: gene3
+    };
+    console.log(animal);
+    const request = { animal: animal, colonyId: colonyId };
+    console.log(request);
+
+  };
 
   console.log('PROPS: ', props.location.state.animal);
-  const onSaveNotes = (event) => {
-    alert(`click works: ${notes}`);
-    const myNotes = { animalId: id, notes }; // store the notes against an animal for a specific user.
-    // saveNotes(myNotes);
-  };
+  // const onSaveNotes = (event) => {
+  //   alert(`click works: ${notes}`);
+  //   const myNotes = { animalId: id, notes }; // store the notes against an animal for a specific user.
+  //   // saveNotes(myNotes);
+  // };
 
-  const onNotesAdded = (event) => {
-    console.log(event.target.value);
-    setNotes(event.target.value);
-  };
+  // const onNotesAdded = (event) => {
+  //   console.log(event.target.value);
+  //   setNotes(event.target.value);
+  // };
 
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
@@ -99,6 +177,10 @@ const SingleAnimal = (props) => {
 
   return (
     <div>
+      {
+        isDefault ?
+          null :
+          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3)}
       <div className={classes.root} style={{ textAlign: 'left' }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
           <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
@@ -109,19 +191,18 @@ const SingleAnimal = (props) => {
         </Link>
           <Link color="inherit" onClick={() => setRedirectToAnimals(true)}>
             {colonyName}
-        </Link>
+          </Link>
           <Link
             color="textPrimary"
             aria-current="page"
           >
-          {currentAnimal.mouseId}
-        </Link>
+            {currentAnimal.mouseId}
+          </Link>
         </Breadcrumbs>
       </div>
       <Container component="main">
         <CssBaseline />
         <div className={classesTwo.paper}>
-
           <Card className={classesTwo.root}>
             <CardMedia
               className={classesTwo.cover}
@@ -129,54 +210,179 @@ const SingleAnimal = (props) => {
               title="Rat"
             />
             <div className={classesTwo.details}>
-              <CardContent className={classesTwo.content}>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>ID:</strong> {currentAnimal.mouseId}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Species:</strong> My Species
-              </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Date of birth:</strong> {currentAnimal.dobMonth}/{currentAnimal.dobDay}/{currentAnimal.dobYear}
-                </Typography>
+              <form className={classes.form} noValidate>
+                <CardContent className={classesTwo.content}>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>ID:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="mouseId"
+                      defaultValue={currentAnimal.mouseId}
+                      onChange={(event) => setAnimalId(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Gender:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="gender"
+                      defaultValue={currentAnimal.gender}
+                      onChange={(event) => setGender(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Date of birth month:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="dobMonth"
+                      defaultValue={currentAnimal.dobMonth}
+                      onChange={(event) => setMonth(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Date of birth day:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="dobDay"
+                      defaultValue={currentAnimal.dobDay}
+                      onChange={(event) => setDay(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Date of birth year:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="dobYear"
+                      defaultValue={currentAnimal.dobYear}
+                      onChange={(event) => setYear(event.target.value)}
+                    />
+                  </Typography>
+                  {
+                    currentAnimal.dodDay > 0 ?
+                      <Typography variant="subtitle1" color="textSecondary">
+                        <strong>Date of death month:</strong>
+                        <TextField
+                          variant="outlined"
+                          margin="normal"
+                          name="dodMonth"
+                          defaultValue={currentAnimal.dodMonth}
+                          onChange={(event) => setDeathMonth(event.target.value)}
+                        />
+                      </Typography>
+                      : null
+                  }
+                  {
+                    currentAnimal.dodDay > 0 ?
+                      <Typography variant="subtitle1" color="textSecondary">
+                        <strong>Date of death day:</strong>
+                        <TextField
+                          variant="outlined"
+                          margin="normal"
+                          name="dodDay"
+                          defaultValue={currentAnimal.dodDay}
+                          onChange={(event) => setDeathDay(event.target.value)}
+                        />
+                      </Typography>
+                      : null
+                  }
+                  {
+                    currentAnimal.dodYear ?
+                      <Typography variant="subtitle1" color="textSecondary">
+                        <strong>Date of death year:</strong>
+                        <TextField
+                          variant="outlined"
+                          margin="normal"
+                          name="dodYear"
+                          defaultValue={currentAnimal.dodYear}
+                          onChange={(event) => setDeathYear(event.target.value)}
+                        />
+                      </Typography>
+                      : null
+                  }
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Litter:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      name="litter"
+                      type="litter"
+                      defaultValue={currentAnimal.litter}
+                      onChange={(event) => setLitter(event.target.value)}
+                    />
+                  </Typography>
+                </CardContent>
 
-                {
-                  currentAnimal.dodDay > 0 ?
-                    <Typography variant="subtitle1" color="textSecondary">
-                      <strong>Date of death:</strong> {currentAnimal.dodMonth}/{currentAnimal.dodDay}/{currentAnimal.dodYear}
-                    </Typography>
-                    : null
-                }
+                <CardContent className={classesTwo.content}>
 
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Litter:</strong> {currentAnimal.litter}
-                </Typography>
-              </CardContent>
-
-              <CardContent className={classesTwo.content}>
-
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Father ID:</strong> {currentAnimal.fatherId}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Mother ID:</strong> {currentAnimal.motherId}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 1</strong> {currentAnimal.gene1}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 2</strong> {currentAnimal.gene2}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 3</strong> Y
-              </Typography>
-
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Litter:</strong> {currentAnimal.litter}
-                </Typography>
-              </CardContent>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Father ID:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="fatherId"
+                      defaultValue={currentAnimal.fatherId}
+                      onChange={(event) => setFather(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Mother ID:</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="motherId"
+                      defaultValue={currentAnimal.motherId}
+                      onChange={(event) => setMother(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Gene 1</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      name="gene1"
+                      type="gene1"
+                      defaultValue={currentAnimal.gene1}
+                      onChange={(event) => setGene1(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Gene 2</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="gene2"
+                      defaultValue={currentAnimal.gene2}
+                      onChange={(event) => setGene2(event.target.value)}
+                    />
+                  </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>Gene 3</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="gene3"
+                      defaultValue={currentAnimal.gene3}
+                      onChange={(event) => setGene3(event.target.value)}
+                    />
+                  </Typography>
+                </CardContent>
+              </form>
 
               <div className={classesTwo.controls}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  onClick={saveChanges}
+                >Save Changes
+                </Button>
                 <Button
                   onClick={() => {
                     setRedirectToAnimals(true);
@@ -199,7 +405,7 @@ const SingleAnimal = (props) => {
                 style={{ margin: 8 }}
                 className={classesTwo.textField}
                 fullWidth
-                onChange={onNotesAdded}
+                // onChange={onNotesAdded}
                 margin="normal"
                 variant="outlined"
                 InputLabelProps={{
@@ -208,7 +414,8 @@ const SingleAnimal = (props) => {
               />
             </div>
             <div className={classesTwo.controls} style={{ paddingRight: 0 }}>
-              <Button onClick={onSaveNotes} variant="contained" color="primary">Save</Button>
+              {/* <Button onClick={onSaveNotes} variant="contained" color="primary">Save</Button> */}
+              <Button variant="contained" color="primary">Save</Button>
             </div>
           </div>
         </div>

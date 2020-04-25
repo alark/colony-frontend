@@ -9,13 +9,10 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import { red } from '@material-ui/core/colors';
+import { blue } from '@material-ui/core/colors';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogTitle from '@material-ui/core/DialogTitle';
 
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -124,8 +121,9 @@ const useStyles2 = makeStyles(theme => ({
     height: 38,
     width: 38,
   },
-  avatar: {
-    backgroundColor: red[500],
+  blue: {
+    color: theme.palette.getContrastText(blue[800]),
+    backgroundColor: blue[800],
   },
 }));
 
@@ -139,7 +137,6 @@ const Animals = () => {
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
   const { animals, accessRights, colonyId, colonySize, colonyName } = state;
-  console.log("rights:", accessRights);
 
   const handleChangePage = async (event, newPage) => {
     const request = {
@@ -205,8 +202,7 @@ const Animals = () => {
                   }}
                 >
                   <div style={{ fontWeight: 'bold', fontSize: 18, flexDirection: 'row' }}>
-                    <Avatar alt={animal.mouseId} />
-                    <span>{animal.mouseId}</span>
+                    <Avatar className={classes.blue}>{animal.mouseId}</Avatar>
                   </div>
                 </TableCell>
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>

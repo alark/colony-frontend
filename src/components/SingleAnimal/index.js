@@ -9,6 +9,7 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import Uploader from 'components/ImageUpload';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -149,6 +150,11 @@ const SingleAnimal = (props) => {
     const request = { animal: animal, colonyId: colonyId };
     console.log(request);
 
+  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : "https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg";
+
+  const onNotesAdded = (event) => {
+    console.log(event.target.value);
+    setNotes(event.target.value);
   };
 
   console.log('PROPS: ', props.location.state.animal);
@@ -206,7 +212,7 @@ const SingleAnimal = (props) => {
           <Card className={classesTwo.root}>
             <CardMedia
               className={classesTwo.cover}
-              image="https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg"
+              image={avatarLink}
               title="Rat"
             />
             <div className={classesTwo.details}>
@@ -418,6 +424,13 @@ const SingleAnimal = (props) => {
               <Button variant="contained" color="primary">Save</Button>
             </div>
           </div>
+          <Uploader animalId={currentAnimal.animalUUID} />
+          {
+            currentAnimal.imageLinks.map((link) => (
+                <img src={link} />
+              )
+            )
+          }
         </div>
       </Container>
     </div>

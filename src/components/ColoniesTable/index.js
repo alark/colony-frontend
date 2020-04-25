@@ -110,6 +110,7 @@ const ColoniesTable = () => {
   const [sharedUser, setSharedUserEmail] = useState('');
   const [sharedColony, setSharedColony] = useState('');
   const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
+  const [deletedColony, setDeletedColony] = useState('');
   const [accessRightsShare, setAccessRights] = React.useState(false);
 
   const openShareDialog = (id) => {
@@ -121,7 +122,8 @@ const ColoniesTable = () => {
     setShareDialogOpen(false);
   };
 
-  const openDeleteDialog = () => {
+  const openDeleteDialog = (id) => {
+    setDeletedColony(id);
     setDeleteDialogOpen(true);
   };
 
@@ -138,6 +140,11 @@ const ColoniesTable = () => {
     console.log(data);
     await shareColony(data);
     closeShareDialog();
+  }
+
+  const deleteEntry = () => {
+    deleteColony(deletedColony);
+    closeDeleteDialog();
   }
 
   /* Pagination handler */
@@ -206,12 +213,12 @@ const ColoniesTable = () => {
 
                 </DialogActions>
               </Dialog>
-              <Button variant="contained" color="primary" onClick={openDeleteDialog}>Remove</Button>
+              <Button variant="contained" color="primary" onClick={() => openDeleteDialog(colony.colonyId)}>Remove</Button>
               <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
                 <DialogActions>
-                  <Button variant="contained" color="secondary" onClick={() => {
-                    deleteColony(colony.colonyId); closeDeleteDialog();
+                  <Button variant="contained" color="secondary" onClick={ () => {
+                    deleteEntry();
                   }}>
                     Delete
                   </Button>

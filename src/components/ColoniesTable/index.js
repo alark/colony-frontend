@@ -187,7 +187,6 @@ const ColoniesTable = () => {
             >
               <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
               <p style={{ color: '#333333' }}>Size: {colony.size}</p>
-              <p style={{ color: '#333333' }}>Permissions: Read and Write</p>
             </TableCell>
             <TableCell align="right">
               <Button variant="contained" color="primary" startIcon={<Share />} onClick={() => openShareDialog(colony.colonyId)}>Share</Button>

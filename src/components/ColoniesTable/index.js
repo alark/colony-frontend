@@ -115,6 +115,7 @@ const ColoniesTable = () => {
 
   const openShareDialog = (id) => {
     setSharedColony(id);
+    setAccessRights(false);
     setShareDialogOpen(true);
   };
 
@@ -156,10 +157,9 @@ const ColoniesTable = () => {
 
   const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
     const request = {
-      colonyId, accessRights: true, colonyName, colonySize, rowsPerPage, page,
+      colonyId, rowsPerPage, page,
     };
-
-    await getAnimals(request);
+    await getAnimals(request, true, colonyName, colonySize);
     setRedirectToAnimals(true);
   };
 

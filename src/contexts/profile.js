@@ -140,9 +140,12 @@ const useProfileProvider = () => {
   const shareColony = shareInfo => axios
     .post(`${BASE_URL}/colony/share`, shareInfo);
 
-  const getAnimals = async pageInfo => axios
+  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
     .post(`${BASE_URL}/colony/animals`, pageInfo)
     .then(({ data }) => {
+      data.accessRights = accessRights;
+      data.colonyName = colonyName;
+      data.colonySize = colonySize;
       dispatch({ type: ANIMALS, payload: data });
     });
 

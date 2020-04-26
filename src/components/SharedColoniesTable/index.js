@@ -121,10 +121,10 @@ const SharedColoniesTable = () => {
 
   const handleCellClick = async (colonyId, colonyName, colonySize, accessRights) => {
     const request = {
-      colonyId, colonyName, accessRights, colonySize, rowsPerPage, page, 
+      colonyId, rowsPerPage, page, 
     };
 
-    await getAnimals(request);
+    await getAnimals(request, accessRights, colonyName, colonySize);
     setRedirectToAnimals(true);
   };
 

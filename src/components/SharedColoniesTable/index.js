@@ -91,8 +91,13 @@ const SharedColoniesTable = () => {
   const rowsPerPage = 10;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [deleteDialog, setDeleteDialogOpen] = React.useState(false);
+  const [deletedColony, setDeletedColony] = useState('');
+  const [permission, setPermission] = useState(false);
 
-  const openDeleteDialog = () => {
+
+  const openDeleteDialog = (id, accessRights) => {
+    setDeletedColony(id);
+    setPermission(accessRights);
     setDeleteDialogOpen(true);
   };
 
@@ -100,12 +105,21 @@ const SharedColoniesTable = () => {
     setDeleteDialogOpen(false);
   };
 
+  const deleteEntry = async () => {
+
+    if (permission) {
+      await deleteColony(deletedColony);
+    } else {
+      console.log("User does not have write access");
+    }
+  }
+
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleCellClick = async (colonyId, colonyName, colonySize, accessRights) => {
-    console.log(accessRights);
     const request = {
       colonyId, colonyName, accessRights, colonySize, rowsPerPage, page, 
     };
@@ -138,12 +152,12 @@ const SharedColoniesTable = () => {
                 <p style={{ color: '#333333' }}>Permissions: { colony.accessRights ? "Read and Write" : "Read Only" }</p>
               </TableCell>
               <TableCell align="right">
-              <Button variant="contained" color="primary" onClick={openDeleteDialog}>Remove</Button>
+              <Button variant="contained" color="primary" onClick={() => openDeleteDialog(colony.colonyId, colony.accessRights)}>Remove</Button>
               <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
                 <DialogActions>
-                  <Button variant="contained" color="secondary" onClick={() => {
-                      deleteColony(colony.colonyId);
+                  <Button variant="contained" color="secondary" onClick={async () => {
+                    await deleteEntry();
                   }}>
                     Delete
                   </Button>

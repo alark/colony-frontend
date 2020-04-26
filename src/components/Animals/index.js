@@ -234,12 +234,15 @@ const Animals = () => {
                     }}
                   >Details
                   </Button>
-
+                  
                   <IconButton aria-label="delete" className={classes.margin}>
                     <DeleteIcon 
                       onClick={() => {
-
-                        deleteChosenAnimal(animal.animalUUID);
+                        if (accessRights) {
+                          deleteChosenAnimal(animal.animalUUID);
+                        } else {
+                          console.log("User does not have write access");
+                        }
                       }}/>
                   </IconButton>
                   

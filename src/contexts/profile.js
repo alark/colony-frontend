@@ -47,7 +47,7 @@ const ProfileProvider = ({ children }) => {
         const colonies = payload.sharedTable ? [...prevState.sharedColonies] : [...prevState.ownedColonies];
         const newList = colonies.filter((item, index) => item.colonyId !== payload.colonyId);
         console.log('deleted Colony ID: ', payload);
-        return payload.sharedTable ? { ...prevState, sharedColonies: newList } :  { ...prevState, ownedColonies: newList };
+        return payload.sharedTable ? { ...prevState, sharedColonies: newList } : { ...prevState, ownedColonies: newList };
       }
 
       case DELETEANIMAL: {

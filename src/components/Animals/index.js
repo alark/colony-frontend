@@ -212,7 +212,7 @@ const Animals = () => {
                   }}
                 >
                   <div style={{ fontWeight: 'bold', fontSize: 18, flexDirection: 'row' }}>
-                    <Avatar className={animal.gender === "M" ? classes.blue : classes.red }>{animal.mouseId}</Avatar>
+                    <Avatar className={animal.gender === 'M' ? classes.blue : classes.red}>{animal.mouseId}</Avatar>
                   </div>
                 </TableCell>
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>

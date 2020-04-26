@@ -12,6 +12,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Add from '@material-ui/icons/Add';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 
 function TabPanel(props) {
   const {
@@ -132,6 +133,8 @@ const Colonies = () => {
     setFileName(value);
   };
 
+  const headers = "mouseId,gender,litter,fatherId,motherId,dobMonth,dobDay,dobYear,dodMonth,dodDay,dodYear,tod,notes,gene1,gene2,gene3";
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -204,6 +207,19 @@ const Colonies = () => {
             <DialogContent>
               <DialogContentText>
                   Upload an animal colony along with its name.
+                  A colony should be in this format along with the headers at the top of the file. 
+              </DialogContentText>
+              <br></br>
+              <DialogContentText>
+                mouseId,gender,litter,fatherId,motherId,dobMonth .... 
+              </DialogContentText>
+              <DialogContentText>
+                  1,M,L2,111,1110,3,29,2012,-1,-1,-1,NA,,WT,NA,NA
+                  10,M,L2,111,1110,3,29,2012,-1,-1,-1,NA,,WT,NA,NA
+              </DialogContentText>
+              <br></br>
+              <DialogContentText>
+                  Click the &lt;Copy Headers&gt; button to copy the full set of headers to your clipboard.
               </DialogContentText>
               <input type="file" name="file" onChange={chooseFile} />
               <div>
@@ -211,7 +227,10 @@ const Colonies = () => {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button onClick={uploadFile} startIcon={<CloudUploadIcon />}>Upload</Button>
+              <CopyToClipboard text={headers}>
+                <Button variant="outlined"> &lt;Copy Headers&gt; </Button>
+              </CopyToClipboard>
+              <Button variant="outlined" onClick={uploadFile} startIcon={<CloudUploadIcon />}>Upload</Button>
             </DialogActions>
           </Dialog>
 

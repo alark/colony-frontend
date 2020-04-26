@@ -59,7 +59,7 @@ const Login = () => {
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
-        <h1>Login</h1>
+        <Typography variant="h5">Login</Typography>
         <form className={classes.form} noValidate>
           <TextField
             variant="outlined"

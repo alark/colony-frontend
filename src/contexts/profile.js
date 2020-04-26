@@ -158,6 +158,9 @@ const useProfileProvider = () => {
       dispatch({ type: DELETEANIMAL, payload: request.animalId });
     });
 
+  const editAnimal = request => axios
+    .post(`${BASE_URL}/colony/editAnimal`, request)
+
   const storeImageLink = request => axios
     .post(`${BASE_URL}/colony/storeImageLink`, request)  //passing colony id to the colony id object
     .then(({ data }) => {
@@ -185,6 +188,7 @@ const useProfileProvider = () => {
     sortAlpha,
     deleteColony,
     deleteAnimal,
+    editAnimal,
     shareColony,
     storeImageLink
   };

@@ -60,38 +60,17 @@ const useStyles2 = makeStyles(theme => ({
   },
 }));
 
-const formStyles = makeStyles(theme => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-}));
-
-
 const SingleAnimal = (props) => {
   // const { id } = useParams();
   const classes = useStyles();
   const classesTwo = useStyles2();
-  const formClasses = formStyles();
-  const { logout, state } = useProfileProvider();
+  const { logout, editAnimal, state } = useProfileProvider();
   const currentAnimal = props.location.state.animal;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const { colonyName, colonyId } = state;
+  const [notes, setNotes] = useState('');
 
   /** Traits */
   const [animalId, setAnimalId] = useState('');
@@ -108,9 +87,10 @@ const SingleAnimal = (props) => {
   const [gene1, setGene1] = useState('');
   const [gene2, setGene2] = useState('');
   const [gene3, setGene3] = useState('');
+  const [tod, setTod] = useState('');
   const [isDefault, setDefault] = useState(false);
 
-  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3) => {
+  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
     setAnimalId(id);
     setGender(gen);
     setLitter(litt);
@@ -125,12 +105,14 @@ const SingleAnimal = (props) => {
     setGene1(gn1);
     setGene2(gn2);
     setGene3(gn3);
+    setTod(tod)
     setDefault(true);
   };
 
   const saveChanges = async (event) => {
     event.preventDefault();
     const animal = {
+      animalUUID: currentAnimal.animalUUID,
       mouseId: animalId,
       gender: gender,
       litter: litter,
@@ -144,11 +126,13 @@ const SingleAnimal = (props) => {
       motherId: mother,
       gene1: gene1,
       gene2: gene2,
-      gene3: gene3
+      gene3: gene3,
+      imageLinks: currentAnimal.imageLinks,
+      tod: tod
     };
-    console.log(animal);
     const request = { animal: animal, colonyId: colonyId };
-    console.log(request);
+    editAnimal(request);
+  }
 
   const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : "https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg";
 
@@ -186,7 +170,7 @@ const SingleAnimal = (props) => {
       {
         isDefault ?
           null :
-          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3)}
+          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3, currentAnimal.tod)}
       <div className={classes.root} style={{ textAlign: 'left' }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
           <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
@@ -215,6 +199,7 @@ const SingleAnimal = (props) => {
               image={avatarLink}
               title="Rat"
             />
+            
             <div className={classesTwo.details}>
               <form className={classes.form} noValidate>
                 <CardContent className={classesTwo.content}>
@@ -378,6 +363,16 @@ const SingleAnimal = (props) => {
                       onChange={(event) => setGene3(event.target.value)}
                     />
                   </Typography>
+                  <Typography variant="subtitle1" color="textSecondary">
+                    <strong>tod</strong>
+                    <TextField
+                      variant="outlined"
+                      margin="normal"
+                      name="gene3"
+                      defaultValue={currentAnimal.tod}
+                      onChange={(event) => setTod(event.target.value)}
+                    />
+                  </Typography>
                 </CardContent>
               </form>
 
@@ -427,10 +422,8 @@ const SingleAnimal = (props) => {
           <Uploader animalId={currentAnimal.animalUUID} />
           {
             currentAnimal.imageLinks.map((link) => (
-                <img src={link} />
-              )
-            )
-          }
+              <img src={link} />
+            ))}
         </div>
       </Container>
     </div>

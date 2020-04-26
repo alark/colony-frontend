@@ -139,10 +139,12 @@ const ColoniesTable = () => {
     const data = { email: sharedUser, colonyId: sharedColony, accessRights: accessRightsShare };
     console.log(data);
     await shareColony(data);
+    closeShareDialog();
   }
 
   const deleteEntry = () => {
     deleteColony(deletedColony);
+    closeDeleteDialog();
   }
 
   /* Pagination handler */

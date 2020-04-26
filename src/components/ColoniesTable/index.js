@@ -82,7 +82,7 @@ function TablePaginationActions(props) {
   );
 }
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   formControl: {
     margin: theme.spacing(3),
   },
@@ -100,7 +100,9 @@ const tableStyle = makeStyles({
 });
 
 const ColoniesTable = () => {
-  const { deleteColony, shareColony, getAnimals, state: { ownedColonies } } = useProfileProvider();
+  const {
+    deleteColony, shareColony, getAnimals, state: { ownedColonies },
+  } = useProfileProvider();
   const classes = tableStyle();
   const radioStyle = useStyles();
   const [page, setPage] = useState(0);
@@ -134,19 +136,19 @@ const ColoniesTable = () => {
 
   const updateInputSharedUser = ({ target: { value } }) => {
     setSharedUserEmail(value);
-  }
+  };
 
   const share = async () => {
     const data = { email: sharedUser, colonyId: sharedColony, accessRights: accessRightsShare };
     console.log(data);
     await shareColony(data);
     closeShareDialog();
-  }
+  };
 
   const deleteEntry = () => {
     deleteColony(deletedColony);
     closeDeleteDialog();
-  }
+  };
 
   /* Pagination handler */
   // const emptyRows = rowsPerPage - Math.min(rowsPerPage, ownedColonies.length - page * rowsPerPage);
@@ -165,7 +167,7 @@ const ColoniesTable = () => {
 
 
   const handleRadioChange = (event) => {
-    setAccessRights((event.target.value === 'write') ? true : false );
+    setAccessRights((event.target.value === 'write'));
   };
 
   if (redirectToAnimals) {
@@ -174,9 +176,9 @@ const ColoniesTable = () => {
 
   return (
     <TableContainer className={classes.table} component={Paper}>
-    <Table className={classes.table} aria-label="custom pagination table">
-      <TableBody>
-        {(rowsPerPage > 0
+      <Table className={classes.table} aria-label="custom pagination table">
+        <TableBody>
+          {(rowsPerPage > 0
           ? ownedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
           : ownedColonies
         ).map(colony => (
@@ -197,19 +199,19 @@ const ColoniesTable = () => {
                 <DialogContent>
                   <DialogContentText>
                     Share animal colony with another user.
-                      </DialogContentText>
+                  </DialogContentText>
                   <div>
                     <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
                   </div>
                 </DialogContent>
                 <DialogActions>
-                      <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange} defaultValue="read_o">
-                        <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
-                        <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
-                      </RadioGroup>
-                      <Button onClick={ async () => await share()} variant="outlined" color="primary" className={radioStyle.button}>
+                  <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange} defaultValue="read_o">
+                    <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
+                    <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
+                  </RadioGroup>
+                  <Button onClick={async () => await share()} variant="outlined" color="primary" className={radioStyle.button}>
                         Share
-                      </Button>
+                  </Button>
 
                 </DialogActions>
               </Dialog>
@@ -217,9 +219,13 @@ const ColoniesTable = () => {
               <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
                 <DialogActions>
-                  <Button variant="contained" color="secondary" onClick={ () => {
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => {
                     deleteEntry();
-                  }}>
+                  }}
+                  >
                     Delete
                   </Button>
                 </DialogActions>
@@ -227,32 +233,28 @@ const ColoniesTable = () => {
             </TableCell>
           </TableRow>
         ))}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TablePagination
-            rowsPerPageOptions={[]}
-            colSpan={3}
-            count={ownedColonies.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            SelectProps={{
+        </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TablePagination
+              rowsPerPageOptions={[]}
+              colSpan={3}
+              count={ownedColonies.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              SelectProps={{
               inputProps: { 'aria-label': 'rows per page' },
               native: true,
             }}
-            onChangePage={handleChangePage}
-            ActionsComponent={TablePaginationActions}
-          />
-        </TableRow>
-      </TableFooter>
-    </Table>
-  </TableContainer>
+              onChangePage={handleChangePage}
+              ActionsComponent={TablePaginationActions}
+            />
+          </TableRow>
+        </TableFooter>
+      </Table>
+    </TableContainer>
   );
 };
 
 export default ColoniesTable;
-
-
-
-
 

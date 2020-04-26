@@ -39,33 +39,29 @@ const ProfileProvider = ({ children }) => {
       }
 
       case COLONY: {
-        const colonies = [payload, ...prevState.ownedColonies]
+        const colonies = [payload, ...prevState.ownedColonies];
         return { ...prevState, ownedColonies: colonies };
       }
 
       case DELETE: {
-        const colonies = [...prevState.ownedColonies]
-        const newList = colonies.filter((item, index) => {
-          return item.colonyId !== payload
-        });
-        console.log("deleted Colony ID: ", payload);
+        const colonies = [...prevState.ownedColonies];
+        const newList = colonies.filter((item, index) => item.colonyId !== payload);
+        console.log('deleted Colony ID: ', payload);
         return { ...prevState, ownedColonies: newList };
       }
 
       case DELETEANIMAL: {
-        const animals = [...prevState.animals]
-        const newList = animals.filter((item, index) => {
-          return item.animalUUID !== payload
-        });
-        console.log("deleted animal ID: ", payload);
+        const animals = [...prevState.animals];
+        const newList = animals.filter((item, index) => item.animalUUID !== payload);
+        console.log('deleted animal ID: ', payload);
         return { ...prevState, animals: newList };
       }
 
       case SORT: {
-        const colonies = [...prevState.ownedColonies]
+        const colonies = [...prevState.ownedColonies];
         colonies.sort((a, b) => {
           if (a[payload] < b[payload]) {
-            return -1;  //locations swap
+            return -1; // locations swap
           }
           if (a[payload] > b[payload]) {
             return 1;
@@ -76,7 +72,7 @@ const ProfileProvider = ({ children }) => {
       }
 
       case ALPHASORT: {
-        const colonies = [...prevState.ownedColonies]
+        const colonies = [...prevState.ownedColonies];
         colonies.sort((a, b) => {
           if (a[payload].toLowerCase() < b[payload].toLowerCase()) {
             return -1;
@@ -150,22 +146,22 @@ const useProfileProvider = () => {
     });
 
   const deleteColony = colonyID => axios
-    .post(`${BASE_URL}/colony/delete`, { colonyId: colonyID })  //passing colony id to the colony id object
+    .post(`${BASE_URL}/colony/delete`, { colonyId: colonyID }) // passing colony id to the colony id object
     .then(({ data }) => {
       dispatch({ type: DELETE, payload: colonyID });
     });
 
   const deleteAnimal = request => axios
-    .post(`${BASE_URL}/colony/deleteAnimal`, request)  //passing colony id to the colony id object
+    .post(`${BASE_URL}/colony/deleteAnimal`, request) // passing colony id to the colony id object
     .then(({ data }) => {
       dispatch({ type: DELETEANIMAL, payload: request.animalId });
     });
 
   const editAnimal = request => axios
-    .post(`${BASE_URL}/colony/editAnimal`, request)
+    .post(`${BASE_URL}/colony/editAnimal`, request);
 
   const storeImageLink = request => axios
-    .post(`${BASE_URL}/colony/storeImageLink`, request)  //passing colony id to the colony id object
+    .post(`${BASE_URL}/colony/storeImageLink`, request) // passing colony id to the colony id object
     .then(({ data }) => {
       dispatch({ type: IMAGEUPLOAD, payload: request });
     });
@@ -193,7 +189,7 @@ const useProfileProvider = () => {
     deleteAnimal,
     editAnimal,
     shareColony,
-    storeImageLink
+    storeImageLink,
   };
 };
 

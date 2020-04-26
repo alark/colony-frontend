@@ -136,9 +136,11 @@ const Animals = () => {
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
-  const { animals, accessRights, colonyId, colonySize, colonyName } = state;
+  const {
+    animals, accessRights, colonyId, colonySize, colonyName,
+  } = state;
 
-  const permissions = accessRights ? "Read and Write" : "Read Only";
+  const permissions = accessRights ? 'Read and Write' : 'Read Only';
   console.log('access', accessRights);
 
   const handleChangePage = async (event, newPage) => {
@@ -234,18 +236,19 @@ const Animals = () => {
                     }}
                   >Details
                   </Button>
-                  
+
                   <IconButton aria-label="delete" className={classes.margin}>
-                    <DeleteIcon 
+                    <DeleteIcon
                       onClick={() => {
                         if (accessRights) {
                           deleteChosenAnimal(animal.animalUUID);
                         } else {
-                          console.log("User does not have write access");
+                          console.log('User does not have write access');
                         }
-                      }}/>
+                      }}
+                    />
                   </IconButton>
-                  
+
                 </TableCell>
               </TableRow>
             ))}

@@ -14,7 +14,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Add from '@material-ui/icons/Add';
 
 function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+  const {
+    children, value, index, ...other
+  } = props;
 
   return (
     <Typography
@@ -43,7 +45,7 @@ function a11yProps(index) {
   };
 }
 
-const tabStyle = makeStyles((theme) => ({
+const tabStyle = makeStyles(theme => ({
   root: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.paper,
@@ -51,7 +53,9 @@ const tabStyle = makeStyles((theme) => ({
 }));
 
 const Colonies = () => {
-  const { addColony, sortList, sortAlpha, state: { ownedColonies, sharedColonies } } = useProfileProvider();
+  const {
+    addColony, sortList, sortAlpha, state: { ownedColonies, sharedColonies },
+  } = useProfileProvider();
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
   const [addDialog, setAddDialogOpen] = React.useState(false);
@@ -64,8 +68,8 @@ const Colonies = () => {
   };
 
   useEffect(() => {
-    console.log("OWNED LIST: ", ownedColonies);
-    console.log("SHARED LIST: ", sharedColonies);
+    console.log('OWNED LIST: ', ownedColonies);
+    console.log('SHARED LIST: ', sharedColonies);
   });
 
   const openAddDialog = () => {
@@ -86,9 +90,8 @@ const Colonies = () => {
 
     if (file != null && file.size > 0) {
       reader.readAsText(file);
-    }
-    else {
-      alert("Please input a file!");
+    } else {
+      alert('Please input a file!');
     }
 
     let check = true;
@@ -98,10 +101,9 @@ const Colonies = () => {
       const data = { payload: load, name: fileName };
       if (!isBlank(fileName.trim())) {
         await addColony(data);
-      }
-      else {
+      } else {
         check = false;
-        alert("Name can not be blank or just spaces!");
+        alert('Name can not be blank or just spaces!');
       }
     };
 
@@ -119,7 +121,7 @@ const Colonies = () => {
       return true;
     }
     return false;
-  }
+  };
   /**
  * Updates input for file name.
  *
@@ -146,7 +148,7 @@ const Colonies = () => {
   const handleAlpha = (key) => {
     sortAlpha(key);
     handleClose();
-  }
+  };
 
   return (
     <Container component="main">
@@ -155,63 +157,71 @@ const Colonies = () => {
 
       <div className={tabClasses.root}>
         <AppBar position="static">
-            <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
-              <Tab label="My Colonies" {...a11yProps(0)} />
-              <Tab label="Shared With Me" {...a11yProps(1)} />
-            </Tabs>
+          <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
+            <Tab label="My Colonies" {...a11yProps(0)} />
+            <Tab label="Shared With Me" {...a11yProps(1)} />
+          </Tabs>
 
           <Grid
             justify="flex-end" // Add it here :)
-            container 
+            container
             spacing={1}
             alignItems="flex-end"
           >
-            <Grid style={{paddingRight: 10}} item>
-              <Button color="inherit" variant="outlined" onClick={() => {
-                handleAlpha("colonyName");
-              }}>
+            <Grid style={{ paddingRight: 10 }} item>
+              <Button
+                color="inherit"
+                variant="outlined"
+                onClick={() => {
+                handleAlpha('colonyName');
+              }}
+              >
                 Sort by Name
               </Button>
             </Grid>
 
-            <Grid style={{paddingRight: 10}} item>
-              <Button color="inherit" variant="outlined" onClick={() => {
-                handleSort("size");
-              }}>
+            <Grid style={{ paddingRight: 10 }} item>
+              <Button
+                color="inherit"
+                variant="outlined"
+                onClick={() => {
+                handleSort('size');
+              }}
+              >
                 Sort by Size
               </Button>
 
             </Grid>
-            <Grid style={{paddingRight: 28}} item>
+            <Grid style={{ paddingRight: 28 }} item>
               <Button startIcon={<Add />} color="inherit" variant="outlined" onClick={openAddDialog}>
                 Add Colony
               </Button>
             </Grid>
           </Grid>
 
-            <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
-              <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
+          <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
                   Upload an animal colony along with its name.
-                    </DialogContentText>
-                <input type="file" name="file" onChange={chooseFile} />
-                <div>
-                  <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
-                </div>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={uploadFile} startIcon={<CloudUploadIcon />}>Upload</Button>
-              </DialogActions>
-            </Dialog>
+              </DialogContentText>
+              <input type="file" name="file" onChange={chooseFile} />
+              <div>
+                <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={uploadFile} startIcon={<CloudUploadIcon />}>Upload</Button>
+            </DialogActions>
+          </Dialog>
 
-        <TabPanel value={tab} index={0}>
-          <ColoniesTable />
-        </TabPanel>
+          <TabPanel value={tab} index={0}>
+            <ColoniesTable />
+          </TabPanel>
 
-        <TabPanel value={tab} index={1}>
-          <SharedColoniesTable />
-        </TabPanel>
+          <TabPanel value={tab} index={1}>
+            <SharedColoniesTable />
+          </TabPanel>
         </AppBar>
 
       </div>

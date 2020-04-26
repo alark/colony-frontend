@@ -66,12 +66,13 @@ const Register = () => {
       <div style={{ textAlign: 'left' }}>
 
         <Breadcrumbs aria-label="breadcrumb">
-          <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
+          <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
             Logout
           </Link>
-          <Link 
-          color="textPrimary"
-          aria-current="page">
+          <Link
+            color="textPrimary"
+            aria-current="page"
+          >
             Register
           </Link>
         </Breadcrumbs>

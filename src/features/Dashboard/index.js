@@ -5,7 +5,7 @@ import { useProfileProvider } from 'contexts/profile';
 import { Breadcrumbs, Link, makeStyles } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     '& > * + *': {
       marginTop: theme.spacing(2),
@@ -28,12 +28,13 @@ const Dashboard = () => {
     <div className="dashboard">
       <div className={classes.root} style={{ textAlign: 'left' }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
-          <Link color="inherit" onClick={()=> setRedirectToLogin(true)}>
+          <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
             Logout
           </Link>
-          <Link 
-          color="textPrimary"
-          aria-current="page">
+          <Link
+            color="textPrimary"
+            aria-current="page"
+          >
             Colonies
           </Link>
         </Breadcrumbs>

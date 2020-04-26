@@ -6,7 +6,7 @@ import { Breadcrumbs, Link, makeStyles } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     '& > * + *': {
       marginTop: theme.spacing(2),
@@ -24,11 +24,9 @@ const ColonyPage = () => {
 
   if (redirectToColonies) {
     return <Redirect to="/dashboard" />;
-  }
-  else if (redirectToLogin) {
+  } else if (redirectToLogin) {
     logout();
     return <Redirect to="/" />;
-
   }
 
   return (
@@ -37,16 +35,16 @@ const ColonyPage = () => {
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
           <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
             Logout
-        </Link>
+          </Link>
           <Link color="inherit" onClick={() => setRedirectToColonies(true)}>
             Colonies
-        </Link>
+          </Link>
           <Link
             color="textPrimary"
             aria-current="page"
           >
             {colonyName}
-        </Link>
+          </Link>
         </Breadcrumbs>
       </div>
       <Animals />

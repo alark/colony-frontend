@@ -107,10 +107,11 @@ const SharedColoniesTable = () => {
 
   const deleteEntry = async () => {
     if (permission) {
-      await deleteColony(deletedColony);
+      await deleteColony(deletedColony, true);
     } else {
       console.log('User does not have write access');
     }
+    closeDeleteDialog();
   };
 
 

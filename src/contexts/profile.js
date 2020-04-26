@@ -44,10 +44,10 @@ const ProfileProvider = ({ children }) => {
       }
 
       case DELETE: {
-        const colonies = [...prevState.ownedColonies];
-        const newList = colonies.filter((item, index) => item.colonyId !== payload);
+        const colonies = payload.sharedTable ? [...prevState.sharedColonies] : [...prevState.ownedColonies];
+        const newList = colonies.filter((item, index) => item.colonyId !== payload.colonyId);
         console.log('deleted Colony ID: ', payload);
-        return { ...prevState, ownedColonies: newList };
+        return payload.sharedTable ? { ...prevState, sharedColonies: newList } :  { ...prevState, ownedColonies: newList };
       }
 
       case DELETEANIMAL: {
@@ -145,10 +145,10 @@ const useProfileProvider = () => {
       dispatch({ type: ANIMALS, payload: data });
     });
 
-  const deleteColony = colonyID => axios
-    .post(`${BASE_URL}/colony/delete`, { colonyId: colonyID }) // passing colony id to the colony id object
+  const deleteColony = (colonyId, sharedTable) => axios
+    .post(`${BASE_URL}/colony/delete`, { colonyId }) // passing colony id to the colony id object
     .then(({ data }) => {
-      dispatch({ type: DELETE, payload: colonyID });
+      dispatch({ type: DELETE, payload: { colonyId, sharedTable } });
     });
 
   const deleteAnimal = request => axios

@@ -9,7 +9,7 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import { blue } from '@material-ui/core/colors';
+import { blue, red } from '@material-ui/core/colors';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
@@ -123,7 +123,11 @@ const useStyles2 = makeStyles(theme => ({
   },
   blue: {
     color: theme.palette.getContrastText(blue[800]),
-    backgroundColor: blue[800],
+    backgroundColor: blue[300],
+  },
+  red: {
+    color: theme.palette.getContrastText(red[800]),
+    backgroundColor: red[300],
   },
 }));
 
@@ -208,7 +212,7 @@ const Animals = () => {
                   }}
                 >
                   <div style={{ fontWeight: 'bold', fontSize: 18, flexDirection: 'row' }}>
-                    <Avatar className={classes.blue}>{animal.mouseId}</Avatar>
+                    <Avatar className={animal.gender === "M" ? classes.blue : classes.red }>{animal.mouseId}</Avatar>
                   </div>
                 </TableCell>
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>

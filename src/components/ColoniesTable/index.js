@@ -146,7 +146,7 @@ const ColoniesTable = () => {
   };
 
   const deleteEntry = () => {
-    deleteColony(deletedColony);
+    deleteColony(deletedColony, false);
     closeDeleteDialog();
   };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, Redirect } from 'react-router-dom';
-import { Button, Breadcrumbs, Link, Container, CssBaseline } from '@material-ui/core';
+import { Button, Grid, Breadcrumbs, Link, Container, CssBaseline } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -43,7 +43,7 @@ const useStyles2 = makeStyles(theme => ({
     flex: '1 0 auto',
   },
   cover: {
-    width: 151,
+    width: 500,
   },
   controls: {
     display: 'flex',
@@ -200,11 +200,13 @@ const SingleAnimal = (props) => {
               title="Rat"
             />
             
-            <div className={classesTwo.details}>
+            <CardContent className={classes.form}>
               <form className={classes.form} noValidate>
-                <CardContent className={classesTwo.content}>
+                  <Grid container>
+                  <Grid item>
                   <Typography variant="subtitle1" color="textSecondary">
                     <strong>ID:</strong>
+                  </Typography>
                     <TextField
                       variant="outlined"
                       margin="normal"
@@ -212,9 +214,11 @@ const SingleAnimal = (props) => {
                       defaultValue={currentAnimal.mouseId}
                       onChange={(event) => setAnimalId(event.target.value)}
                     />
-                  </Typography>
+                  </Grid>
+                  <Grid item>
                   <Typography variant="subtitle1" color="textSecondary">
                     <strong>Gender:</strong>
+                  </Typography>
                     <TextField
                       variant="outlined"
                       margin="normal"
@@ -222,9 +226,26 @@ const SingleAnimal = (props) => {
                       defaultValue={currentAnimal.gender}
                       onChange={(event) => setGender(event.target.value)}
                     />
-                  </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      <strong>tod:</strong>
+                    </Typography>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        name="gene3"
+                        defaultValue={currentAnimal.tod}
+                        onChange={(event) => setTod(event.target.value)}
+                      />
+                  </Grid>
+                  </Grid>
+
+                  <Grid container>
+                  <Grid item>
                   <Typography variant="subtitle1" color="textSecondary">
                     <strong>Date of birth month:</strong>
+                  </Typography>
                     <TextField
                       variant="outlined"
                       margin="normal"
@@ -232,9 +253,11 @@ const SingleAnimal = (props) => {
                       defaultValue={currentAnimal.dobMonth}
                       onChange={(event) => setMonth(event.target.value)}
                     />
-                  </Typography>
+                  </Grid>
+                  <Grid item>
                   <Typography variant="subtitle1" color="textSecondary">
                     <strong>Date of birth day:</strong>
+                  </Typography>
                     <TextField
                       variant="outlined"
                       margin="normal"
@@ -242,9 +265,11 @@ const SingleAnimal = (props) => {
                       defaultValue={currentAnimal.dobDay}
                       onChange={(event) => setDay(event.target.value)}
                     />
-                  </Typography>
+                  </Grid>
+                  <Grid item>
                   <Typography variant="subtitle1" color="textSecondary">
                     <strong>Date of birth year:</strong>
+                  </Typography>
                     <TextField
                       variant="outlined"
                       margin="normal"
@@ -252,25 +277,25 @@ const SingleAnimal = (props) => {
                       defaultValue={currentAnimal.dobYear}
                       onChange={(event) => setYear(event.target.value)}
                     />
-                  </Typography>
-                  {
-                    currentAnimal.dodDay > 0 ?
-                      <Typography variant="subtitle1" color="textSecondary">
-                        <strong>Date of death month:</strong>
-                        <TextField
-                          variant="outlined"
-                          margin="normal"
-                          name="dodMonth"
-                          defaultValue={currentAnimal.dodMonth}
-                          onChange={(event) => setDeathMonth(event.target.value)}
-                        />
-                      </Typography>
-                      : null
-                  }
-                  {
-                    currentAnimal.dodDay > 0 ?
+                  </Grid>
+                  </Grid>
+                  <Grid container>
+                    <Grid item>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      <strong>Date of death month:</strong>
+                    </Typography>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        name="dodMonth"
+                        defaultValue={currentAnimal.dodMonth}
+                        onChange={(event) => setDeathMonth(event.target.value)}
+                      />
+                    </Grid>
+                    <Grid item>
                       <Typography variant="subtitle1" color="textSecondary">
                         <strong>Date of death day:</strong>
+                      </Typography>
                         <TextField
                           variant="outlined"
                           margin="normal"
@@ -278,13 +303,11 @@ const SingleAnimal = (props) => {
                           defaultValue={currentAnimal.dodDay}
                           onChange={(event) => setDeathDay(event.target.value)}
                         />
-                      </Typography>
-                      : null
-                  }
-                  {
-                    currentAnimal.dodYear ?
+                    </Grid>
+                    <Grid item>
                       <Typography variant="subtitle1" color="textSecondary">
                         <strong>Date of death year:</strong>
+                      </Typography>
                         <TextField
                           variant="outlined"
                           margin="normal"
@@ -292,88 +315,89 @@ const SingleAnimal = (props) => {
                           defaultValue={currentAnimal.dodYear}
                           onChange={(event) => setDeathYear(event.target.value)}
                         />
+                    </Grid>
+                    </Grid>
+
+                  <Grid container>
+                    <Grid item>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        <strong>Litter:</strong>
                       </Typography>
-                      : null
-                  }
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Litter:</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      name="litter"
-                      type="litter"
-                      defaultValue={currentAnimal.litter}
-                      onChange={(event) => setLitter(event.target.value)}
-                    />
-                  </Typography>
-                </CardContent>
-
-                <CardContent className={classesTwo.content}>
-
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Father ID:</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      name="fatherId"
-                      defaultValue={currentAnimal.fatherId}
-                      onChange={(event) => setFather(event.target.value)}
-                    />
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Mother ID:</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      name="motherId"
-                      defaultValue={currentAnimal.motherId}
-                      onChange={(event) => setMother(event.target.value)}
-                    />
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Gene 1</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      required
-                      name="gene1"
-                      type="gene1"
-                      defaultValue={currentAnimal.gene1}
-                      onChange={(event) => setGene1(event.target.value)}
-                    />
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Gene 2</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      name="gene2"
-                      defaultValue={currentAnimal.gene2}
-                      onChange={(event) => setGene2(event.target.value)}
-                    />
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>Gene 3</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      name="gene3"
-                      defaultValue={currentAnimal.gene3}
-                      onChange={(event) => setGene3(event.target.value)}
-                    />
-                  </Typography>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    <strong>tod</strong>
-                    <TextField
-                      variant="outlined"
-                      margin="normal"
-                      name="gene3"
-                      defaultValue={currentAnimal.tod}
-                      onChange={(event) => setTod(event.target.value)}
-                    />
-                  </Typography>
-                </CardContent>
+                        <TextField
+                          variant="outlined"
+                          margin="normal"
+                          required
+                          name="litter"
+                          type="litter"
+                          defaultValue={currentAnimal.litter}
+                          onChange={(event) => setLitter(event.target.value)}
+                        />
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        <strong>Father ID:</strong>
+                      </Typography>
+                        <TextField
+                          variant="outlined"
+                          margin="normal"
+                          name="fatherId"
+                          defaultValue={currentAnimal.fatherId}
+                          onChange={(event) => setFather(event.target.value)}
+                        />
+                    </Grid>
+                    <Grid item>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        <strong>Mother ID:</strong>
+                      </Typography>
+                        <TextField
+                          variant="outlined"
+                          margin="normal"
+                          name="motherId"
+                          defaultValue={currentAnimal.motherId}
+                          onChange={(event) => setMother(event.target.value)}
+                        />
+                    </Grid>
+                    </Grid>
+                <Grid container>
+                  <Grid item>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      <strong>Gene 1:</strong>
+                    </Typography>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        name="gene1"
+                        type="gene1"
+                        defaultValue={currentAnimal.gene1}
+                        onChange={(event) => setGene1(event.target.value)}
+                      />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      <strong>Gene 2:</strong>
+                    </Typography>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        name="gene2"
+                        defaultValue={currentAnimal.gene2}
+                        onChange={(event) => setGene2(event.target.value)}
+                      />
+                  </Grid>
+                  <Grid item>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      <strong>Gene 3:</strong>
+                    </Typography>
+                      <TextField
+                        variant="outlined"
+                        margin="normal"
+                        name="gene3"
+                        defaultValue={currentAnimal.gene3}
+                        onChange={(event) => setGene3(event.target.value)}
+                      />
+                  </Grid>
+                  </Grid>
               </form>
 
               <div className={classesTwo.controls}>
@@ -393,7 +417,7 @@ const SingleAnimal = (props) => {
                 >Back
               </Button>
               </div>
-            </div>
+            </CardContent>
 
           </Card>
 
@@ -421,8 +445,8 @@ const SingleAnimal = (props) => {
           </div>
           <Uploader animalId={currentAnimal.animalUUID} />
           {
-            currentAnimal.imageLinks.map((link) => (
-              <img src={link} />
+            currentAnimal.imageLinks.map((link, index) => (
+              <img src={link} key={index} />
             ))}
         </div>
       </Container>

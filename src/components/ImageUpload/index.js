@@ -61,9 +61,10 @@ const Uploader = (props) => {
             .getDownloadURL()
             .then(url => {
               setUrl(url);
+              console.log('url', url);
+              storeImageLink({ colonyId, animalId, url });
               setProgress(0);
             });
-            storeImageLink({ colonyId, animalId, url });
         }
       );
     } else {

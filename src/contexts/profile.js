@@ -17,6 +17,7 @@ const ANIMALS = 'ANIMALS';
 const SORT = 'SORT';
 const ALPHASORT = 'ALPHASORT';
 const DELETE = 'DELETE';
+const EDITANIMAL = 'EDITANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 
@@ -92,6 +93,18 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
+      case EDITANIMAL: {
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex((item, index) => item.animalUUID === payload.animalUUID);
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          animals[targetIndex] = payload; // Store edited animal
+        }
+        return {
+          ...prevState, animals
+        };
+      }
+
       case IMAGEUPLOAD: {
         return { ...prevState };
       }
@@ -147,21 +160,24 @@ const useProfileProvider = () => {
 
   const deleteColony = (colonyId, sharedTable) => axios
     .post(`${BASE_URL}/colony/delete`, { colonyId }) // passing colony id to the colony id object
-    .then(({ data }) => {
+    .then(() => {
       dispatch({ type: DELETE, payload: { colonyId, sharedTable } });
     });
 
   const deleteAnimal = request => axios
-    .post(`${BASE_URL}/colony/deleteAnimal`, request) // passing colony id to the colony id object
-    .then(({ data }) => {
+    .post(`${BASE_URL}/colony/deleteAnimal`, request)
+    .then(() => {
       dispatch({ type: DELETEANIMAL, payload: request.animalId });
     });
 
   const editAnimal = request => axios
-    .post(`${BASE_URL}/colony/editAnimal`, request);
+    .post(`${BASE_URL}/colony/editAnimal`, request)
+    .then(({ data }) => {
+      dispatch({ type: EDITANIMAL, payload: data});
+    });
 
   const storeImageLink = request => axios
-    .post(`${BASE_URL}/colony/storeImageLink`, request) // passing colony id to the colony id object
+    .post(`${BASE_URL}/colony/storeImageLink`, request)
     .then(({ data }) => {
       dispatch({ type: IMAGEUPLOAD, payload: request });
     });

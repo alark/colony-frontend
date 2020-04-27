@@ -95,7 +95,8 @@ const ProfileProvider = ({ children }) => {
 
       case EDITANIMAL: {
         const animals = [...prevState.animals];
-        const targetIndex = animals.findIndex((item, index) => item.animalUUID === payload.animalUUID);
+        const targetIndex = animals.findIndex((item) => item.animalUUID === payload.animalUUID);
+        console.log("here");
         // Get index of animal to edit
         if (targetIndex !== -1) {
           animals[targetIndex] = payload; // Store edited animal
@@ -106,7 +107,16 @@ const ProfileProvider = ({ children }) => {
       }
 
       case IMAGEUPLOAD: {
-        return { ...prevState };
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex((item) => item.animalUUID === payload.animalId);
+        console.log("here");
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          animals[targetIndex].imageLinks.push(payload.url); // Store edited animal
+        }
+        return {
+          ...prevState, animals
+        };
       }
 
       case LOGOUT: {
@@ -179,7 +189,7 @@ const useProfileProvider = () => {
   const storeImageLink = request => axios
     .post(`${BASE_URL}/colony/storeImageLink`, request)
     .then(({ data }) => {
-      dispatch({ type: IMAGEUPLOAD, payload: request });
+      dispatch({ type: IMAGEUPLOAD, payload: data });
     });
 
   const sortList = (sortBy) => {

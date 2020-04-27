@@ -47,14 +47,14 @@ const ProfileProvider = ({ children }) => {
       case DELETE: {
         const colonies = payload.sharedTable ? [...prevState.sharedColonies] : [...prevState.ownedColonies];
         const newList = colonies.filter((item, index) => item.colonyId !== payload.colonyId);
-        console.log('deleted Colony ID: ', payload);
+        console.log('Deleted Colony ID: ', payload);
         return payload.sharedTable ? { ...prevState, sharedColonies: newList } : { ...prevState, ownedColonies: newList };
       }
 
       case DELETEANIMAL: {
         const animals = [...prevState.animals];
         const newList = animals.filter((item, index) => item.animalUUID !== payload);
-        console.log('deleted animal ID: ', payload);
+        console.log('Deleted Animal ID: ', payload);
         return { ...prevState, animals: newList };
       }
 
@@ -173,7 +173,7 @@ const useProfileProvider = () => {
   const editAnimal = request => axios
     .post(`${BASE_URL}/colony/editAnimal`, request)
     .then(({ data }) => {
-      dispatch({ type: EDITANIMAL, payload: data});
+      dispatch({ type: EDITANIMAL, payload: data });
     });
 
   const storeImageLink = request => axios

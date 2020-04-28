@@ -446,7 +446,7 @@ const SingleAnimal = (props) => {
           <Uploader animalId={currentAnimal.animalUUID} />
           {
             currentAnimal.imageLinks.map((link, index) => (
-              <img src={link} alt={defaultLink} key={index} />
+              <img src={link} key={index} />
             ))}
         </div>
       </Container>

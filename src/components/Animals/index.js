@@ -240,7 +240,7 @@ const Animals = () => {
                       setCurrentAnimal(animal);
                       setRedirectTodetails(true);
                     }}
-                  >Details
+                  >Profile
                   </Button>
 
                   <IconButton

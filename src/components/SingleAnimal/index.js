@@ -89,6 +89,8 @@ const SingleAnimal = (props) => {
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
   const [isDefault, setDefault] = useState(false);
+  
+  currentAnimal.imageLinks.splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
     setAnimalId(id);

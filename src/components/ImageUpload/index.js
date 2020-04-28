@@ -8,7 +8,6 @@ import Add from '@material-ui/icons/Add';
 
 const Uploader = (props) => {
   const [image, setImage] = useState(null);
-  const [url, setUrl] = useState('');
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
   const [addDialog, setAddDialogOpen] = React.useState(false);
@@ -58,7 +57,6 @@ const Uploader = (props) => {
             .child(image.name)
             .getDownloadURL()
             .then((url) => {
-              setUrl(url);
               console.log('url', url);
               storeImageLink({ colonyId, animalId, url });
               setProgress(0);

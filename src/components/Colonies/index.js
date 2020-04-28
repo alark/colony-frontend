@@ -3,8 +3,8 @@ import ColoniesTable from 'components/ColoniesTable';
 import SharedColoniesTable from 'components/SharedColoniesTable';
 import { useProfileProvider } from 'contexts/profile';
 import PropTypes from 'prop-types';
-import { AppBar, Toolbar, Button, Box, TextField, Container, CssBaseline, Grid, Tabs, Tab, Typography } from '@material-ui/core';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { AppBar, Button, Box, TextField, Container, CssBaseline, Grid, Tabs, Tab, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -60,7 +60,6 @@ const Colonies = () => {
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
   const [addDialog, setAddDialogOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
   const [tab, setTab] = React.useState(0);
   const tabClasses = tabStyle();
 
@@ -135,22 +134,13 @@ const Colonies = () => {
 
   const headers = 'mouseId,gender,litter,fatherId,motherId,dobMonth,dobDay,dobYear,dodMonth,dodDay,dodYear,tod,notes,gene1,gene2,gene3';
 
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   const handleSort = (key) => {
     sortList(key);
-    handleClose();
   };
 
   const handleAlpha = (key) => {
     sortAlpha(key);
-    handleClose();
   };
 
   return (

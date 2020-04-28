@@ -9,10 +9,10 @@ const HomePage = () => {
   const { state: { loggedIn } } = useProfileProvider();
   return (
     <div className="home-page" style={{ textAlign: 'center' }}>
-      <div style={{paddingTop: 75 }}>
-      <Typography variant="h5">
+      <div style={{ paddingTop: 75 }}>
+        <Typography variant="h5">
           Animal Colony Management System
-      </Typography>
+        </Typography>
       </div>
       { loggedIn ? <Redirect to="/dashboard" /> : <Login /> }
     </div>

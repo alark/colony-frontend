@@ -191,15 +191,15 @@ const Animals = () => {
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
           <TableBody>
-          <TableRow>
-            <TableCell style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>ID</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Gender</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Litter</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Father&nbsp;ID</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Mother&nbsp;ID</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Date&nbsp; of&nbsp; Birth</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }} />
-          </TableRow>
+            <TableRow>
+              <TableCell style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>ID</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Gender</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Litter</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Father&nbsp;ID</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Mother&nbsp;ID</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Date&nbsp; of&nbsp; Birth</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }} />
+            </TableRow>
           </TableBody>
           <TableBody>
             {(animals
@@ -243,8 +243,10 @@ const Animals = () => {
                   >Details
                   </Button>
 
-                  <IconButton aria-label="delete" className={classes.margin}
-                      onClick={() => {
+                  <IconButton
+                    aria-label="delete"
+                    className={classes.margin}
+                    onClick={() => {
                         if (accessRights) {
                           deleteChosenAnimal(animal.animalUUID);
                         } else {
@@ -252,8 +254,7 @@ const Animals = () => {
                         }
                       }}
                   >
-                    <DeleteIcon
-                    />
+                    <DeleteIcon />
                   </IconButton>
 
                 </TableCell>

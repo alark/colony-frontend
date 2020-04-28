@@ -95,27 +95,27 @@ const ProfileProvider = ({ children }) => {
 
       case EDITANIMAL: {
         const animals = [...prevState.animals];
-        const targetIndex = animals.findIndex((item) => item.animalUUID === payload.animalUUID);
-        console.log("here");
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalUUID);
+        console.log('here');
         // Get index of animal to edit
         if (targetIndex !== -1) {
           animals[targetIndex] = payload; // Store edited animal
         }
         return {
-          ...prevState, animals
+          ...prevState, animals,
         };
       }
 
       case IMAGEUPLOAD: {
         const animals = [...prevState.animals];
-        const targetIndex = animals.findIndex((item) => item.animalUUID === payload.animalId);
-        console.log("here");
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
+        console.log('here');
         // Get index of animal to edit
         if (targetIndex !== -1) {
           animals[targetIndex].imageLinks.push(payload.url); // Store edited animal
         }
         return {
-          ...prevState, animals
+          ...prevState, animals,
         };
       }
 

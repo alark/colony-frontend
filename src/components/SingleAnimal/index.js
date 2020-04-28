@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { Button, Grid, Breadcrumbs, Link, Container, CssBaseline } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -61,7 +61,6 @@ const useStyles2 = makeStyles(theme => ({
 }));
 
 const SingleAnimal = (props) => {
-  // const { id } = useParams();
   const classes = useStyles();
   const classesTwo = useStyles2();
   const { logout, editAnimal, state } = useProfileProvider();
@@ -89,6 +88,8 @@ const SingleAnimal = (props) => {
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
   const [isDefault, setDefault] = useState(false);
+
+  currentAnimal.imageLinks.splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
     setAnimalId(id);
@@ -134,7 +135,9 @@ const SingleAnimal = (props) => {
     editAnimal(request);
   };
 
-  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : 'https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg';
+  const defaultLink = 'https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg';
+
+  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : defaultLink;
 
   const onNotesAdded = (event) => {
     console.log(event.target.value);
@@ -443,7 +446,7 @@ const SingleAnimal = (props) => {
           <Uploader animalId={currentAnimal.animalUUID} />
           {
             currentAnimal.imageLinks.map((link, index) => (
-              <img src={link} key={index} />
+              <img src={link} alt={defaultLink} key={index} />
             ))}
         </div>
       </Container>

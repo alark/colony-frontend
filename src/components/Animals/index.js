@@ -149,9 +149,9 @@ const Animals = () => {
 
   const handleChangePage = async (event, newPage) => {
     const request = {
-      colonyId, colonyName, colonySize, rowsPerPage, page: newPage,
+      colonyId, rowsPerPage, page: newPage,
     };
-    await getAnimals(request);
+    await getAnimals(request, accessRights, colonyName, colonySize);
     setPage(newPage);
   };
 
@@ -190,15 +190,17 @@ const Animals = () => {
 
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
-          <TableRow>
-            <TableCell style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>ID</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Gender</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Litter</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Father&nbsp;ID</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Mother&nbsp;ID</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Date&nbsp; of&nbsp; Birth</TableCell>
-            <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }} />
-          </TableRow>
+          <TableBody>
+            <TableRow>
+              <TableCell style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>ID</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Gender</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Litter</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Father&nbsp;ID</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Mother&nbsp;ID</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Date&nbsp; of&nbsp; Birth</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }} />
+            </TableRow>
+          </TableBody>
           <TableBody>
             {(animals
             ).map(animal => (
@@ -241,16 +243,18 @@ const Animals = () => {
                   >Details
                   </Button>
 
-                  <IconButton aria-label="delete" className={classes.margin}>
-                    <DeleteIcon
-                      onClick={() => {
+                  <IconButton
+                    aria-label="delete"
+                    className={classes.margin}
+                    onClick={() => {
                         if (accessRights) {
                           deleteChosenAnimal(animal.animalUUID);
                         } else {
                           console.log('User does not have write access');
                         }
                       }}
-                    />
+                  >
+                    <DeleteIcon />
                   </IconButton>
 
                 </TableCell>

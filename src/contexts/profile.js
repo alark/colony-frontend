@@ -17,6 +17,7 @@ const ANIMALS = 'ANIMALS';
 const SORT = 'SORT';
 const ALPHASORT = 'ALPHASORT';
 const DELETE = 'DELETE';
+const EDITANIMAL = 'EDITANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 
@@ -46,14 +47,14 @@ const ProfileProvider = ({ children }) => {
       case DELETE: {
         const colonies = payload.sharedTable ? [...prevState.sharedColonies] : [...prevState.ownedColonies];
         const newList = colonies.filter((item, index) => item.colonyId !== payload.colonyId);
-        console.log('deleted Colony ID: ', payload);
+        console.log('Deleted Colony ID: ', payload);
         return payload.sharedTable ? { ...prevState, sharedColonies: newList } : { ...prevState, ownedColonies: newList };
       }
 
       case DELETEANIMAL: {
         const animals = [...prevState.animals];
         const newList = animals.filter((item, index) => item.animalUUID !== payload);
-        console.log('deleted animal ID: ', payload);
+        console.log('Deleted Animal ID: ', payload);
         return { ...prevState, animals: newList };
       }
 
@@ -92,8 +93,30 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
+      case EDITANIMAL: {
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalUUID);
+        console.log('here');
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          animals[targetIndex] = payload; // Store edited animal
+        }
+        return {
+          ...prevState, animals,
+        };
+      }
+
       case IMAGEUPLOAD: {
-        return { ...prevState };
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
+        console.log('here');
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          animals[targetIndex].imageLinks.push(payload.url); // Store edited animal
+        }
+        return {
+          ...prevState, animals,
+        };
       }
 
       case LOGOUT: {
@@ -147,23 +170,26 @@ const useProfileProvider = () => {
 
   const deleteColony = (colonyId, sharedTable) => axios
     .post(`${BASE_URL}/colony/delete`, { colonyId }) // passing colony id to the colony id object
-    .then(({ data }) => {
+    .then(() => {
       dispatch({ type: DELETE, payload: { colonyId, sharedTable } });
     });
 
   const deleteAnimal = request => axios
-    .post(`${BASE_URL}/colony/deleteAnimal`, request) // passing colony id to the colony id object
-    .then(({ data }) => {
+    .post(`${BASE_URL}/colony/deleteAnimal`, request)
+    .then(() => {
       dispatch({ type: DELETEANIMAL, payload: request.animalId });
     });
 
   const editAnimal = request => axios
-    .post(`${BASE_URL}/colony/editAnimal`, request);
+    .post(`${BASE_URL}/colony/editAnimal`, request)
+    .then(({ data }) => {
+      dispatch({ type: EDITANIMAL, payload: data });
+    });
 
   const storeImageLink = request => axios
-    .post(`${BASE_URL}/colony/storeImageLink`, request) // passing colony id to the colony id object
+    .post(`${BASE_URL}/colony/storeImageLink`, request)
     .then(({ data }) => {
-      dispatch({ type: IMAGEUPLOAD, payload: request });
+      dispatch({ type: IMAGEUPLOAD, payload: data });
     });
 
   const sortList = (sortBy) => {

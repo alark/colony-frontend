@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
 import { Redirect } from 'react-router-dom';
-import { Button, Grid, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
+import { Button, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';

@@ -69,7 +69,6 @@ const Uploader = (props) => {
   };
 
   return (
-    <div>
       <div>
         <Button startIcon={<Add />} variant="outlined" onClick={openAddDialog}>
           Upload Image
@@ -92,7 +91,6 @@ const Uploader = (props) => {
           <p style={{ color: 'red' }}>{error}</p>
         </div>
       </div>
-    </div>
   );
 };
 

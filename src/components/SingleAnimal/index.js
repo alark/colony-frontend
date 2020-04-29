@@ -63,7 +63,7 @@ const useStyles2 = makeStyles(theme => ({
 const SingleAnimal = (props) => {
   const classes = useStyles();
   const classesTwo = useStyles2();
-  const { logout, editAnimal, state } = useProfileProvider();
+  const { logout, editAnimal, storeNote, state } = useProfileProvider();
   const currentAnimal = props.location.state.animal;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
@@ -89,7 +89,11 @@ const SingleAnimal = (props) => {
   const [tod, setTod] = useState('');
   const [isDefault, setDefault] = useState(false);
 
-  currentAnimal.imageLinks.splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
+  currentAnimal.imageLinks
+    .splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
+
+  const animalNotes = currentAnimal.notes
+    .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
     setAnimalId(id);
@@ -140,21 +144,21 @@ const SingleAnimal = (props) => {
   const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : defaultLink;
 
   const onNotesAdded = (event) => {
-    console.log(event.target.value);
     setNotes(event.target.value);
   };
 
   console.log('PROPS: ', props.location.state.animal);
-  // const onSaveNotes = (event) => {
-  //   alert(`click works: ${notes}`);
-  //   const myNotes = { animalId: id, notes }; // store the notes against an animal for a specific user.
-  //   // saveNotes(myNotes);
-  // };
+  const onSaveNotes = () => {
+    const note = { notes, timestamp: Date.now()};
+    const myNotes = { colonyId, animalId: currentAnimal.animalUUID, note };
+    console.log(myNotes);
+    storeNote(myNotes);
+  };
 
-  // const onNotesAdded = (event) => {
-  //   console.log(event.target.value);
-  //   setNotes(event.target.value);
-  // };
+  const convertTimeStamp = (timestamp) => {
+    return (new Date(timestamp)).toLocaleString();
+  }
+
 
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
@@ -433,21 +437,31 @@ const SingleAnimal = (props) => {
                 // onChange={onNotesAdded}
                 margin="normal"
                 variant="outlined"
+                onChange={onNotesAdded}
                 InputLabelProps={{
                   shrink: true,
                 }}
               />
             </div>
             <div className={classesTwo.controls} style={{ paddingRight: 0 }}>
-              {/* <Button onClick={onSaveNotes} variant="contained" color="primary">Save</Button> */}
-              <Button variant="contained" color="primary">Save</Button>
+
+              <Button variant="contained" color="primary" onClick={onSaveNotes}>
+                Save Note
+              </Button>
+
             </div>
+            <Uploader animalId={currentAnimal.animalUUID} />
           </div>
-          <Uploader animalId={currentAnimal.animalUUID} />
+          {
+            animalNotes.map((note, index) => (
+              <Typography key={index}>{note.notes} {convertTimeStamp(note.timestamp)}</Typography>
+            ))
+          }
           {
             currentAnimal.imageLinks.map((link, index) => (
               <img src={link} key={index} />
-            ))}
+            ))
+          }
         </div>
       </Container>
     </div>

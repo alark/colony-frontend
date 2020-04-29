@@ -20,6 +20,7 @@ const DELETE = 'DELETE';
 const EDITANIMAL = 'EDITANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
+const NOTE = 'NOTE';
 
 axios.defaults.withCredentials = true;
 
@@ -119,6 +120,19 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
+      case NOTE: {
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
+        console.log('here');
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          animals[targetIndex].notes.push(payload.note); // Store edited animal
+        }
+        return {
+          ...prevState, animals,
+        };
+      }
+
       case LOGOUT: {
         // Reset state to logged out
         return initialState;
@@ -192,6 +206,13 @@ const useProfileProvider = () => {
       dispatch({ type: IMAGEUPLOAD, payload: data });
     });
 
+  const storeNote = request => axios
+    .post(`${BASE_URL}/animals/storeNote`, request)
+    .then(({ data }) => {
+      dispatch({ type: NOTE, payload: data });
+    });
+
+
   const sortList = (sortBy) => {
     dispatch({ type: SORT, payload: sortBy });
   };
@@ -216,6 +237,7 @@ const useProfileProvider = () => {
     editAnimal,
     shareColony,
     storeImageLink,
+    storeNote,
   };
 };
 

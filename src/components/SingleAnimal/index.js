@@ -102,6 +102,10 @@ const SingleAnimal = (props) => {
   const animalNotes = currentAnimal.notes
     .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
 
+  animalNotes.sort((a, b) => {
+    return b.timestamp - a.timestamp;
+  });
+
   console.log('Current animal', currentAnimal);
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {

@@ -69,28 +69,28 @@ const Uploader = (props) => {
   };
 
   return (
-      <div>
-        <Button startIcon={<Add />} variant="outlined" onClick={openAddDialog}>
+    <div>
+      <Button startIcon={<Add />} variant="outlined" onClick={openAddDialog}>
           Upload Image
-        </Button>
+      </Button>
 
-        <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Upload Image</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
+      <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">Upload Image</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
               Upload an image for this animal
-            </DialogContentText>
-            <input type="file" name="file" onChange={handleChange} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleUpdate} startIcon={<CloudUploadIcon />}>Upload</Button>
-          </DialogActions>
-        </Dialog>
-        <div style={{ height: '100px' }}>
-          {progress > 0 ? <progress value={progress} max="100" /> : ''}
-          <p style={{ color: 'red' }}>{error}</p>
-        </div>
+          </DialogContentText>
+          <input type="file" name="file" onChange={handleChange} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUpdate} startIcon={<CloudUploadIcon />}>Upload</Button>
+        </DialogActions>
+      </Dialog>
+      <div style={{ height: '100px' }}>
+        {progress > 0 ? <progress value={progress} max="100" /> : ''}
+        <p style={{ color: 'red' }}>{error}</p>
       </div>
+    </div>
   );
 };
 

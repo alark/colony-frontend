@@ -68,7 +68,9 @@ const useStyles2 = makeStyles(theme => ({
 const SingleAnimal = (props) => {
   const classes = useStyles();
   const classesTwo = useStyles2();
-  const { logout, editAnimal, storeNote, state } = useProfileProvider();
+  const {
+    logout, editAnimal, storeNote, state,
+  } = useProfileProvider();
   const currentAnimal = props.location.state.animal;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
@@ -155,14 +157,12 @@ const SingleAnimal = (props) => {
   };
 
   const onSaveNotes = () => {
-    const note = { notes, timestamp: Date.now()};
+    const note = { notes, timestamp: Date.now() };
     const myNotes = { colonyId, animalId: currentAnimal.animalUUID, note };
     storeNote(myNotes);
   };
 
-  const convertTimeStamp = (timestamp) => {
-    return (new Date(timestamp)).toLocaleString();
-  }
+  const convertTimeStamp = timestamp => (new Date(timestamp)).toLocaleString();
 
 
   if (redirectToAnimals) {
@@ -460,12 +460,12 @@ const SingleAnimal = (props) => {
 
           <div className={classes.root}>
             <List component="nav" aria-label="main mailbox folders">
-            {
+              {
               animalNotes.map((note, index) => (
                 <div key={index}>
                   <ListItem button>
-                    <ListItemText 
-                      primary={note.notes} 
+                    <ListItemText
+                      primary={note.notes}
                       secondary={convertTimeStamp(note.timestamp)}
                     />
                   </ListItem>

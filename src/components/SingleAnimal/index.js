@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Button, Grid, Breadcrumbs, Link, Container, CssBaseline } from '@material-ui/core';
+import { Button, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider } from '@material-ui/core';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -58,6 +58,11 @@ const useStyles2 = makeStyles(theme => ({
     height: 38,
     width: 38,
   },
+  notes: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: theme.palette.background.paper,
+  },
 }));
 
 const SingleAnimal = (props) => {
@@ -94,6 +99,8 @@ const SingleAnimal = (props) => {
 
   const animalNotes = currentAnimal.notes
     .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
+
+  console.log('Current animal', currentAnimal);
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
     setAnimalId(id);
@@ -147,11 +154,9 @@ const SingleAnimal = (props) => {
     setNotes(event.target.value);
   };
 
-  console.log('PROPS: ', props.location.state.animal);
   const onSaveNotes = () => {
     const note = { notes, timestamp: Date.now()};
     const myNotes = { colonyId, animalId: currentAnimal.animalUUID, note };
-    console.log(myNotes);
     storeNote(myNotes);
   };
 
@@ -452,11 +457,25 @@ const SingleAnimal = (props) => {
             </div>
             <Uploader animalId={currentAnimal.animalUUID} />
           </div>
-          {
-            animalNotes.map((note, index) => (
-              <Typography key={index}>{note.notes} {convertTimeStamp(note.timestamp)}</Typography>
-            ))
-          }
+
+          <div className={classes.root}>
+            <List component="nav" aria-label="main mailbox folders">
+            {
+              animalNotes.map((note, index) => (
+                <div key={index}>
+                  <ListItem button>
+                    <ListItemText 
+                      primary={note.notes} 
+                      secondary={convertTimeStamp(note.timestamp)}
+                    />
+                  </ListItem>
+                  <Divider />
+                </div>
+              ))
+            }
+
+            </List>
+          </div>
           {
             currentAnimal.imageLinks.map((link, index) => (
               <img src={link} key={index} />

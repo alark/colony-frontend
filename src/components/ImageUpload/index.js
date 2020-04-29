@@ -75,7 +75,7 @@ const Uploader = (props) => {
         </Button>
 
         <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
-          <DialogTitle id="form-dialog-title">Add Colony</DialogTitle>
+          <DialogTitle id="form-dialog-title">Upload Image</DialogTitle>
           <DialogContent>
             <DialogContentText>
               Upload an image for this animal

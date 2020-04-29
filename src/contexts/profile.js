@@ -160,7 +160,7 @@ const useProfileProvider = () => {
     .post(`${BASE_URL}/colony/share`, shareInfo);
 
   const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
-    .post(`${BASE_URL}/colony/animals`, pageInfo)
+    .post(`${BASE_URL}/animals`, pageInfo)
     .then(({ data }) => {
       data.accessRights = accessRights;
       data.colonyName = colonyName;
@@ -175,19 +175,19 @@ const useProfileProvider = () => {
     });
 
   const deleteAnimal = request => axios
-    .post(`${BASE_URL}/colony/deleteAnimal`, request)
+    .post(`${BASE_URL}/animals/delete`, request)
     .then(() => {
       dispatch({ type: DELETEANIMAL, payload: request.animalId });
     });
 
   const editAnimal = request => axios
-    .post(`${BASE_URL}/colony/editAnimal`, request)
+    .post(`${BASE_URL}/animals/edit`, request)
     .then(({ data }) => {
       dispatch({ type: EDITANIMAL, payload: data });
     });
 
   const storeImageLink = request => axios
-    .post(`${BASE_URL}/colony/storeImageLink`, request)
+    .post(`${BASE_URL}/animals/storeImageLink`, request)
     .then(({ data }) => {
       dispatch({ type: IMAGEUPLOAD, payload: data });
     });

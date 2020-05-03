@@ -79,7 +79,7 @@ function TablePaginationActions(props) {
 }
 
 
-const useStyles2 = makeStyles(theme => ({
+const useStyles = makeStyles(theme => ({
   table: {
     width: '100%',
     minWidth: 500,
@@ -133,7 +133,7 @@ const useStyles2 = makeStyles(theme => ({
 
 
 const Animals = () => {
-  const classes = useStyles2();
+  const classes = useStyles();
   const [page, setPage] = React.useState(0);
   const rowsPerPage = 10;
   const [openModal, setOpenModal] = React.useState(false);
@@ -173,11 +173,11 @@ const Animals = () => {
 
   if (redirectToDetails) {
     return (<Redirect
-     // to={`/animal/${currentAnimal.mouseId}`}
+      // to={`/animal/${currentAnimal.mouseId}`}
       to={{
-      pathname: `/animal/${currentAnimal.mouseId}`,
-      state: { animal: currentAnimal },
-    }}
+        pathname: `/animal/${currentAnimal.mouseId}`,
+        state: { animal: currentAnimal },
+      }}
     />);
   }
 
@@ -242,20 +242,23 @@ const Animals = () => {
                     }}
                   >Profile
                   </Button>
-
-                  <IconButton
-                    aria-label="delete"
-                    className={classes.margin}
-                    onClick={() => {
-                        if (accessRights) {
-                          deleteChosenAnimal(animal.animalUUID);
-                        } else {
-                          console.log('User does not have write access');
-                        }
-                      }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {
+                    accessRights ?
+                      <IconButton
+                        aria-label="delete"
+                        className={classes.margin}
+                        onClick={() => {
+                          if (accessRights) {
+                            deleteChosenAnimal(animal.animalUUID);
+                          } else {
+                            console.log('User does not have write access');
+                          }
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                      : null
+                  }
 
                 </TableCell>
               </TableRow>
@@ -296,12 +299,12 @@ const Animals = () => {
               <CardHeader
                 avatar={
                   <Avatar alt={currentAnimal.mouseId} />
-                  }
+                }
                 title={
                   <Typography gutterBottom variant="h5" component="h2">
-                      ID: {currentAnimal.mouseId}
+                    ID: {currentAnimal.mouseId}
                   </Typography>
-                  }
+                }
                 subheader={`Notes: ${currentAnimal.notes}`}
               />
             </div>

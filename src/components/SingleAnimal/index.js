@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Button, Card, CardContent, CardMedia, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, TextField } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import { AppBar, Button, Box, Card, CardContent, CardMedia, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, Tabs, Tab, Typography, TextField } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
@@ -11,15 +12,51 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+function TabPanel(props) {
+  const {
+    children, value, index, ...other
+  } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box p={3}>{children}</Box>}
+    </Typography>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+const tabStyle = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
+
 const useStyles = makeStyles(theme => ({
   root: {
     '& > * + *': {
       marginTop: theme.spacing(2),
     },
   },
-}));
-
-const useStyles2 = makeStyles(theme => ({
   table: {
     width: '100%',
     minWidth: 500,
@@ -79,7 +116,7 @@ const gridStyles = makeStyles((theme) => ({
 
 const SingleAnimal = (props) => {
   const classes = useStyles();
-  const classesTwo = useStyles2();
+  const classesTab = tabStyle();
   const classesGrid = gridStyles();
   const {
     logout, editAnimal, storeNote, state,
@@ -110,9 +147,14 @@ const SingleAnimal = (props) => {
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
   const [isDefault, setDefault] = useState(false);
+  const [tab, setTab] = React.useState(0);
 
   currentAnimal.imageLinks
     .splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
+
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
+  };
 
   const animalNotes = currentAnimal.notes
     .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
@@ -246,12 +288,13 @@ const SingleAnimal = (props) => {
           </Link>
         </Breadcrumbs>
       </div>
+
       <Container component="main">
         <CssBaseline />
-        <div className={classesTwo.paper}>
-          <Card className={classesTwo.root}>
+        <div className={classes.paper}>
+          <Card className={classes.root}>
             <CardMedia
-              className={classesTwo.cover}
+              className={classes.cover}
               image={avatarLink}
               title="Rat"
             />
@@ -470,7 +513,7 @@ const SingleAnimal = (props) => {
                 </div>
               </form>
 
-              <div className={classesTwo.controls}>
+              <div className={classes.controls}>
                 <Button
                   type="submit"
                   variant="contained"
@@ -495,65 +538,70 @@ const SingleAnimal = (props) => {
             </CardContent>
           </Card>
 
-          <div className={classesTwo.details} style={{ flexDirection: 'column' }}>
-            <div>
-              <TextField
-                id="filled-full-width"
-                label="Notes"
-                defaultValue={currentAnimal.notes[0].notes}
-                style={{ margin: 8 }}
-                className={classesTwo.textField}
-                fullWidth
-                // onChange={onNotesAdded}
-                margin="normal"
-                variant="outlined"
-                onChange={onNotesAdded}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </div>
-            <div className={classesTwo.controls} style={{ paddingRight: 0 }}>
-
-              <Button variant="contained" color="primary" onClick={onSaveNotes}>
-                Save Notes
-              </Button>
-              <Snackbar open={notesOpen} autoHideDuration={6000} onClose={handleNotesClose}>
-                  <Alert onClose={handleNotesClose} severity="success">
-                    Notes saved successfully!
-                  </Alert>
-              </Snackbar>
-
-            </div>
-            <Uploader animalId={currentAnimal.animalUUID} />
-          </div>
-
-          <div className={classes.root}>
-            <List component="nav" aria-label="main mailbox folders">
-              {
-                animalNotes.map((note, index) => (
-                  <div key={index}>
-                    <ListItem button>
-                      <ListItemText
-                        primary={note.notes}
-                        secondary={convertTimeStamp(note.timestamp)}
-                      />
-                    </ListItem>
-                    <Divider />
+          <div className={classesTab.root}>
+            <AppBar position="static">
+              <Tabs value={tab} variant="fullWidth"onChange={handleTabChange} aria-label="simple tabs example">
+                <Tab label="Notes" {...a11yProps(0)} />
+                <Tab label="Gallery" {...a11yProps(1)} />
+                <TabPanel value={tab} index={0}>
+                  <div>
+                    <TextField
+                      id="filled-full-width"
+                      label="Notes"
+                      defaultValue={currentAnimal.notes[0].notes}
+                      style={{ margin: 8 }}
+                      className={classes.textField}
+                      fullWidth
+                      margin="normal"
+                      variant="outlined"
+                      onChange={onNotesAdded}
+                      InputLabelProps={{
+                        shrink: true,
+                      }}
+                    />
                   </div>
-                ))
-              }
-
-            </List>
+                  <div className={classes.controls} style={{ paddingRight: 0 }}>
+                    <Button variant="contained" color="primary" onClick={onSaveNotes}>
+                      Save Notes
+                    </Button>
+                    <Snackbar open={notesOpen} autoHideDuration={6000} onClose={handleNotesClose}>
+                      <Alert onClose={handleNotesClose} severity="success">
+                        Notes saved successfully!
+                      </Alert>
+                    </Snackbar>
+                  </div>
+                  <div className={classes.root}>
+                    <List component="nav" aria-label="main mailbox folders">
+                      {
+                        animalNotes.map((note, index) => (
+                          <div key={index}>
+                            <ListItem button>
+                              <ListItemText
+                                primary={note.notes}
+                                secondary={convertTimeStamp(note.timestamp)}
+                              />
+                            </ListItem>
+                            <Divider />
+                          </div>
+                        ))
+                      }
+                    </List>
+                  </div>
+                </TabPanel>
+                <TabPanel value={tab} index={1}>
+                  <Uploader animalId={currentAnimal.animalUUID} />
+                  {
+                    currentAnimal.imageLinks.map((link, index) => (
+                      <img src={link} key={index} />
+                    ))
+                  }
+                </TabPanel>
+              </Tabs>
+            </AppBar>
           </div>
-          {
-            currentAnimal.imageLinks.map((link, index) => (
-              <img src={link} key={index} />
-            ))
-          }
         </div>
       </Container>
-    </div>
+    </div >
   );
 };
 

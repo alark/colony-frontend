@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
 import { Redirect } from 'react-router-dom';
-import { Button, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
+import { Button, IconButton, TextField, Table, TableBody, TableCell, TableContainer, TableRow, Paper } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
-import IconButton from '@material-ui/core/IconButton';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
@@ -16,6 +15,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Share from '@material-ui/icons/Share';
+import DeleteIcon from '@material-ui/icons/Delete';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -150,9 +150,6 @@ const ColoniesTable = () => {
     closeDeleteDialog();
   };
 
-  /* Pagination handler */
-  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, ownedColonies.length - page * rowsPerPage);
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -179,60 +176,67 @@ const ColoniesTable = () => {
       <Table className={classes.table} aria-label="custom pagination table">
         <TableBody>
           {(rowsPerPage > 0
-          ? ownedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-          : ownedColonies
-        ).map(colony => (
-          <TableRow key={colony.colonyId}>
-            <TableCell
-              style={{ cursor: 'pointer' }}
-              component="th"
-              scope="row"
-              onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, rowsPerPage, page)}
-            >
-              <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
-              <p style={{ color: '#333333' }}>Size: {colony.size}</p>
-            </TableCell>
-            <TableCell align="right">
-              <Button variant="contained" color="primary" startIcon={<Share />} onClick={() => openShareDialog(colony.colonyId)}>Share</Button>
-              <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
-                <DialogContent>
-                  <DialogContentText>
-                    Share animal colony with another user.
+            ? ownedColonies.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            : ownedColonies
+          ).map(colony => (
+            <TableRow key={colony.colonyId}>
+              <TableCell
+                style={{ cursor: 'pointer' }}
+                component="th"
+                scope="row"
+                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, rowsPerPage, page)}
+              >
+                <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
+                <p style={{ color: '#333333' }}>Size: {colony.size}</p>
+              </TableCell>
+              <TableCell align="right">
+                <Button variant="contained" color="primary" startIcon={<Share />} onClick={() => openShareDialog(colony.colonyId)}>Share</Button>
+                <Dialog open={shareDialog} onClose={closeShareDialog} aria-labelledby="form-dialog-title">
+                  <DialogTitle id="form-dialog-title">Share with others</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Share animal colony with another user.
                   </DialogContentText>
-                  <div>
-                    <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
-                  </div>
-                </DialogContent>
-                <DialogActions>
-                  <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange} defaultValue="read_o">
-                    <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
-                    <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
-                  </RadioGroup>
-                  <Button onClick={async () => await share()} variant="outlined" color="primary" className={radioStyle.button}>
-                        Share
+                    <div>
+                      <TextField variant="outlined" margin="dense" size="small" name="email" label="Person to share" onChange={updateInputSharedUser} />
+                    </div>
+                  </DialogContent>
+                  <DialogActions>
+                    <RadioGroup aria-label="quiz" name="quiz" onChange={handleRadioChange} defaultValue="read_o">
+                      <FormControlLabel value="read_o" control={<Radio />} label="Read Only" />
+                      <FormControlLabel value="write" control={<Radio />} label="Read and Write" />
+                    </RadioGroup>
+                    <Button onClick={async () => await share()} variant="outlined" color="primary" className={radioStyle.button}>
+                      Share
                   </Button>
 
-                </DialogActions>
-              </Dialog>
-              <Button variant="contained" color="primary" onClick={() => openDeleteDialog(colony.colonyId)}>Remove</Button>
-              <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
-                <DialogActions>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {
-                    deleteEntry();
+                  </DialogActions>
+                </Dialog>
+                <IconButton
+                  aria-label="delete"
+                  onClick={() => {
+                    openDeleteDialog(colony.colonyId);
                   }}
-                  >
-                    Delete
+                >
+                  <DeleteIcon />
+                </IconButton>
+                <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
+                  <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
+                  <DialogActions>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => {
+                        deleteEntry();
+                      }}
+                    >
+                      Delete
                   </Button>
-                </DialogActions>
-              </Dialog>
-            </TableCell>
-          </TableRow>
-        ))}
+                  </DialogActions>
+                </Dialog>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
         <TableFooter>
           <TableRow>
@@ -243,9 +247,9 @@ const ColoniesTable = () => {
               rowsPerPage={rowsPerPage}
               page={page}
               SelectProps={{
-              inputProps: { 'aria-label': 'rows per page' },
-              native: true,
-            }}
+                inputProps: { 'aria-label': 'rows per page' },
+                native: true,
+              }}
               onChangePage={handleChangePage}
               ActionsComponent={TablePaginationActions}
             />

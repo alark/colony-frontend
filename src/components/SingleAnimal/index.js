@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { Button, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Paper, Container, CssBaseline, Divider } from '@material-ui/core';
-import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
+import { Button, Card, CardContent, CardMedia, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, TextField } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import Uploader from 'components/ImageUpload';
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -50,6 +49,7 @@ const useStyles2 = makeStyles(theme => ({
     alignItems: 'right',
     alignContent: 'right',
     alignSelf: 'flex-end',
+    float: 'right',
     paddingLeft: theme.spacing(1),
     paddingRight: theme.spacing(1),
     paddingBottom: theme.spacing(1),
@@ -90,6 +90,8 @@ const SingleAnimal = (props) => {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const { colonyName, colonyId } = state;
   const [notes, setNotes] = useState('');
+  const [open, setOpen] = React.useState(false);
+  const [notesOpen, setNotesOpen] = React.useState(false);
 
   /** Traits */
   const [animalId, setAnimalId] = useState('');
@@ -138,6 +140,31 @@ const SingleAnimal = (props) => {
     setGene3(gn3);
     setTod(tod);
     setDefault(true);
+    setNotes(currentAnimal.notes);
+  };
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const handleNotesClick = () => {
+    setNotesOpen(true);
+  };
+
+  const handleNotesClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setNotesOpen(false);
   };
 
   const saveChanges = async (event) => {
@@ -145,8 +172,8 @@ const SingleAnimal = (props) => {
     const animal = {
       animalUUID: currentAnimal.animalUUID,
       mouseId: animalId,
-      gender,
-      litter,
+      gender: gender,
+      litter: litter,
       dobMonth: month,
       dobDay: day,
       dobYear: year,
@@ -156,14 +183,15 @@ const SingleAnimal = (props) => {
       fatherId: father,
       motherId: mother,
       notes: animalNotes,
-      gene1,
-      gene2,
-      gene3,
+      gene1: gene1,
+      gene2: gene2,
+      gene3: gene3,
       imageLinks: currentAnimal.imageLinks,
-      tod,
+      tod: tod,
     };
     const request = { animal, colonyId };
     editAnimal(request);
+    handleClick();
   };
 
   const defaultLink = 'https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg';
@@ -178,6 +206,7 @@ const SingleAnimal = (props) => {
     const note = { notes, timestamp: Date.now() };
     const myNotes = { colonyId, animalId: currentAnimal.animalUUID, note };
     storeNote(myNotes);
+    handleNotesClick();
   };
 
   const convertTimeStamp = timestamp => (new Date(timestamp)).toLocaleString();
@@ -457,9 +486,13 @@ const SingleAnimal = (props) => {
                   color="primary"
                 >Back
                 </Button>
+                <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+                  <Alert onClose={handleClose} severity="success">
+                    Changes saved successfully!
+                  </Alert>
+                </Snackbar>
               </div>
             </CardContent>
-
           </Card>
 
           <div className={classesTwo.details} style={{ flexDirection: 'column' }}>
@@ -467,7 +500,7 @@ const SingleAnimal = (props) => {
               <TextField
                 id="filled-full-width"
                 label="Notes"
-                placeholder="Type your notes here"
+                defaultValue={currentAnimal.notes[0].notes}
                 style={{ margin: 8 }}
                 className={classesTwo.textField}
                 fullWidth
@@ -483,8 +516,13 @@ const SingleAnimal = (props) => {
             <div className={classesTwo.controls} style={{ paddingRight: 0 }}>
 
               <Button variant="contained" color="primary" onClick={onSaveNotes}>
-                Save Note
+                Save Notes
               </Button>
+              <Snackbar open={notesOpen} autoHideDuration={6000} onClose={handleNotesClose}>
+                  <Alert onClose={handleNotesClose} severity="success">
+                    Notes saved successfully!
+                  </Alert>
+              </Snackbar>
 
             </div>
             <Uploader animalId={currentAnimal.animalUUID} />

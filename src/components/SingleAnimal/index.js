@@ -142,6 +142,7 @@ const SingleAnimal = (props) => {
       dodYear: deathYear,
       fatherId: father,
       motherId: mother,
+      notes: animalNotes,
       gene1,
       gene2,
       gene3,

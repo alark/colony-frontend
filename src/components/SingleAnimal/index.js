@@ -368,7 +368,7 @@ const SingleAnimal = (props) => {
                         />
                       </div>
                     </Grid>
-                    <Grid item>
+                    <Grid item xs>
                       <div className={classesGrid.paper}>
                         <TextField
                           label="Father ID"

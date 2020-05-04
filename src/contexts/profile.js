@@ -150,7 +150,7 @@ const useProfileProvider = () => {
 
   const login = credentials => axios
     .post(`${BASE_URL}/login`, credentials)
-    .catch(function(response) {
+    .catch((response) => {
       console.log(response.status);
     })
     .then(({ data }) => {

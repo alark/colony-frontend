@@ -846,7 +846,7 @@ const SingleAnimal = (props) => {
                 <Card className={classesTwo.root}>
                   <CardActionArea>
                     <CardMedia style={{ align: 'center' }}>
-                      <img src={currentAnimal.imageLinks[currentImage]} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
+                      <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
                     </CardMedia>
                     <CardActions>
                       <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>

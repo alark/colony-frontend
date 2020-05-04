@@ -150,6 +150,9 @@ const useProfileProvider = () => {
 
   const login = credentials => axios
     .post(`${BASE_URL}/login`, credentials)
+    .catch(function (error) {
+      console.log(JSON.stringify(error));
+    })
     .then(({ data }) => {
       dispatch({ type: LOGIN, payload: data });
     });
@@ -220,7 +223,6 @@ const useProfileProvider = () => {
   const sortAlpha = (sortBy) => {
     dispatch({ type: ALPHASORT, payload: sortBy });
   };
-
 
   return {
     state,

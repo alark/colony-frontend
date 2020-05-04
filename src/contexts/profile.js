@@ -152,7 +152,6 @@ const useProfileProvider = () => {
     .post(`${BASE_URL}/login`, credentials)
     .catch(function(response) {
       console.log(response.status);
-      return response.status;
     })
     .then(({ data }) => {
       dispatch({ type: LOGIN, payload: data });

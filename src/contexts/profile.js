@@ -150,11 +150,11 @@ const useProfileProvider = () => {
 
   const login = credentials => axios
     .post(`${BASE_URL}/login`, credentials)
-    .catch(function(response) {
-      console.log(response.status);
-    })
     .then(({ data }) => {
       dispatch({ type: LOGIN, payload: data });
+    })
+    .catch(function (response) {
+      console.log(response.status);
     });
 
   const register = credentials => axios

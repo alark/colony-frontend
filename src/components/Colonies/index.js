@@ -156,7 +156,7 @@ const Colonies = () => {
           </Tabs>
 
           <Grid
-            justify="flex-end" // Add it here :)
+            justify="flex-end"
             container
             spacing={1}
             alignItems="flex-end"

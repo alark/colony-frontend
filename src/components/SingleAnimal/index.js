@@ -214,7 +214,7 @@ const SingleAnimal = (props) => {
   const handleNextImage = () => {
     const index = currentImage + 1;
     console.log(index);
-    if (index <= currentAnimal.imageLinks.length) {
+    if (index < currentAnimal.imageLinks.length) {
       setCurrentImage(index);
     }
     console.log(currentImage);
@@ -854,6 +854,7 @@ const SingleAnimal = (props) => {
                     <CardActions>
                       <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
                       <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
+                      {currentImage+1} / {currentAnimal.imageLinks.length}
                     </CardActions>
                   </CardActionArea>
                 </Card>

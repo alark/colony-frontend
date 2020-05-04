@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { AppBar, Button, Box, Card, CardContent, CardMedia, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, Tabs, Tab, Typography, TextField } from '@material-ui/core';
+import { AppBar, Box, Button, Card, CardActions, CardContent, CardMedia, IconButton, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, Tab, Tabs, TextField, Typography, CardActionArea } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
+import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
+
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -44,19 +46,18 @@ function a11yProps(index) {
   };
 }
 
-const tabStyle = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
-
 const useStyles = makeStyles(theme => ({
   root: {
     '& > * + *': {
       marginTop: theme.spacing(2),
     },
   },
+  primary: {
+    color: 'black',
+  }
+}));
+
+const useStyles2 = makeStyles(theme => ({
   table: {
     width: '100%',
     minWidth: 500,
@@ -116,11 +117,12 @@ const gridStyles = makeStyles((theme) => ({
 
 const SingleAnimal = (props) => {
   const classes = useStyles();
-  const classesTab = tabStyle();
+  const classesTwo = useStyles2();
   const classesGrid = gridStyles();
   const {
     logout, editAnimal, storeNote, state,
   } = useProfileProvider();
+  const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
@@ -148,13 +150,14 @@ const SingleAnimal = (props) => {
   const [tod, setTod] = useState('');
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
-
-  currentAnimal.imageLinks
-    .splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
+  const [currentImage, setCurrentImage] = React.useState(0);
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
   };
+
+  currentAnimal.imageLinks
+    .splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
 
   const animalNotes = currentAnimal.notes
     .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
@@ -182,7 +185,6 @@ const SingleAnimal = (props) => {
     setGene3(gn3);
     setTod(tod);
     setDefault(true);
-    setNotes(currentAnimal.notes);
   };
 
   const handleClick = () => {
@@ -208,6 +210,24 @@ const SingleAnimal = (props) => {
 
     setNotesOpen(false);
   };
+
+  const handleNextImage = () => {
+    const index = currentImage + 1;
+    console.log(index);
+    if (index <= currentAnimal.imageLinks.length) {
+      setCurrentImage(index);
+    }
+    console.log(currentImage);
+  }
+
+  const handlePreviousImage = () => {
+    const index = currentImage - 1;
+    console.log(index);
+    if (index >= 0) {
+      setCurrentImage(index);
+    }
+    console.log(currentImage);
+  }
 
   const saveChanges = async (event) => {
     event.preventDefault();
@@ -288,239 +308,473 @@ const SingleAnimal = (props) => {
           </Link>
         </Breadcrumbs>
       </div>
-
       <Container component="main">
         <CssBaseline />
-        <div className={classes.paper}>
-          <Card className={classes.root}>
+        <div className={classesTwo.paper}>
+          <Card className={classesTwo.root}>
             <CardMedia
-              className={classes.cover}
+              className={classesTwo.cover}
               image={avatarLink}
               title="Rat"
             />
             <CardContent className={classes.form}>
               <form className={classes.form} noValidate>
-                <div className={classesGrid.root}>
-                  <Grid container>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="ID"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="mouseId"
-                          defaultValue={currentAnimal.mouseId}
-                          onChange={event => setAnimalId(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Gender"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="gender"
-                          defaultValue={currentAnimal.gender}
-                          onChange={event => setGender(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="tod"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="tod"
-                          defaultValue={currentAnimal.tod}
-                          onChange={event => setTod(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                  </Grid>
+                {
+                  accessRights ?
+                    <div className={classesGrid.root}>
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="ID"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="mouseId"
+                              defaultValue={currentAnimal.mouseId}
+                              onChange={event => setAnimalId(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Gender"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gender"
+                              defaultValue={currentAnimal.gender}
+                              onChange={event => setGender(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="tod"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="tod"
+                              defaultValue={currentAnimal.tod}
+                              onChange={event => setTod(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
 
-                  <Grid container>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Birth month"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="dobMonth"
-                          defaultValue={currentAnimal.dobMonth}
-                          onChange={event => setMonth(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Birth day"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="dobDay"
-                          defaultValue={currentAnimal.dobDay}
-                          onChange={event => setDay(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Birth year"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="dobYear"
-                          defaultValue={currentAnimal.dobYear}
-                          onChange={event => setYear(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                  </Grid>
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Birth month"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dobMonth"
+                              defaultValue={currentAnimal.dobMonth}
+                              onChange={event => setMonth(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Birth day"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dobDay"
+                              defaultValue={currentAnimal.dobDay}
+                              onChange={event => setDay(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Birth year"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dobYear"
+                              defaultValue={currentAnimal.dobYear}
+                              onChange={event => setYear(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
 
-                  <Grid container>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Death month"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="dodMonth"
-                          defaultValue={currentAnimal.dodMonth}
-                          onChange={event => setDeathMonth(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Death day"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="dodDay"
-                          defaultValue={currentAnimal.dodDay}
-                          onChange={event => setDeathDay(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Death year"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="dodYear"
-                          defaultValue={currentAnimal.dodYear}
-                          onChange={event => setDeathYear(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                  </Grid>
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Death month"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dodMonth"
+                              defaultValue={currentAnimal.dodMonth}
+                              onChange={event => setDeathMonth(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Death day"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dodDay"
+                              defaultValue={currentAnimal.dodDay}
+                              onChange={event => setDeathDay(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Death year"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dodYear"
+                              defaultValue={currentAnimal.dodYear}
+                              onChange={event => setDeathYear(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
 
-                  <Grid container>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Litter"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="litter"
-                          defaultValue={currentAnimal.litter}
-                          onChange={event => setLitter(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Father ID"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="fatherId"
-                          defaultValue={currentAnimal.fatherId}
-                          onChange={event => setFather(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Mother ID"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="motherId"
-                          defaultValue={currentAnimal.motherId}
-                          onChange={event => setMother(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                  </Grid>
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Litter"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="litter"
+                              defaultValue={currentAnimal.litter}
+                              onChange={event => setLitter(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Father ID"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="fatherId"
+                              defaultValue={currentAnimal.fatherId}
+                              onChange={event => setFather(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Mother ID"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="motherId"
+                              defaultValue={currentAnimal.motherId}
+                              onChange={event => setMother(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
 
-                  <Grid container>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Gene 1"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="gene1"
-                          defaultValue={currentAnimal.gene1}
-                          onChange={event => setGene1(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Gene 2"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="gene2"
-                          defaultValue={currentAnimal.gene2}
-                          onChange={event => setGene2(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                    <Grid item xs>
-                      <div className={classesGrid.paper}>
-                        <TextField
-                          label="Gene 3"
-                          variant="outlined"
-                          size="small"
-                          margin="normal"
-                          name="gene3"
-                          defaultValue={currentAnimal.gene3}
-                          onChange={event => setGene3(event.target.value)}
-                        />
-                      </div>
-                    </Grid>
-                  </Grid>
-                </div>
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Gene 1"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gene1"
+                              defaultValue={currentAnimal.gene1}
+                              onChange={event => setGene1(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Gene 2"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gene2"
+                              defaultValue={currentAnimal.gene2}
+                              onChange={event => setGene2(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              label="Gene 3"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gene3"
+                              defaultValue={currentAnimal.gene3}
+                              onChange={event => setGene3(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+                    </div>
+                    :
+                    <div className={classesGrid.root}>
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="ID"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="mouseId"
+                              defaultValue={currentAnimal.mouseId}
+                              onChange={event => setAnimalId(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Gender"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gender"
+                              defaultValue={currentAnimal.gender}
+                              onChange={event => setGender(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="tod"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="tod"
+                              defaultValue={currentAnimal.tod}
+                              onChange={event => setTod(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Birth month"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dobMonth"
+                              defaultValue={currentAnimal.dobMonth}
+                              onChange={event => setMonth(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Birth day"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dobDay"
+                              defaultValue={currentAnimal.dobDay}
+                              onChange={event => setDay(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Birth year"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dobYear"
+                              defaultValue={currentAnimal.dobYear}
+                              onChange={event => setYear(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Death month"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dodMonth"
+                              defaultValue={currentAnimal.dodMonth}
+                              onChange={event => setDeathMonth(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Death day"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dodDay"
+                              defaultValue={currentAnimal.dodDay}
+                              onChange={event => setDeathDay(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Death year"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="dodYear"
+                              defaultValue={currentAnimal.dodYear}
+                              onChange={event => setDeathYear(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Litter"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="litter"
+                              defaultValue={currentAnimal.litter}
+                              onChange={event => setLitter(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Father ID"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="fatherId"
+                              defaultValue={currentAnimal.fatherId}
+                              onChange={event => setFather(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Mother ID"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="motherId"
+                              defaultValue={currentAnimal.motherId}
+                              onChange={event => setMother(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Gene 1"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gene1"
+                              defaultValue={currentAnimal.gene1}
+                              onChange={event => setGene1(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Gene 2"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gene2"
+                              defaultValue={currentAnimal.gene2}
+                              onChange={event => setGene2(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Gene 3"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="gene3"
+                              defaultValue={currentAnimal.gene3}
+                              onChange={event => setGene3(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+                    </div>
+                }
               </form>
 
-              <div className={classes.controls}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                  onClick={saveChanges}
-                >Save Changes
-                </Button>
+              <div className={classesTwo.controls}>
+                {
+                  accessRights ?
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      onClick={saveChanges}
+                    >Save Changes
+                    </Button>
+                    : null
+                }
+
                 <Button
                   onClick={() => {
                     setRedirectToAnimals(true);
@@ -537,71 +791,78 @@ const SingleAnimal = (props) => {
               </div>
             </CardContent>
           </Card>
+        </div>
 
-          <div className={classesTab.root}>
-            <AppBar position="static">
-              <Tabs value={tab} variant="fullWidth"onChange={handleTabChange} aria-label="simple tabs example">
-                <Tab label="Notes" {...a11yProps(0)} />
-                <Tab label="Gallery" {...a11yProps(1)} />
-                <TabPanel value={tab} index={0}>
-                  <div>
-                    <TextField
-                      id="filled-full-width"
-                      label="Notes"
-                      defaultValue={currentAnimal.notes[0].notes}
-                      style={{ margin: 8 }}
-                      className={classes.textField}
-                      fullWidth
-                      margin="normal"
-                      variant="outlined"
-                      onChange={onNotesAdded}
-                      InputLabelProps={{
-                        shrink: true,
-                      }}
-                    />
-                  </div>
-                  <div className={classes.controls} style={{ paddingRight: 0 }}>
-                    <Button variant="contained" color="primary" onClick={onSaveNotes}>
-                      Save Notes
-                    </Button>
-                    <Snackbar open={notesOpen} autoHideDuration={6000} onClose={handleNotesClose}>
-                      <Alert onClose={handleNotesClose} severity="success">
-                        Notes saved successfully!
-                      </Alert>
-                    </Snackbar>
-                  </div>
-                  <div className={classes.root}>
-                    <List component="nav" aria-label="main mailbox folders">
-                      {
-                        animalNotes.map((note, index) => (
-                          <div key={index}>
-                            <ListItem button>
-                              <ListItemText
-                                primary={note.notes}
-                                secondary={convertTimeStamp(note.timestamp)}
-                              />
-                            </ListItem>
-                            <Divider />
-                          </div>
-                        ))
-                      }
-                    </List>
-                  </div>
-                </TabPanel>
-                <TabPanel value={tab} index={1}>
-                  <Uploader animalId={currentAnimal.animalUUID} />
+        <div className={classesTwo.paper} style={{ flexDirection: 'column' }}>
+          <AppBar position="static" style={{ background: 'white' }}>
+            <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
+              <Tab label={<span style={{ color: 'black' }}>Notes</span>} {...a11yProps(0)} />
+              <Tab label={<span style={{ color: 'black' }}>Gallery</span>} {...a11yProps(1)} />
+            </Tabs>
+
+            <TabPanel value={tab} index={0}>
+              <div>
+                <TextField
+                  id="filled-full-width"
+                  label="Notes"
+                  style={{ margin: 8 }}
+                  className={classesTwo.textField}
+                  fullWidth
+                  margin="normal"
+                  variant="outlined"
+                  onChange={onNotesAdded}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <Button variant="contained" color="primary" onClick={onSaveNotes}>
+                  Save Notes
+                  </Button>
+                <Snackbar open={notesOpen} autoHideDuration={6000} onClose={handleNotesClose}>
+                  <Alert onClose={handleNotesClose} severity="success">
+                    Notes saved successfully!
+                  </Alert>
+                </Snackbar>
+              </div>
+
+              <div className={classes.root}>
+                <List component="nav" aria-label="main mailbox folders">
                   {
-                    currentAnimal.imageLinks.map((link, index) => (
-                      <img src={link} key={index} />
+                    animalNotes.map((note, index) => (
+                      <div key={index}>
+                        <ListItem button>
+                          <ListItemText
+                            primary={<Typography color="textPrimary">{note.notes}</Typography>}
+                            secondary={convertTimeStamp(note.timestamp)}
+                          />
+                        </ListItem>
+                        <Divider />
+                      </div>
                     ))
                   }
-                </TabPanel>
-              </Tabs>
-            </AppBar>
-          </div>
+                </List>
+              </div>
+            </TabPanel>
+            <TabPanel value={tab} index={1}>
+              <Uploader animalId={currentAnimal.animalUUID} />
+              {
+                <Card className={classesTwo.root}>
+                  <CardActionArea>
+                    <CardMedia style={{ align: 'center' }}>
+                      <img src={currentAnimal.imageLinks[currentImage]} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
+                    </CardMedia>
+                    <CardActions>
+                      <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
+                      <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
+                    </CardActions>
+                  </CardActionArea>
+                </Card>
+              }
+            </TabPanel>
+          </AppBar>
         </div>
       </Container>
-    </div >
+    </div>
   );
 };
 

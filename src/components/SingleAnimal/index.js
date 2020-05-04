@@ -213,20 +213,16 @@ const SingleAnimal = (props) => {
 
   const handleNextImage = () => {
     const index = currentImage + 1;
-    console.log(index);
     if (index < currentAnimal.imageLinks.length) {
       setCurrentImage(index);
     }
-    console.log(currentImage);
   }
 
   const handlePreviousImage = () => {
     const index = currentImage - 1;
-    console.log(index);
     if (index >= 0) {
       setCurrentImage(index);
     }
-    console.log(currentImage);
   }
 
   const saveChanges = async (event) => {
@@ -846,6 +842,7 @@ const SingleAnimal = (props) => {
             <TabPanel value={tab} index={1}>
               <Uploader animalId={currentAnimal.animalUUID} />
               {
+                currentAnimal.imageLinks.length > 0 ?
                 <Card className={classesTwo.root}>
                   <CardActionArea>
                     <CardMedia style={{ align: 'center' }}>
@@ -857,7 +854,7 @@ const SingleAnimal = (props) => {
                       {currentImage+1} / {currentAnimal.imageLinks.length}
                     </CardActions>
                   </CardActionArea>
-                </Card>
+                </Card> : null
               }
             </TabPanel>
           </AppBar>

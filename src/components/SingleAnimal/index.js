@@ -148,9 +148,11 @@ const SingleAnimal = (props) => {
   const [gene2, setGene2] = useState('');
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
+  const [tags, setTags] = useState('');
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
   const [currentImage, setCurrentImage] = React.useState(0);
+  //add tags here?
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -166,9 +168,10 @@ const SingleAnimal = (props) => {
     return b.timestamp - a.timestamp;
   });
 
-  console.log('Current animal', currentAnimal);
+  // console.log('Current animal', currentAnimal);
 
-  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
+  //add tags to default traits parameters
+  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
     setAnimalId(id);
     setGender(gen);
     setLitter(litt);
@@ -184,7 +187,10 @@ const SingleAnimal = (props) => {
     setGene2(gn2);
     setGene3(gn3);
     setTod(tod);
+    setTags(tags);
+    // console.log(`~~~~~~~~~~~~~~~~~~~~~~CurrentANimal.tags ==> ${currentAnimal.tags[0]}, ${typeof currentAnimal.tags}`);
     setDefault(true);
+    //add tags here?
   };
 
   const handleClick = () => {
@@ -246,7 +252,10 @@ const SingleAnimal = (props) => {
       gene3: gene3,
       imageLinks: currentAnimal.imageLinks,
       tod: tod,
+      tags: tags,
+      //add tags here?
     };
+    console.log(`>>>>>>>>>>>>>>>> tags: ${tags} -> ${typeof tags}`);
     const request = { animal, colonyId };
     editAnimal(request);
     handleClick();
@@ -284,7 +293,8 @@ const SingleAnimal = (props) => {
       {
         isDefault ?
           null :
-          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3, currentAnimal.tod)}
+          //add currentAnimal.tags to parameters passed
+          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3, currentAnimal.tod, currentAnimal.tags)}
       <div className={classes.root} style={{ textAlign: 'left' }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
           <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
@@ -527,6 +537,22 @@ const SingleAnimal = (props) => {
                           </div>
                         </Grid>
                       </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                          <TextField
+                              label="Tags"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="tags"
+                              defaultValue={currentAnimal.tags}
+                              onChange={event => setTags(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
                     </div>
                     :
                     <div className={classesGrid.root}>
@@ -750,6 +776,23 @@ const SingleAnimal = (props) => {
                               name="gene3"
                               defaultValue={currentAnimal.gene3}
                               onChange={event => setGene3(event.target.value)}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                          <TextField
+                              disabled
+                              label="Tags"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="tags"
+                              defaultValue={currentAnimal.tags}
+                              onChange={event => setTags(event.target.value)}
                             />
                           </div>
                         </Grid>

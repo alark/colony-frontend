@@ -198,6 +198,7 @@ const Animals = () => {
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Father&nbsp;ID</TableCell>
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Mother&nbsp;ID</TableCell>
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Date&nbsp; of&nbsp; Birth</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Tags</TableCell>
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }} />
             </TableRow>
           </TableBody>
@@ -231,6 +232,9 @@ const Animals = () => {
                 </TableCell>
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <span>{animal.dobMonth}/{animal.dobDay}/{animal.dobYear}</span>
+                </TableCell>
+                <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
+                  {animal.tags}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <Button
@@ -305,6 +309,7 @@ const Animals = () => {
                     ID: {currentAnimal.mouseId}
                   </Typography>
                 }
+                //doesn't show up on card so fix or axe
                 subheader={`Notes: ${currentAnimal.notes}`}
               />
             </div>
@@ -353,6 +358,9 @@ const Animals = () => {
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
                   <strong>TOD:</strong> {currentAnimal.tod}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Tags:</strong> {currentAnimal.tags}
                 </Typography>
               </CardContent>
             </div>

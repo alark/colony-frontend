@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { ProfileProvider, useProfileProvider } from 'contexts/profile';
+import Form from './components/ReminderForm'
 import HomePage from 'features/HomePage';
 import Dashboard from 'features/Dashboard';
 import ColonyPage from 'features/ColonyPage';
@@ -20,6 +21,7 @@ const App = () => (
         <ProtectedRoute exact path="/dashboard" component={Dashboard} />
         <ProtectedRoute path="/dashboard/colony" component={ColonyPage} />
         <ProtectedRoute path="/animals/:id" component={Animals} />
+        <ProtectedRoute path="/animal/:id/form" component={Form} />
         <ProtectedRoute path="/animal/:id" component={SingleAnimal} />
         <Route exact path="/" component={HomePage} />
         <Route exact path="/registration" component={Registration} />

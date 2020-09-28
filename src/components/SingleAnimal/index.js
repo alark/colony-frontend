@@ -124,6 +124,7 @@ const SingleAnimal = (props) => {
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
+  const [redirectToReminder, setRedirectToReminder] = useState(false);
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
@@ -274,6 +275,9 @@ const SingleAnimal = (props) => {
     return <Redirect to="/dashboard/colony" />;
   } else if (redirectToColonies) {
     return <Redirect to="/dashboard" />;
+  } else if (redirectToReminder) {
+    return <Redirect to={{
+        pathname: `/animal/${currentAnimal.mouseId}/form` }}/>;
   } else if (redirectToLogin) {
     logout();
     return <Redirect to="/" />;
@@ -759,6 +763,15 @@ const SingleAnimal = (props) => {
               </form>
 
               <div className={classesTwo.controls}>
+                <Button
+                  onClick={() => {
+                    setRedirectToReminder(true);
+                  }}
+                  variant="outlined"
+                  color="primary"
+                >Set Reminder
+                </Button>
+                
                 {
                   accessRights ?
                     <Button
@@ -770,7 +783,6 @@ const SingleAnimal = (props) => {
                     </Button>
                     : null
                 }
-
                 <Button
                   onClick={() => {
                     setRedirectToAnimals(true);

@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Button, Card, CardActions, CardContent, CardMedia, IconButton, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, Tab, Tabs, TextField, Typography, CardActionArea } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Chip, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
-
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -101,6 +100,23 @@ const useStyles2 = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  //added formatting for the tags
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    maxWidth: 300,
+  },
+  chips: {
+    // defaultValue: 'tags',
+    display: 'flex',
+    flexWrap: 'wrap',
+  }, 
+  chip: {
+    margin: 3,
+  },
+  noLabel: {
+    marginTop: theme.spacing(3),
+  },
 }));
 
 const gridStyles = makeStyles((theme) => ({
@@ -115,10 +131,49 @@ const gridStyles = makeStyles((theme) => ({
   },
 }));
 
+//formatting for the tag box
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tagList, theme) {
+  return {
+    fontWeight:
+      tagList.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+//TODO
+//temporary default tags, to be updated later
+const tags = [
+  'Tag1',
+  'Tag2',
+  'Tag3',
+  'Tag4',
+  'Tag5',
+  'Tag6',
+  'Tag7',
+  'Tag8',
+  'Tag9',
+  'Tag10',
+];
+
 const SingleAnimal = (props) => {
   const classes = useStyles();
   const classesTwo = useStyles2();
   const classesGrid = gridStyles();
+  const themeTag = useTheme();
+  // const classesTag = useStyles2();
+
   const {
     logout, editAnimal, storeNote, state,
   } = useProfileProvider();
@@ -148,7 +203,7 @@ const SingleAnimal = (props) => {
   const [gene2, setGene2] = useState('');
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
-  const [tags, setTags] = useState('');
+  const [tagList, setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -170,8 +225,27 @@ const SingleAnimal = (props) => {
 
   // console.log('Current animal', currentAnimal);
 
+  const handleTagChange = (event) => {
+    console.log(event.target.value);
+    setTagList(event.target.value);
+  };
+  
+  const handleTagChangeMultiple = (event) => {
+    const { options } = event.target;
+    const value = [];
+    for (let i = 0, l = options.length; i < l; i += 1) {
+       if (options[i].selected) {
+        value.push(options[i].value);
+      }
+    }
+    console.log(value);
+    setTagList(value);
+  };
+  
+
+
   //add tags to default traits parameters
-  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
+  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
     setAnimalId(id);
     setGender(gen);
     setLitter(litt);
@@ -187,7 +261,7 @@ const SingleAnimal = (props) => {
     setGene2(gn2);
     setGene3(gn3);
     setTod(tod);
-    setTags(tags);
+    // setTags(tags);
     // console.log(`~~~~~~~~~~~~~~~~~~~~~~CurrentANimal.tags ==> ${currentAnimal.tags[0]}, ${typeof currentAnimal.tags}`);
     setDefault(true);
     //add tags here?
@@ -537,19 +611,35 @@ const SingleAnimal = (props) => {
                           </div>
                         </Grid>
                       </Grid>
-
                       <Grid container>
                         <Grid item xs>
-                          <div className={classesGrid.paper}>
-                          <TextField
-                              label="Tags"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="tags"
-                              defaultValue={currentAnimal.tags}
-                              onChange={event => setTags(event.target.value)}
-                            />
+                          <div>
+                            <FormControl className={classesTwo.formControl}>
+                              <InputLabel id="demo-mutiple-chip-label">Tags</InputLabel>
+                              <Select
+                                labelId="demo-mutiple-chip-label"
+                                id="demo-mutiple-chip"
+                                multiple
+                                value={tagList}
+                                onChange={handleTagChange}
+                                input={<Input id="select-multiple-chip" />}
+                                renderValue={(selected) => (
+                                  <div className={classesTwo.chips}>
+                                    {selected.map((value) => (
+                                      <Chip key={value} label={value} className={classesTwo.chip} />
+                                    ))}
+                                  </div>
+                                )}
+                                MenuProps={MenuProps}
+                              >
+                                {tags.map((tag) => (
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, tagList, themeTag)}>
+                                    <Checkbox checked={tagList.indexOf(tag) > -1} />
+                                    <ListItemText primary={tag} />
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                           </div>
                         </Grid>
                       </Grid>
@@ -783,17 +873,34 @@ const SingleAnimal = (props) => {
 
                       <Grid container>
                         <Grid item xs>
-                          <div className={classesGrid.paper}>
-                          <TextField
-                              disabled
-                              label="Tags"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="tags"
-                              defaultValue={currentAnimal.tags}
-                              onChange={event => setTags(event.target.value)}
-                            />
+                        <div>
+                            <FormControl className={classesTwo.formControl}>
+                              <InputLabel id="demo-mutiple-chip-label">Tags</InputLabel>
+                              <Select
+                                disabled
+                                labelId="demo-mutiple-chip-label"
+                                id="demo-mutiple-chip"
+                                multiple
+                                value={tagList}
+                                onChange={handleTagChange}
+                                input={<Input id="select-multiple-chip" />}
+                                renderValue={(selected) => (
+                                  <div className={classesTwo.chips}>
+                                    {selected.map((value) => (
+                                      <Chip key={value} label={value} className={classesTwo.chip} />
+                                    ))}
+                                  </div>
+                                )}
+                                MenuProps={MenuProps}
+                              >
+                                {tags.map((tag) => (
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, tagList, themeTag)}>
+                                    <Checkbox checked={tagList.indexOf(tag) > -1} />
+                                    <ListItemText primary={tag} />
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
                           </div>
                         </Grid>
                       </Grid>

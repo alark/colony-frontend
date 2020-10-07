@@ -100,23 +100,24 @@ const useStyles2 = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
-  //added formatting for the tags
+}));
+
+const useStylesTag = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
     maxWidth: 300,
   },
   chips: {
-    // defaultValue: 'tags',
-    display: 'flex',
-    flexWrap: 'wrap',
-  }, 
+    display: "flex",
+    flexWrap: "wrap",
+  },
   chip: {
-    margin: 3,
+    margin: 1
   },
   noLabel: {
-    marginTop: theme.spacing(3),
-  },
+    marginTop: theme.spacing(3)
+  }
 }));
 
 const gridStyles = makeStyles((theme) => ({
@@ -144,6 +145,10 @@ const MenuProps = {
 };
 
 function getStyles(tag, tagList, theme) {
+  if(tag === undefined){
+    console.log(`tag is undefined? -> ${tag}`);
+    return;
+  }
   return {
     fontWeight:
       tagList.indexOf(tag) === -1
@@ -154,7 +159,7 @@ function getStyles(tag, tagList, theme) {
 
 //TODO
 //temporary default tags, to be updated later
-const tags = [
+const defaultTags = [
   'Tag1',
   'Tag2',
   'Tag3',
@@ -172,10 +177,10 @@ const SingleAnimal = (props) => {
   const classesTwo = useStyles2();
   const classesGrid = gridStyles();
   const themeTag = useTheme();
-  // const classesTag = useStyles2();
+  const classesTag = useStylesTag();
 
   const {
-    logout, editAnimal, storeNote, state,
+    logout, editAnimal, storeNote, createTag, state,
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
@@ -226,7 +231,23 @@ const SingleAnimal = (props) => {
   // console.log('Current animal', currentAnimal);
 
   const handleTagChange = (event) => {
-    console.log(event.target.value);
+    console.log('$$$$$$$ '+event.target.value);
+    console.log(`1.currentAnimal.tags => ${currentAnimal.tags}`);
+    if(currentAnimal.tags == undefined){
+      currentAnimal.tags = [];
+    }
+
+    event.target.value.forEach(function(item){
+      if(typeof currentAnimal.tags === 'object' && !currentAnimal.tags.includes(item)){
+         currentAnimal.tags.push(item);
+         createTag(item, [currentAnimal.animalUUID]);
+         console.log('called createTag');
+      }
+    });
+    //adds selected tags to animal.tags without duplicates
+    //TODO make it so tags can be deleted
+    console.log(`2.currentAnimal.tags => ${currentAnimal.tags}`);
+
     setTagList(event.target.value);
   };
   
@@ -243,9 +264,8 @@ const SingleAnimal = (props) => {
   };
   
 
-
   //add tags to default traits parameters
-  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
+  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
     setAnimalId(id);
     setGender(gen);
     setLitter(litt);
@@ -261,7 +281,7 @@ const SingleAnimal = (props) => {
     setGene2(gn2);
     setGene3(gn3);
     setTod(tod);
-    // setTags(tags);
+    // 
     // console.log(`~~~~~~~~~~~~~~~~~~~~~~CurrentANimal.tags ==> ${currentAnimal.tags[0]}, ${typeof currentAnimal.tags}`);
     setDefault(true);
     //add tags here?
@@ -326,10 +346,9 @@ const SingleAnimal = (props) => {
       gene3: gene3,
       imageLinks: currentAnimal.imageLinks,
       tod: tod,
-      tags: tags,
-      //add tags here?
+      tags: currentAnimal.tags,
     };
-    console.log(`>>>>>>>>>>>>>>>> tags: ${tags} -> ${typeof tags}`);
+    // console.log(`>>>>>>>>>>>>>>>> tags: ${tags} -> ${typeof tags}`);
     const request = { animal, colonyId };
     editAnimal(request);
     handleClick();
@@ -614,25 +633,26 @@ const SingleAnimal = (props) => {
                       <Grid container>
                         <Grid item xs>
                           <div>
-                            <FormControl className={classesTwo.formControl}>
-                              <InputLabel id="demo-mutiple-chip-label">Tags</InputLabel>
+                            <FormControl className={classesTag.formControl}>
+                              <InputLabel id="chip-label">Tags</InputLabel>
                               <Select
-                                labelId="demo-mutiple-chip-label"
-                                id="demo-mutiple-chip"
-                                multiple
+                                labelId="chip-label"
+                                id="multiple-chip"
+                                multiple  
                                 value={tagList}
                                 onChange={handleTagChange}
-                                input={<Input id="select-multiple-chip" />}
+                                input={<Input id="select-multiple-chip"/>}
                                 renderValue={(selected) => (
-                                  <div className={classesTwo.chips}>
+                                  <div className={classesTag.chips}>
+                                    {console.log(`selected: ${selected}  animal.tags: ${currentAnimal.tags}`)}
                                     {selected.map((value) => (
-                                      <Chip key={value} label={value} className={classesTwo.chip} />
+                                      <Chip key={value} label={value} className={classesTag.chip} />
                                     ))}
                                   </div>
                                 )}
                                 MenuProps={MenuProps}
                               >
-                                {tags.map((tag) => (
+                                {defaultTags.map((tag) => (
                                   <MenuItem key={tag} value={tag} style={getStyles(tag, tagList, themeTag)}>
                                     <Checkbox checked={tagList.indexOf(tag) > -1} />
                                     <ListItemText primary={tag} />
@@ -640,6 +660,20 @@ const SingleAnimal = (props) => {
                                 ))}
                               </Select>
                             </FormControl>
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="currentTags"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="currentTags"
+                              defaultValue={currentAnimal.tags}
+                              // onChange={event => setGene3(event.target.value)}
+                            />
                           </div>
                         </Grid>
                       </Grid>
@@ -874,26 +908,26 @@ const SingleAnimal = (props) => {
                       <Grid container>
                         <Grid item xs>
                         <div>
-                            <FormControl className={classesTwo.formControl}>
-                              <InputLabel id="demo-mutiple-chip-label">Tags</InputLabel>
+                            <FormControl className={classesTag.formControl}>
+                              <InputLabel id="chip-label">Tags</InputLabel>
                               <Select
                                 disabled
-                                labelId="demo-mutiple-chip-label"
-                                id="demo-mutiple-chip"
+                                labelId="chip-label"
+                                id="multiple-chip"
                                 multiple
                                 value={tagList}
                                 onChange={handleTagChange}
                                 input={<Input id="select-multiple-chip" />}
                                 renderValue={(selected) => (
-                                  <div className={classesTwo.chips}>
+                                  <div className={classesTag.chips}>
                                     {selected.map((value) => (
-                                      <Chip key={value} label={value} className={classesTwo.chip} />
+                                      <Chip key={value} label={value} className={classesTag.chip} />
                                     ))}
                                   </div>
                                 )}
                                 MenuProps={MenuProps}
                               >
-                                {tags.map((tag) => (
+                                {defaultTags.map((tag) => (
                                   <MenuItem key={tag} value={tag} style={getStyles(tag, tagList, themeTag)}>
                                     <Checkbox checked={tagList.indexOf(tag) > -1} />
                                     <ListItemText primary={tag} />
@@ -901,6 +935,20 @@ const SingleAnimal = (props) => {
                                 ))}
                               </Select>
                             </FormControl>
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="currentTags"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="currentTags"
+                              defaultValue={currentAnimal.tags}
+                              // onChange={event => setGene3(event.target.value)}
+                            />
                           </div>
                         </Grid>
                       </Grid>

@@ -181,6 +181,15 @@ const Animals = () => {
     />);
   }
 
+  function displayTags(tags){
+    if(typeof tags === 'object'){
+      console.log(`${tags.join(', ')}: ${typeof tags.join(', ')}`);
+      return tags.join(', ');
+    }
+    else{
+      return('');
+    }
+  }
 
   return (
     <Container component="main" style={{ padding: 8 }}>
@@ -203,8 +212,7 @@ const Animals = () => {
             </TableRow>
           </TableBody>
           <TableBody>
-            {(animals
-            ).map(animal => (
+            {(animals).map(animal => (
               <TableRow key={animal.mouseId}>
                 <TableCell
                   style={{ cursor: 'pointer', borderRight: '1px solid rgba(224, 224, 224, 1)' }}
@@ -234,7 +242,7 @@ const Animals = () => {
                   <span>{animal.dobMonth}/{animal.dobDay}/{animal.dobYear}</span>
                 </TableCell>
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
-                  {animal.tags}
+                  {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <Button

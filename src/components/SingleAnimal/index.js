@@ -172,6 +172,8 @@ const defaultTags = [
   'Tag10',
 ];
 
+const currentTags = [];
+
 const SingleAnimal = (props) => {
   const classes = useStyles();
   const classesTwo = useStyles2();
@@ -232,36 +234,45 @@ const SingleAnimal = (props) => {
 
   const handleTagChange = (event) => {
     console.log('$$$$$$$ '+event.target.value);
-    console.log(`1.currentAnimal.tags => ${currentAnimal.tags}`);
-    if(currentAnimal.tags == undefined){
-      currentAnimal.tags = [];
-    }
+    addTagToAnimal(event);
+  };
 
+  const addTagToAnimal = (event) => {
+    console.log(`1.to currentAnimal.tags => ${typeof currentAnimal.tags}`);
+    if(typeof currentAnimal.tags !== "object"){
+      currentAnimal.tags = [];
+      console.log(`in if. currentAnimal.tags => ${currentAnimal.tags}`);
+
+    }
+    console.log(`2. currentAnimal.tags => ${currentAnimal.tags}`);
     event.target.value.forEach(function(item){
-      if(typeof currentAnimal.tags === 'object' && !currentAnimal.tags.includes(item)){
+      console.log(`to ca.tag:${typeof currentAnimal.tags} -> etv:${event.target.value}`)
+      if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
          currentAnimal.tags.push(item);
-         createTag(item, [currentAnimal.animalUUID]);
+         console.log(`added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
+         const tagData = { tagName: item, mouseList: [currentAnimal.animalUUID]}
+         createTag(tagData);
          console.log('called createTag');
       }
     });
     //adds selected tags to animal.tags without duplicates
     //TODO make it so tags can be deleted
-    console.log(`2.currentAnimal.tags => ${currentAnimal.tags}`);
+    console.log(`3.currentAnimal.tags => ${currentAnimal.tags}`);
 
     setTagList(event.target.value);
-  };
+  }
   
-  const handleTagChangeMultiple = (event) => {
-    const { options } = event.target;
-    const value = [];
-    for (let i = 0, l = options.length; i < l; i += 1) {
-       if (options[i].selected) {
-        value.push(options[i].value);
-      }
-    }
-    console.log(value);
-    setTagList(value);
-  };
+  // const handleTagChangeMultiple = (event) => {
+  //   const { options } = event.target;
+  //   const value = [];
+  //   for (let i = 0, l = options.length; i < l; i += 1) {
+  //      if (options[i].selected) {
+  //       value.push(options[i].value);
+  //     }
+  //   }
+  //   console.log(value);
+  //   setTagList(value);
+  // };
   
 
   //add tags to default traits parameters

@@ -368,7 +368,7 @@ const Animals = () => {
                   <strong>TOD:</strong> {currentAnimal.tod}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Tags:</strong> {currentAnimal.tags}
+                  <strong>Tags:</strong> {displayTags(currentAnimal.tags)}
                 </Typography>
               </CardContent>
             </div>

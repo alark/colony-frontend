@@ -139,6 +139,7 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
+  const [redirectToAdd, setRedirectToAdd] = useState(false);
   const { state, getAnimals, deleteAnimal } = useProfileProvider();
   const {
     animals, accessRights, colonyId, colonySize, colonyName,
@@ -181,12 +182,31 @@ const Animals = () => {
     />);
   }
 
+  if (redirectToAdd) {
+    console.log("redirect to add");
+    console.log(redirectToAdd);
+    return (<Redirect
+      to={{
+        pathname: `/addanimal`,
+      }}
+    />);
+  }
 
   return (
     <Container component="main" style={{ padding: 8 }}>
       <CssBaseline />
       <h1>Colony: {colonyName}</h1>
       <h2>Access:{permissions}</h2>
+
+      <Button
+          color="inherit"
+          variant="outlined"
+          onClick={() => {
+          setRedirectToAdd(true);
+        }}
+        >
+          Add Animal
+        </Button>
 
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">

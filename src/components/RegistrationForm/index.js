@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
 import { Button, Breadcrumbs, Link, TextField, Grid, Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { auth } from 'components/FirebaseConfig';
 
 const Register = () => {
   const { register } = useProfileProvider();
@@ -36,9 +37,34 @@ const Register = () => {
   const attemptRegister = (event) => {
     // TODO: Check for 401 and redirect if 200.
     event.preventDefault();
-    register(userDetails);
-    setRedirectToDashboard(true);
+
+    const { email, password } = userDetails;
+    auth.createUserWithEmailAndPassword(email, password).catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      if (errorCode === 'auth/weak-password') {
+        alert('The password is too weak.');
+      } else {
+        alert(errorMessage);
+      }
+      console.log(error);
+    });
+
+    //TODO some reason this is still getting called when the above gets an error.... idk
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        user.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+          userDetails.idToken = idToken;
+          register(userDetails);
+          setRedirectToDashboard(true);
+        }).catch(function(error) {
+          console.error(error);
+        });
+      }
+    });
   };
+
   /**
    * A reusable function to update the state with a key/value pair where the
    * key is the name of the component and the value is its most recent value...

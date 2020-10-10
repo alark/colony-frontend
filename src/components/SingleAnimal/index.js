@@ -172,7 +172,7 @@ const defaultTags = [
   'Tag10',
 ];
 
-const currentTags = [];
+
 
 const SingleAnimal = (props) => {
   const classes = useStyles();
@@ -181,8 +181,10 @@ const SingleAnimal = (props) => {
   const themeTag = useTheme();
   const classesTag = useStylesTag();
 
+  const currentTags = new Set();
+
   const {
-    logout, editAnimal, storeNote, createTag, state,
+    logout, editAnimal, storeNote, addNewToTag, state,
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
@@ -216,6 +218,7 @@ const SingleAnimal = (props) => {
   const [currentImage, setCurrentImage] = React.useState(0);
   //add tags here?
 
+
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
   };
@@ -230,37 +233,83 @@ const SingleAnimal = (props) => {
     return b.timestamp - a.timestamp;
   });
 
-  // console.log('Current animal', currentAnimal);
+  const handleTagOpen = (event) => {
+    console.log('in handletagopen', event);
+  }
+
 
   const handleTagChange = (event) => {
-    console.log('$$$$$$$ '+event.target.value);
+    // console.log(`currentTags: ${currentTags.size}`);
+    // if(!currentTags.has(event.target.value)){
+    //   console.log(`doesnt include: ${event.target.value}`);
+    //   currentTags.add(event.target.value);
+    //   console.log(`currentTags: ${currentTags.size}`);
+    // }
+    // else{
+    //   console.log(`does include: ${event.target.value}`);
+    // }
     addTagToAnimal(event);
-  };
+  }
 
   const addTagToAnimal = (event) => {
-    console.log(`1.to currentAnimal.tags => ${typeof currentAnimal.tags}`);
-    if(typeof currentAnimal.tags !== "object"){
-      currentAnimal.tags = [];
-      console.log(`in if. currentAnimal.tags => ${currentAnimal.tags}`);
-
-    }
-    console.log(`2. currentAnimal.tags => ${currentAnimal.tags}`);
-    event.target.value.forEach(function(item){
-      console.log(`to ca.tag:${typeof currentAnimal.tags} -> etv:${event.target.value}`)
-      if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
-         currentAnimal.tags.push(item);
-         console.log(`added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
-         const tagData = { tagName: item, mouseList: [currentAnimal.animalUUID]}
-         createTag(tagData);
-         console.log('called createTag');
+      console.log(`** to currentAnimal.tags => ${typeof currentAnimal.tags}`);
+  
+      if(typeof currentAnimal.tags !== "object"){
+        currentAnimal.tags = [];
+  
+        console.log(`** in if. currentAnimal.tags => ${currentAnimal.tags}`);
+  
       }
-    });
-    //adds selected tags to animal.tags without duplicates
-    //TODO make it so tags can be deleted
-    console.log(`3.currentAnimal.tags => ${currentAnimal.tags}`);
+      console.log(`** currentAnimal.tags => ${currentAnimal.tags}`);
+  
+      event.target.value.forEach(function(item){
+        console.log(`** to ca.tags:${typeof currentAnimal.tags} -> etv:${event.target.value}`)
+        
+        if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
+           currentAnimal.tags.push(item);
+           console.log(`** added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
+           console.log(`type of curAn.uuid: ${typeof currentAnimal.animalUUID}`);
+           const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
+           addNewToTag(tagData);
+           console.log('called addNewToTag');
+        }
+      });
 
-    setTagList(event.target.value);
-  }
+      console.log(`** currentAnimal.tags => ${currentAnimal.tags}`);
+  
+      setTagList(event.target.value);
+    }
+
+
+  
+  // const addTagToAnimal = (event) => {
+  //   console.log(`1.to currentAnimal.tags => ${typeof currentAnimal.tags}`);
+
+  //   if(typeof currentAnimal.tags !== "object"){
+  //     currentAnimal.tags = [];
+
+  //     console.log(`in if. currentAnimal.tags => ${currentAnimal.tags}`);
+
+  //   }
+  //   console.log(`2. currentAnimal.tags => ${currentAnimal.tags}`);
+
+  //   event.target.value.forEach(function(item){
+  //     console.log(`to ca.tags:${typeof currentAnimal.tags} -> etv:${event.target.value}`)
+      
+  //     if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
+  //        currentAnimal.tags.push(item);
+  //        console.log(`added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
+  //        const tagData = { tagName: item, mouseList: [currentAnimal.animalUUID]}
+  //        addNewToTag(tagData);
+  //        console.log('called addNewToTag');
+  //     }
+  //   });
+  //   //adds selected tags to animal.tags without duplicates
+  //   //TODO make it so tags can be deleted
+  //   console.log(`3.currentAnimal.tags => ${currentAnimal.tags}`);
+
+  //   setTagList(event.target.value);
+  // }
   
   // const handleTagChangeMultiple = (event) => {
   //   const { options } = event.target;
@@ -338,6 +387,7 @@ const SingleAnimal = (props) => {
 
   const saveChanges = async (event) => {
     event.preventDefault();
+
     const animal = {
       animalUUID: currentAnimal.animalUUID,
       mouseId: animalId,
@@ -645,7 +695,10 @@ const SingleAnimal = (props) => {
                         <Grid item xs>
                           <div>
                             <FormControl className={classesTag.formControl}>
-                              <InputLabel id="chip-label">Tags</InputLabel>
+                              <InputLabel
+                                id="chip-label"
+                                onChange={handleTagOpen}
+                              >Tags</InputLabel>
                               <Select
                                 labelId="chip-label"
                                 id="multiple-chip"
@@ -656,9 +709,13 @@ const SingleAnimal = (props) => {
                                 renderValue={(selected) => (
                                   <div className={classesTag.chips}>
                                     {console.log(`selected: ${selected}  animal.tags: ${currentAnimal.tags}`)}
+                                    {(currentAnimal.tags.filter(tag => !selected.includes(tag)))
+                                    .map((value) => selected.push(value))}
                                     {selected.map((value) => (
                                       <Chip key={value} label={value} className={classesTag.chip} />
                                     ))}
+                                    
+                                    {console.log('after currentanimal thing')}
                                   </div>
                                 )}
                                 MenuProps={MenuProps}
@@ -931,6 +988,8 @@ const SingleAnimal = (props) => {
                                 input={<Input id="select-multiple-chip" />}
                                 renderValue={(selected) => (
                                   <div className={classesTag.chips}>
+                                    {(currentAnimal.tags.filter(tag => !selected.includes(tag)))
+                                    .map((value) => selected.push(value))}
                                     {selected.map((value) => (
                                       <Chip key={value} label={value} className={classesTag.chip} />
                                     ))}

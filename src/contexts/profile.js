@@ -232,6 +232,12 @@ const useProfileProvider = () => {
       dispatch({ type: TAG, payload: data});
     });
 
+  const addNewToTag = request => axios
+  .post(`${BASE_URL}/tags/addNewToTag`, request)
+  .then(({ data }) => {
+    dispatch({ type: TAG, payload: data});
+  });
+
   const sortList = (sortBy) => {
     dispatch({ type: SORT, payload: sortBy });
   };
@@ -258,6 +264,7 @@ const useProfileProvider = () => {
     storeNote,
     getTag,
     createTag,
+    addNewToTag,
   };
 };
 

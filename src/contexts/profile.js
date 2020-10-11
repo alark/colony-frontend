@@ -18,6 +18,7 @@ const SORT = 'SORT';
 const ALPHASORT = 'ALPHASORT';
 const DELETE = 'DELETE';
 const EDITANIMAL = 'EDITANIMAL';
+const ADDANIMAL = 'ADDANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 const NOTE = 'NOTE';
@@ -105,6 +106,14 @@ const ProfileProvider = ({ children }) => {
         return {
           ...prevState, animals,
         };
+      }
+
+      //TODO is this even right?
+      case ADDANIMAL: {
+        const animals = [...prevState.animals];
+        const newList = animals.concat(payload);
+        console.log('New Animal: ', payload.animalUUID);
+        return { ...prevState, animals: newList };
       }
 
       case IMAGEUPLOAD: {
@@ -203,6 +212,12 @@ const useProfileProvider = () => {
       dispatch({ type: EDITANIMAL, payload: data });
     });
 
+  const addAnimal = request => axios
+    .post(`${BASE_URL}/animals/add`, request)
+    .then(({ data }) => {
+      dispatch({ type: ADDANIMAL, payload: data });
+    });
+
   const storeImageLink = request => axios
     .post(`${BASE_URL}/animals/storeImageLink`, request)
     .then(({ data }) => {
@@ -228,7 +243,6 @@ const useProfileProvider = () => {
     state,
     dispatch,
     login,
-    // googleLogin,
     logout,
     register,
     addColony,
@@ -238,6 +252,7 @@ const useProfileProvider = () => {
     deleteColony,
     deleteAnimal,
     editAnimal,
+    addAnimal,
     shareColony,
     storeImageLink,
     storeNote,

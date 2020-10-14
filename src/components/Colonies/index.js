@@ -5,6 +5,7 @@ import { useProfileProvider } from 'contexts/profile';
 import PropTypes from 'prop-types';
 import { AppBar, Button, Box, TextField, Container, CssBaseline, Grid, Tabs, Tab, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -116,6 +117,12 @@ const Colonies = () => {
     }
   };
 
+  const createNew = async () => {
+    const data = { payload: "", name: fileName };
+    await addColony(data);
+    closeAddDialog();
+  };
+
   const isBlank = function (input) {
     if (input.length === 0) {
       return true;
@@ -198,6 +205,7 @@ const Colonies = () => {
               <DialogContentText>
                   Upload an animal colony along with its name.
                   A colony should be in this format along with the headers at the top of the file.
+                  Or, enter a name and click "Create New" to add a colony from scratch. 
               </DialogContentText>
               <br />
               <DialogContentText>
@@ -217,6 +225,7 @@ const Colonies = () => {
               </div>
             </DialogContent>
             <DialogActions>
+              <Button variant="outlined" onClick={createNew} startIcon={<AddCircleRoundedIcon />}>Create New</Button>
               <CopyToClipboard text={headers}>
                 <Button variant="outlined"> &lt;Copy Headers&gt; </Button>
               </CopyToClipboard>

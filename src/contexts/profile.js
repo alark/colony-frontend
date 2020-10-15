@@ -22,6 +22,7 @@ const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 const NOTE = 'NOTE';
 const TAG = 'TAG';
+const TAGS = 'TAGS';
 
 axios.defaults.withCredentials = true;
 
@@ -90,6 +91,7 @@ const ProfileProvider = ({ children }) => {
 
       case ANIMALS: {
         // Store colony animals in the state
+        console.log("typeof payload.animals ", typeof payload.animals);
         return {
           ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, animals: payload.animals,
         };
@@ -138,6 +140,12 @@ const ProfileProvider = ({ children }) => {
         return { ...prevState, tagName: payload.tagName, mouseList: payload.mouseList,};
       }
 
+      case TAGS: {
+        console.log(`payload.data.taglist in TAGS case: ${payload.tagList}`);
+        console.log(`payload.data.taglist in TAGS json str: ${JSON.stringify(payload.tagList)}`);
+        return { ...prevState, listOfTags: payload.tagList,};
+      }
+
       case LOGOUT: {
         // Reset state to logged out
         return initialState;
@@ -184,9 +192,12 @@ const useProfileProvider = () => {
   const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
     .post(`${BASE_URL}/animals`, pageInfo)
     .then(({ data }) => {
+      console.log("DATA:", data);
       data.accessRights = accessRights;
       data.colonyName = colonyName;
       data.colonySize = colonySize;
+      console.log("animals: ", data.animals);
+      console.log(`animals: ${data.animals}`);
       dispatch({ type: ANIMALS, payload: data });
     });
 
@@ -226,6 +237,28 @@ const useProfileProvider = () => {
       dispatch({ type: TAG, payload: data});
     });
 
+/**
+ * 
+ * const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
+    .post(`${BASE_URL}/animals`, pageInfo)
+    .then(({ data }) => {
+      console.log("DATA:", data);
+      data.accessRights = accessRights;
+      data.colonyName = colonyName;
+      data.colonySize = colonySize;
+      dispatch({ type: ANIMALS, payload: data });
+    }); 
+ */
+
+  const getAllTags = request => axios
+    .post(`${BASE_URL}/tags/getAllTags`, request)
+    .then(({ data }) => {
+      console.log("getalltags: data = ", data);
+      // console.log(`in profile data: ${JSON.stringify(data.data.tagList)}`);
+      // console.log(`unstringified: ${data.data.tagList}`);
+      dispatch({ type: TAGS, payload: data});
+    });
+
   const createTag = request => axios
     .post(`${BASE_URL}/tags/createTag`, request)
     .then(({ data }) => {
@@ -263,6 +296,7 @@ const useProfileProvider = () => {
     storeImageLink,
     storeNote,
     getTag,
+    getAllTags,
     createTag,
     addNewToTag,
   };

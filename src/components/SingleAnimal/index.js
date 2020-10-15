@@ -181,7 +181,7 @@ const SingleAnimal = (props) => {
   const themeTag = useTheme();
   const classesTag = useStylesTag();
 
-  const currentTags = new Set();
+  // const currentTags = new Set();
 
   const {
     logout, editAnimal, storeNote, addNewToTag, state,
@@ -269,8 +269,8 @@ const SingleAnimal = (props) => {
            currentAnimal.tags.push(item);
            console.log(`** added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
            console.log(`type of curAn.uuid: ${typeof currentAnimal.animalUUID}`);
-           const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
-           addNewToTag(tagData);
+          //  const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
+          //  addNewToTag(tagData);
            console.log('called addNewToTag');
         }
       });
@@ -412,6 +412,12 @@ const SingleAnimal = (props) => {
     // console.log(`>>>>>>>>>>>>>>>> tags: ${tags} -> ${typeof tags}`);
     const request = { animal, colonyId };
     editAnimal(request);
+
+    currentAnimal.tags.forEach(item => {
+      const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
+      addNewToTag(tagData);
+      console.log('called addNewToTag');
+    });
     handleClick();
   };
 

@@ -147,9 +147,10 @@ const Animals = () => {
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
-  const { state, getAnimals, deleteAnimal, createTag } = useProfileProvider();
+  const { state, getAnimals, deleteAnimal, createTag, getAllTags } = useProfileProvider();
+  // const [listAllTags, setListAllTags] = useState(["og"]);
   const {
-    animals, accessRights, colonyId, colonySize, colonyName,
+    animals, accessRights, colonyId, colonySize, colonyName, listOfTags,
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
@@ -159,7 +160,14 @@ const Animals = () => {
     const request = {
       colonyId, rowsPerPage, page: newPage,
     };
+
+    // console.log(`LIST OF TAGS IS: ${JSON.stringify(listOfTags)}`);
+    console.log("LIST OF TAGS IS: ", listOfTags);
+    console.log("STATE: ", state);
+
+    console.log(`request1:${request}, accessRights:${accessRights}, colonyName:${colonyName}, colonySize:${colonySize}, animals[0]:${animals[0].animalUUID}`);
     await getAnimals(request, accessRights, colonyName, colonySize);
+    console.log(`request2:${request}, accessRights:${accessRights}, colonyName:${colonyName}, colonySize:${colonySize}, animals[0]:${animals[0].id}`);
     setPage(newPage);
   };
 
@@ -172,7 +180,9 @@ const Animals = () => {
   };
 
   const updateNewTagName = ({ target: { value } }) => {
+    console.log(`newTagName before: ${newTagName}`);
     setNewTagName(value);
+    console.log(`newTagName after: ${newTagName}`);
   };
 
 
@@ -202,11 +212,25 @@ const Animals = () => {
     />);
   }
 
-  function handleAddTagButton(){
+  const printAllTags = async () => {
+    // console.log('calling getalltags');
+    // console.log(`tagList stringy before: ${JSON.stringify(listAllTags)}`);
+    await getAllTags()
+    // setListAllTags(result);
+    console.log("state: ", state);
+    console.log(`tagList stringy: ${JSON.stringify(listOfTags)}`);
+    // console.log(`tagList nonstringy: ${listAllTags}`);
+  }
+
+  const handleAddTagButton = async () => {
     console.log(`saved tag value: ${newTagName}`);
     //add to db
     const tagData = { tagName: newTagName };
-    createTag(tagData);
+    await createTag(tagData);
+
+    printAllTags();
+
+    // listOfTags.map(tag => console.log(`tag: ${tag}`));
     //close dialog
     closeAddDialog();
   }
@@ -228,7 +252,7 @@ const Animals = () => {
       <h2>Access:{permissions}</h2>
 
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
-                Add Colony
+                Add Tag
               </Button>
 
       {/* <Button
@@ -245,7 +269,7 @@ const Animals = () => {
               {/* //probably should add an option for info about tag
               so when hovered over it shows what it is: stretch goal tho */}
               <DialogContentText>
-                  Create a new tag.
+                  Enter tag name below and click Save to save
               </DialogContentText>
               <br />
               <div>

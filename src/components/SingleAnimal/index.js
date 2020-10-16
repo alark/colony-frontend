@@ -8,6 +8,7 @@ import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
+const { addToList, printList, addNewToList, getList } = require('components/Tags/index');
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -159,18 +160,20 @@ function getStyles(tag, tagList, theme) {
 
 //TODO
 //temporary default tags, to be updated later
-const defaultTags = [
-  'Tag1',
-  'Tag2',
-  'Tag3',
-  'Tag4',
-  'Tag5',
-  'Tag6',
-  'Tag7',
-  'Tag8',
-  'Tag9',
-  'Tag10',
-];
+const defaultTags = getList().sort();
+console.log("defaultTags = ", defaultTags);
+// const defaultTags = [
+//   'Tag1',
+//   'Tag2',
+//   'Tag3',
+//   'Tag4',
+//   'Tag5',
+  // 'Tag6',
+  // 'Tag7',
+  // 'Tag8',
+  // 'Tag9',
+  // 'Tag10',
+// ];
 
 
 

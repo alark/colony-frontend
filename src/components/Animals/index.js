@@ -23,6 +23,7 @@ import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Redirect } from 'react-router-dom';
+const { addToList, printList, addNewToList, getList } = require('components/Tags/index');
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -148,7 +149,6 @@ const Animals = () => {
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
   const { state, getAnimals, deleteAnimal, createTag, getAllTags } = useProfileProvider();
-  // const [listAllTags, setListAllTags] = useState(["og"]);
   const {
     animals, accessRights, colonyId, colonySize, colonyName, listOfTags,
   } = state;
@@ -161,7 +161,6 @@ const Animals = () => {
       colonyId, rowsPerPage, page: newPage,
     };
 
-    // console.log(`LIST OF TAGS IS: ${JSON.stringify(listOfTags)}`);
     console.log("LIST OF TAGS IS: ", listOfTags);
     console.log("STATE: ", state);
 
@@ -215,7 +214,7 @@ const Animals = () => {
   const printAllTags = async () => {
     // console.log('calling getalltags');
     // console.log(`tagList stringy before: ${JSON.stringify(listAllTags)}`);
-    await getAllTags()
+    await getAllTags();
     // setListAllTags(result);
     console.log("state: ", state);
     console.log(`tagList stringy: ${JSON.stringify(listOfTags)}`);
@@ -227,6 +226,9 @@ const Animals = () => {
     //add to db
     const tagData = { tagName: newTagName };
     await createTag(tagData);
+
+    addNewToList(newTagName);
+    printList();
 
     printAllTags();
 

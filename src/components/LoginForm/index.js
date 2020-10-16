@@ -3,14 +3,23 @@ import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
 import { Button, TextField, Link, Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+const { addToList, printList, addNewToList, getList } = require('components/Tags/index');
 
 const Login = () => {
-  const { login } = useProfileProvider();
+  const { login, getAllTags, state: { ownedColonies, listOfTags } } = useProfileProvider();
   const [userDetails, setUserDetails] = useState({});
   const [redirectToRegister, setRedirectToRegister] = useState(false);
 
+  function checkAllTags(){
+    if(listOfTags === undefined){
+      printAllTags();
+    }
+  }
+
   /** Material-UI */
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles(theme => (
+    checkAllTags(),
+    {
     paper: {
       marginTop: theme.spacing(8),
       display: 'flex',
@@ -30,10 +39,26 @@ const Login = () => {
     },
   }));
 
+  const printAllTags = async () => {
+    console.log("called printalltags");
+    if(listOfTags === undefined){
+      await getAllTags();
+      console.log(`tagList stringy: ${JSON.stringify(listOfTags)}`);
+    }
+    console.log("after await if statement");
+  }
+  
   const classes = useStyles();
 
   const attemptLogin = (event) => {
     event.preventDefault();
+    
+    console.log("LIST OF TAGS IS: ", listOfTags);
+    addToList(listOfTags);
+    printList();
+    // addNewToList("Tag24");
+    // printList();
+    // console.log("getlist: ", getList());
     login(userDetails);
   };
 
@@ -102,3 +127,8 @@ const Login = () => {
 };
 
 export default Login;
+
+
+
+
+// printAllTags();

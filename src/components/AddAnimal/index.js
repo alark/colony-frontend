@@ -6,6 +6,8 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
 import { auth } from 'components/FirebaseConfig';
 
+const numRegex = RegExp('^\\d*$');
+
 const useStyles = makeStyles(theme => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -23,6 +25,9 @@ const useStyles = makeStyles(theme => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },
+  error: {
+    color: 'red',
   },
 }));
 
@@ -85,32 +90,69 @@ const AddAnimal = () => {
   const classes = useStyles();
   const { logout, addAnimal, state } = useProfileProvider();
   const [animalInfo, setAnimalInfo] = useState({});
+  const [errors, setErrors] = useState({});
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
   const { colonyName, colonyId } = state;
 
+  const getErrors = () => {
+    var errorString = "";
+    Object.values(errors).forEach(
+      // if we have an error string set valid to false
+      (val) => errorString = errorString + val + "\n"
+    );
+    return errorString;
+  }
+
+  const validateForm = () => {
+    let valid = true;
+    Object.values(errors).forEach(
+      // if we have an error string set valid to false
+      (val) => val.length > 0 && (valid = false)
+    );
+    return valid;
+  }
+
   const attemptAddAnimal = (event) => {
     // TODO: Check for 401 and redirect if 200.
     event.preventDefault();
-    const request = { animal: animalInfo, colonyId };
-    console.log(request);
-    addAnimal(request);
-    setRedirectToAnimals(true);
+    console.log(errors);
+    console.log(validateForm());
+    if (validateForm()) { //TODO change condition
+      const request = { animal: animalInfo, colonyId };
+      addAnimal(request);
+      setRedirectToAnimals(true);
+    }
   };
 
-  /**
-   * A reusable function to update the state with a key/value pair where the
-   * key is the name of the component and the value is its most recent value...
-   *
-   * This is a great pattern to use if you need to make the UI react to the input
-   * in more complex forms and if you need the most recent value of the users'
-   * submission before they click submit for validation purposes...
-   * @param name
-   * @param value
-   */
   const updateInput = ({ target: { name, value } }) => {
+    console.log(numRegex.test(value));
+    switch(name) {
+      /*
+      case 'email':
+      errors.email =
+        validEmailRegex.test(value)
+          ? ''
+          : 'Email is not valid!';
+      break;
+      */
+
+      case 'mouseId':
+        setErrors(prevState => ({...prevState, [name]:
+          numRegex.test(value)
+          ? ''
+          : 'Mouse ID should contain only numbers.'}));
+        break;
+      case 'gender':
+        setErrors(prevState => ({...prevState, [name]:
+          value === 'M' || value === 'F'
+          ? ''
+          : 'Please enter \'M\' or \'F\' for gender.'}));
+        break;
+    }
+
     setAnimalInfo(prevState => ({ ...prevState, [name]: value }));
   };
 
@@ -333,6 +375,10 @@ const AddAnimal = () => {
                     </Grid>
                   </Grid>
                 </div>
+            <div className={classes.error}>
+              { !validateForm() ? getErrors() : null }
+
+            </div>
             <Button
               type="submit"
               variant="contained"

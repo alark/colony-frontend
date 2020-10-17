@@ -22,6 +22,8 @@ const ADDANIMAL = 'ADDANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 const NOTE = 'NOTE';
+const TAG = 'TAG';
+const TAGS = 'TAGS';
 const SEARCH = 'SEARCH';
 
 axios.defaults.withCredentials = true;
@@ -149,6 +151,14 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
+      case TAG: {
+        return { ...prevState, tagName: payload.tagName, mouseList: payload.mouseList,};
+      }
+
+      case TAGS: {
+        return { ...prevState, listOfTags: payload.tagList,};
+      }
+
       case LOGOUT: {
         // Reset state to logged out
         return initialState;
@@ -243,6 +253,29 @@ const useProfileProvider = () => {
       dispatch({ type: NOTE, payload: data });
     });
 
+  const getTag = request => axios
+    .post(`${BASE_URL}/tags/getTag`, request)
+    .then(({ data }) => {
+      dispatch({ type: TAG, payload: data});
+    });
+
+  const getAllTags = request => axios
+    .post(`${BASE_URL}/tags/getAllTags`, request)
+    .then(({ data }) => {
+      dispatch({ type: TAGS, payload: data});
+    });
+
+  const createTag = request => axios
+    .post(`${BASE_URL}/tags/createTag`, request)
+    .then(({ data }) => {
+      dispatch({ type: TAG, payload: data});
+    });
+
+  const addNewToTag = request => axios
+  .post(`${BASE_URL}/tags/addNewToTag`, request)
+  .then(({ data }) => {
+    dispatch({ type: TAG, payload: data});
+  });
 
   const sortList = (sortBy) => {
     dispatch({ type: SORT, payload: sortBy });
@@ -270,6 +303,10 @@ const useProfileProvider = () => {
     shareColony,
     storeImageLink,
     storeNote,
+    getTag,
+    getAllTags,
+    createTag,
+    addNewToTag,
   };
 };
 

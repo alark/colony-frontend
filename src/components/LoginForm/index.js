@@ -3,6 +3,7 @@ import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
 import { Button, TextField, Link, Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+const { addToList } = require('components/Tags/index');
 import GoogleButton from 'react-google-button';
 //don't get me started on this
 import { auth as auth_ } from 'firebase';
@@ -11,12 +12,21 @@ import { auth } from 'components/FirebaseConfig';
 const Login = () => {
   const { login } = useProfileProvider();
   const { register } = useProfileProvider();
+
   const [userDetails, setUserDetails] = useState({});
   const [redirectToRegister, setRedirectToRegister] = useState(false);
   const [redirectToDashboard, setRedirectToDashboard] = useState(false);
 
+  function checkAllTags(){
+    if(listOfTags === undefined){
+      importTags();
+    }
+  }
+
   /** Material-UI */
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles(theme => (
+    checkAllTags(),
+    {
     paper: {
       marginTop: theme.spacing(8),
       display: 'flex',
@@ -36,10 +46,18 @@ const Login = () => {
     },
   }));
 
+  const importTags = async () => {
+    if(listOfTags === undefined){
+      await getAllTags();
+    }
+  }
+  
   const classes = useStyles();
 
   const attemptLogin = (event) => {
     event.preventDefault();
+    
+    addToList(listOfTags);
 
     const { email, password } = userDetails;
     auth.signInWithEmailAndPassword(email, password).catch(function(error) {
@@ -157,3 +175,8 @@ const Login = () => {
 };
 
 export default Login;
+
+
+
+
+// printAllTags();

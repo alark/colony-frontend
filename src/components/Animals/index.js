@@ -229,6 +229,15 @@ const Animals = () => {
     else{
       return('');
     }
+
+  if (redirectToAdd) {
+    console.log("redirect to add");
+    console.log(redirectToAdd);
+    return (<Redirect
+      to={{
+        pathname: `/addanimal`,
+      }}
+    />);
   }
 
   return (
@@ -255,6 +264,15 @@ const Animals = () => {
               <Button color="primary" variant="contained" onClick={handleAddTagButton} startIcon={<CheckCircle />}>Save</Button>
             </DialogActions>
           </Dialog>
+      <Button
+          color="inherit"
+          variant="outlined"
+          onClick={() => {
+          setRedirectToAdd(true);
+        }}
+        >
+          Add Animal
+        </Button>
 
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">

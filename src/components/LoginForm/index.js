@@ -4,11 +4,18 @@ import { useProfileProvider } from 'contexts/profile';
 import { Button, TextField, Link, Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 const { addToList } = require('components/Tags/index');
+import GoogleButton from 'react-google-button';
+//don't get me started on this
+import { auth as auth_ } from 'firebase';
+import { auth } from 'components/FirebaseConfig';
 
 const Login = () => {
-  const { login, getAllTags, state: { listOfTags } } = useProfileProvider();
+  const { login } = useProfileProvider();
+  const { register } = useProfileProvider();
+
   const [userDetails, setUserDetails] = useState({});
   const [redirectToRegister, setRedirectToRegister] = useState(false);
+  const [redirectToDashboard, setRedirectToDashboard] = useState(false);
 
   function checkAllTags(){
     if(listOfTags === undefined){
@@ -51,8 +58,53 @@ const Login = () => {
     event.preventDefault();
     
     addToList(listOfTags);
-    
-    login(userDetails);
+
+    const { email, password } = userDetails;
+    auth.signInWithEmailAndPassword(email, password).catch(function(error) {
+      // Handle Errors here.
+      console.error(error);
+    });
+
+    auth.onAuthStateChanged(function(user) {
+      if (user) {
+        user.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+          login({idToken: idToken});
+        }).catch(function(error) {
+          console.error(error);
+        });
+      }
+    });
+  };
+
+  const googleLogin = (event) => {
+    event.preventDefault();
+
+    var provider = new auth_.GoogleAuthProvider();
+    auth_().signInWithPopup(provider).then(function(result) {
+      // The signed-in user info.
+      var user = result.user;
+      console.log(result.additionalUserInfo);
+      if (result.additionalUserInfo.isNewUser) { //user has not signed in before
+        console.log('new Google user');
+        user.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+          const name = user.displayName.split(" ");
+          const registrationInformation = {idToken, email: user.email, firstName: name[0], lastName: name[1]};
+          register(registrationInformation);
+          setRedirectToDashboard(true);
+        }).catch(function(error) {
+          console.error(error);
+        });
+      }
+      else { //user has signed in before
+        user.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+          login({idToken: idToken});
+        }).catch(function(error) {
+          console.error(error);
+        });
+      }
+    }).catch(function(error) {
+      console.error(error);
+    });
   };
 
   /**
@@ -111,6 +163,9 @@ const Login = () => {
           >Sign in
           </Button>
         </form>
+        <GoogleButton
+          onClick={googleLogin}
+        />
         <Link href="#" onClick={() => setRedirectToRegister(true)} variant="body2">
           Don't have an account? Register here
         </Link>

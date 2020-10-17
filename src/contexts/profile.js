@@ -18,11 +18,13 @@ const SORT = 'SORT';
 const ALPHASORT = 'ALPHASORT';
 const DELETE = 'DELETE';
 const EDITANIMAL = 'EDITANIMAL';
+const ADDANIMAL = 'ADDANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 const NOTE = 'NOTE';
 const TAG = 'TAG';
 const TAGS = 'TAGS';
+const SEARCH = 'SEARCH';
 
 axios.defaults.withCredentials = true;
 
@@ -96,6 +98,12 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
+      case SEARCH: {
+        return {
+          ...prevState, colonyId: payload.colonyId, searchResults: payload.animals,
+        }
+      }
+
       case EDITANIMAL: {
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalUUID);
@@ -107,6 +115,14 @@ const ProfileProvider = ({ children }) => {
         return {
           ...prevState, animals,
         };
+      }
+
+      //TODO is this even right?
+      case ADDANIMAL: {
+        const animals = [...prevState.animals];
+        const newList = animals.concat(payload);
+        console.log('New Animal: ', payload.animalUUID);
+        return { ...prevState, animals: newList };
       }
 
       case IMAGEUPLOAD: {
@@ -195,6 +211,12 @@ const useProfileProvider = () => {
       dispatch({ type: ANIMALS, payload: data });
     });
 
+  const searchAnimals = async (searchInfo) => axios
+    .post(`${BASE_URL}/animals/search`, searchInfo)
+    .then(({ data }) => {
+      dispatch({ type: SEARCH, payload: data });
+  });
+
   const deleteColony = (colonyId, sharedTable) => axios
     .post(`${BASE_URL}/colony/delete`, { colonyId }) // passing colony id to the colony id object
     .then(() => {
@@ -211,6 +233,12 @@ const useProfileProvider = () => {
     .post(`${BASE_URL}/animals/edit`, request)
     .then(({ data }) => {
       dispatch({ type: EDITANIMAL, payload: data });
+    });
+
+  const addAnimal = request => axios
+    .post(`${BASE_URL}/animals/add`, request)
+    .then(({ data }) => {
+      dispatch({ type: ADDANIMAL, payload: data });
     });
 
   const storeImageLink = request => axios
@@ -265,11 +293,13 @@ const useProfileProvider = () => {
     register,
     addColony,
     getAnimals,
+    searchAnimals,
     sortList,
     sortAlpha,
     deleteColony,
     deleteAnimal,
     editAnimal,
+    addAnimal,
     shareColony,
     storeImageLink,
     storeNote,

@@ -23,7 +23,7 @@ import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Redirect } from 'react-router-dom';
-const { addToList, printList, addNewToList, getList } = require('components/Tags/index');
+const { addNewToList } = require('components/Tags/index');
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -148,9 +148,9 @@ const Animals = () => {
   const [redirectToDetails, setRedirectTodetails] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
-  const { state, getAnimals, deleteAnimal, createTag, getAllTags } = useProfileProvider();
+  const { state, getAnimals, deleteAnimal, createTag} = useProfileProvider();
   const {
-    animals, accessRights, colonyId, colonySize, colonyName, listOfTags,
+    animals, accessRights, colonyId, colonySize, colonyName,
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
@@ -160,13 +160,7 @@ const Animals = () => {
     const request = {
       colonyId, rowsPerPage, page: newPage,
     };
-
-    console.log("LIST OF TAGS IS: ", listOfTags);
-    console.log("STATE: ", state);
-
-    console.log(`request1:${request}, accessRights:${accessRights}, colonyName:${colonyName}, colonySize:${colonySize}, animals[0]:${animals[0].animalUUID}`);
     await getAnimals(request, accessRights, colonyName, colonySize);
-    console.log(`request2:${request}, accessRights:${accessRights}, colonyName:${colonyName}, colonySize:${colonySize}, animals[0]:${animals[0].id}`);
     setPage(newPage);
   };
 
@@ -179,9 +173,7 @@ const Animals = () => {
   };
 
   const updateNewTagName = ({ target: { value } }) => {
-    console.log(`newTagName before: ${newTagName}`);
     setNewTagName(value);
-    console.log(`newTagName after: ${newTagName}`);
   };
 
 
@@ -201,9 +193,19 @@ const Animals = () => {
     await deleteAnimal(request);
   };
 
+  const displayNotes = (noteObj) => {
+    var result = '';
+    for(var i in noteObj){
+      if(i !== '0'){
+        result = result.concat(", ");
+      }
+      result = result.concat(noteObj[i]["notes"]);
+    }
+    return result;
+  }
+
   if (redirectToDetails) {
     return (<Redirect
-      // to={`/animal/${currentAnimal.mouseId}`}
       to={{
         pathname: `/animal/${currentAnimal.mouseId}`,
         state: { animal: currentAnimal },
@@ -211,35 +213,17 @@ const Animals = () => {
     />);
   }
 
-  const printAllTags = async () => {
-    // console.log('calling getalltags');
-    // console.log(`tagList stringy before: ${JSON.stringify(listAllTags)}`);
-    await getAllTags();
-    // setListAllTags(result);
-    console.log("state: ", state);
-    console.log(`tagList stringy: ${JSON.stringify(listOfTags)}`);
-    // console.log(`tagList nonstringy: ${listAllTags}`);
-  }
-
   const handleAddTagButton = async () => {
-    console.log(`saved tag value: ${newTagName}`);
-    //add to db
     const tagData = { tagName: newTagName };
     await createTag(tagData);
 
     addNewToList(newTagName);
-    printList();
 
-    printAllTags();
-
-    // listOfTags.map(tag => console.log(`tag: ${tag}`));
-    //close dialog
     closeAddDialog();
   }
 
   function displayTags(tags){
     if(typeof tags === 'object'){
-      console.log(`${tags.join(', ')}: ${typeof tags.join(', ')}`);
       return tags.join(', ');
     }
     else{
@@ -254,22 +238,11 @@ const Animals = () => {
       <h2>Access:{permissions}</h2>
 
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
-                Add Tag
-              </Button>
-
-      {/* <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        TODO onClick={handleAddTagButton}
-      >Add Tag
-      </Button> */}
-
+        Add Tag
+      </Button>
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>
-              {/* //probably should add an option for info about tag
-              so when hovered over it shows what it is: stretch goal tho */}
               <DialogContentText>
                   Enter tag name below and click Save to save
               </DialogContentText>
@@ -403,8 +376,7 @@ const Animals = () => {
                     ID: {currentAnimal.mouseId}
                   </Typography>
                 }
-                //doesn't show up on card so fix or axe
-                subheader={`Notes: ${currentAnimal.notes}`}
+                subheader={`Notes: ${displayNotes(currentAnimal.notes)}`}
               />
             </div>
             <div className={classes.content}>

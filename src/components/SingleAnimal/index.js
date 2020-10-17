@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Chip, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -8,7 +8,7 @@ import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
-const { addToList, printList, addNewToList, getList } = require('components/Tags/index');
+const { getList } = require('components/Tags/index');
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -107,18 +107,8 @@ const useStylesTag = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
-    maxWidth: 300,
+    maxWidth: 500,
   },
-  chips: {
-    display: "flex",
-    flexWrap: "wrap",
-  },
-  chip: {
-    margin: 1
-  },
-  noLabel: {
-    marginTop: theme.spacing(3)
-  }
 }));
 
 const gridStyles = makeStyles((theme) => ({
@@ -134,7 +124,7 @@ const gridStyles = makeStyles((theme) => ({
 }));
 
 //formatting for the tag box
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 75;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
@@ -147,7 +137,6 @@ const MenuProps = {
 
 function getStyles(tag, tagList, theme) {
   if(tag === undefined){
-    console.log(`tag is undefined? -> ${tag}`);
     return;
   }
   return {
@@ -158,24 +147,7 @@ function getStyles(tag, tagList, theme) {
   };
 }
 
-//TODO
-//temporary default tags, to be updated later
 const defaultTags = getList().sort();
-console.log("defaultTags = ", defaultTags);
-// const defaultTags = [
-//   'Tag1',
-//   'Tag2',
-//   'Tag3',
-//   'Tag4',
-//   'Tag5',
-  // 'Tag6',
-  // 'Tag7',
-  // 'Tag8',
-  // 'Tag9',
-  // 'Tag10',
-// ];
-
-
 
 const SingleAnimal = (props) => {
   const classes = useStyles();
@@ -183,8 +155,6 @@ const SingleAnimal = (props) => {
   const classesGrid = gridStyles();
   const themeTag = useTheme();
   const classesTag = useStylesTag();
-
-  // const currentTags = new Set();
 
   const {
     logout, editAnimal, storeNote, addNewToTag, state,
@@ -198,6 +168,7 @@ const SingleAnimal = (props) => {
   const [notes, setNotes] = useState('');
   const [open, setOpen] = React.useState(false);
   const [notesOpen, setNotesOpen] = React.useState(false);
+  const [selectedTags, setselectedTags] = React.useState([]);
 
   /** Traits */
   const [animalId, setAnimalId] = useState('');
@@ -219,8 +190,6 @@ const SingleAnimal = (props) => {
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
   const [currentImage, setCurrentImage] = React.useState(0);
-  //add tags here?
-
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -236,98 +205,23 @@ const SingleAnimal = (props) => {
     return b.timestamp - a.timestamp;
   });
 
-  const handleTagOpen = (event) => {
-    console.log('in handletagopen', event);
-  }
-
-
   const handleTagChange = (event) => {
-    // console.log(`currentTags: ${currentTags.size}`);
-    // if(!currentTags.has(event.target.value)){
-    //   console.log(`doesnt include: ${event.target.value}`);
-    //   currentTags.add(event.target.value);
-    //   console.log(`currentTags: ${currentTags.size}`);
-    // }
-    // else{
-    //   console.log(`does include: ${event.target.value}`);
-    // }
-    addTagToAnimal(event);
+    setselectedTags(event.target.value);
   }
 
-  const addTagToAnimal = (event) => {
-      console.log(`** to currentAnimal.tags => ${typeof currentAnimal.tags}`);
-  
+  const addTagToAnimal = (newTags) => {  
       if(typeof currentAnimal.tags !== "object"){
         currentAnimal.tags = [];
-  
-        console.log(`** in if. currentAnimal.tags => ${currentAnimal.tags}`);
-  
-      }
-      console.log(`** currentAnimal.tags => ${currentAnimal.tags}`);
-  
-      event.target.value.forEach(function(item){
-        console.log(`** to ca.tags:${typeof currentAnimal.tags} -> etv:${event.target.value}`)
-        
+      }  
+      newTags.forEach(function(item){
         if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
-           currentAnimal.tags.push(item);
-           console.log(`** added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
-           console.log(`type of curAn.uuid: ${typeof currentAnimal.animalUUID}`);
-          //  const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
-          //  addNewToTag(tagData);
-           console.log('called addNewToTag');
+          currentAnimal.tags.push(item);
         }
-      });
+      });  
 
-      console.log(`** currentAnimal.tags => ${currentAnimal.tags}`);
-  
-      setTagList(event.target.value);
+      setTagList(currentAnimal.tags);
     }
 
-
-  
-  // const addTagToAnimal = (event) => {
-  //   console.log(`1.to currentAnimal.tags => ${typeof currentAnimal.tags}`);
-
-  //   if(typeof currentAnimal.tags !== "object"){
-  //     currentAnimal.tags = [];
-
-  //     console.log(`in if. currentAnimal.tags => ${currentAnimal.tags}`);
-
-  //   }
-  //   console.log(`2. currentAnimal.tags => ${currentAnimal.tags}`);
-
-  //   event.target.value.forEach(function(item){
-  //     console.log(`to ca.tags:${typeof currentAnimal.tags} -> etv:${event.target.value}`)
-      
-  //     if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
-  //        currentAnimal.tags.push(item);
-  //        console.log(`added ${item}: includes? ${currentAnimal.tags.includes(item)}`);
-  //        const tagData = { tagName: item, mouseList: [currentAnimal.animalUUID]}
-  //        addNewToTag(tagData);
-  //        console.log('called addNewToTag');
-  //     }
-  //   });
-  //   //adds selected tags to animal.tags without duplicates
-  //   //TODO make it so tags can be deleted
-  //   console.log(`3.currentAnimal.tags => ${currentAnimal.tags}`);
-
-  //   setTagList(event.target.value);
-  // }
-  
-  // const handleTagChangeMultiple = (event) => {
-  //   const { options } = event.target;
-  //   const value = [];
-  //   for (let i = 0, l = options.length; i < l; i += 1) {
-  //      if (options[i].selected) {
-  //       value.push(options[i].value);
-  //     }
-  //   }
-  //   console.log(value);
-  //   setTagList(value);
-  // };
-  
-
-  //add tags to default traits parameters
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
     setAnimalId(id);
     setGender(gen);
@@ -344,10 +238,7 @@ const SingleAnimal = (props) => {
     setGene2(gn2);
     setGene3(gn3);
     setTod(tod);
-    // 
-    // console.log(`~~~~~~~~~~~~~~~~~~~~~~CurrentANimal.tags ==> ${currentAnimal.tags[0]}, ${typeof currentAnimal.tags}`);
     setDefault(true);
-    //add tags here?
   };
 
   const handleClick = () => {
@@ -391,6 +282,8 @@ const SingleAnimal = (props) => {
   const saveChanges = async (event) => {
     event.preventDefault();
 
+    addTagToAnimal(selectedTags);
+
     const animal = {
       animalUUID: currentAnimal.animalUUID,
       mouseId: animalId,
@@ -412,14 +305,13 @@ const SingleAnimal = (props) => {
       tod: tod,
       tags: currentAnimal.tags,
     };
-    // console.log(`>>>>>>>>>>>>>>>> tags: ${tags} -> ${typeof tags}`);
+
     const request = { animal, colonyId };
     editAnimal(request);
 
     currentAnimal.tags.forEach(item => {
       const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
       addNewToTag(tagData);
-      console.log('called addNewToTag');
     });
     handleClick();
   };
@@ -441,7 +333,6 @@ const SingleAnimal = (props) => {
 
   const convertTimeStamp = timestamp => (new Date(timestamp)).toLocaleString();
 
-
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
   } else if (redirectToColonies) {
@@ -456,7 +347,6 @@ const SingleAnimal = (props) => {
       {
         isDefault ?
           null :
-          //add currentAnimal.tags to parameters passed
           defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3, currentAnimal.tod, currentAnimal.tags)}
       <div className={classes.root} style={{ textAlign: 'left' }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
@@ -705,33 +595,21 @@ const SingleAnimal = (props) => {
                           <div>
                             <FormControl className={classesTag.formControl}>
                               <InputLabel
-                                id="chip-label"
-                                onChange={handleTagOpen}
+                                id="tag-label"
                               >Tags</InputLabel>
                               <Select
-                                labelId="chip-label"
-                                id="multiple-chip"
+                                labelId="tag-label"
+                                id="multiple-tag"
                                 multiple  
-                                value={tagList}
+                                value={selectedTags}
                                 onChange={handleTagChange}
-                                input={<Input id="select-multiple-chip"/>}
-                                renderValue={(selected) => (
-                                  <div className={classesTag.chips}>
-                                    {console.log(`selected: ${selected}  animal.tags: ${currentAnimal.tags}`)}
-                                    {(currentAnimal.tags.filter(tag => !selected.includes(tag)))
-                                    .map((value) => selected.push(value))}
-                                    {selected.map((value) => (
-                                      <Chip key={value} label={value} className={classesTag.chip} />
-                                    ))}
-                                    
-                                    {console.log('after currentanimal thing')}
-                                  </div>
-                                )}
+                                input={<Input id="select-multiple-tag"/>}
+                                renderValue={(selected) => selected.join(', ')}
                                 MenuProps={MenuProps}
-                              >
+                              > 
                                 {defaultTags.map((tag) => (
-                                  <MenuItem key={tag} value={tag} style={getStyles(tag, tagList, themeTag)}>
-                                    <Checkbox checked={tagList.indexOf(tag) > -1} />
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+                                    <Checkbox checked={selectedTags.indexOf(tag) > -1} />
                                     <ListItemText primary={tag} />
                                   </MenuItem>
                                 ))}
@@ -743,13 +621,12 @@ const SingleAnimal = (props) => {
                           <div className={classesGrid.paper}>
                             <TextField
                               disabled
-                              label="currentTags"
+                              label="Tags"
                               variant="outlined"
                               size="small"
                               margin="normal"
                               name="currentTags"
                               defaultValue={currentAnimal.tags}
-                              // onChange={event => setGene3(event.target.value)}
                             />
                           </div>
                         </Grid>
@@ -986,29 +863,21 @@ const SingleAnimal = (props) => {
                         <Grid item xs>
                         <div>
                             <FormControl className={classesTag.formControl}>
-                              <InputLabel id="chip-label">Tags</InputLabel>
+                              <InputLabel id="tag-label">Tags</InputLabel>
                               <Select
                                 disabled
-                                labelId="chip-label"
-                                id="multiple-chip"
+                                labelId="tag-label"
+                                id="multiple-tag"
                                 multiple
-                                value={tagList}
+                                value={selectedTags}
                                 onChange={handleTagChange}
-                                input={<Input id="select-multiple-chip" />}
-                                renderValue={(selected) => (
-                                  <div className={classesTag.chips}>
-                                    {(currentAnimal.tags.filter(tag => !selected.includes(tag)))
-                                    .map((value) => selected.push(value))}
-                                    {selected.map((value) => (
-                                      <Chip key={value} label={value} className={classesTag.chip} />
-                                    ))}
-                                  </div>
-                                )}
+                                input={<Input id="select-multiple-tag" />}
+                                renderValue={(selected) => selected.join(', ')}
                                 MenuProps={MenuProps}
                               >
                                 {defaultTags.map((tag) => (
-                                  <MenuItem key={tag} value={tag} style={getStyles(tag, tagList, themeTag)}>
-                                    <Checkbox checked={tagList.indexOf(tag) > -1} />
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+                                    <Checkbox checked={selectedTags.indexOf(tag) > -1} />
                                     <ListItemText primary={tag} />
                                   </MenuItem>
                                 ))}
@@ -1026,7 +895,6 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="currentTags"
                               defaultValue={currentAnimal.tags}
-                              // onChange={event => setGene3(event.target.value)}
                             />
                           </div>
                         </Grid>

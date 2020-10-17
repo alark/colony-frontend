@@ -22,6 +22,7 @@ const ADDANIMAL = 'ADDANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 const NOTE = 'NOTE';
+const SEARCH = 'SEARCH';
 
 axios.defaults.withCredentials = true;
 
@@ -93,6 +94,12 @@ const ProfileProvider = ({ children }) => {
         return {
           ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, animals: payload.animals,
         };
+      }
+
+      case SEARCH: {
+        return {
+          ...prevState, colonyId: payload.colonyId, searchResults: payload.animals,
+        }
       }
 
       case EDITANIMAL: {
@@ -194,6 +201,12 @@ const useProfileProvider = () => {
       dispatch({ type: ANIMALS, payload: data });
     });
 
+  const searchAnimals = async (searchInfo) => axios
+    .post(`${BASE_URL}/animals/search`, searchInfo)
+    .then(({ data }) => {
+      dispatch({ type: SEARCH, payload: data });
+  });
+
   const deleteColony = (colonyId, sharedTable) => axios
     .post(`${BASE_URL}/colony/delete`, { colonyId }) // passing colony id to the colony id object
     .then(() => {
@@ -247,6 +260,7 @@ const useProfileProvider = () => {
     register,
     addColony,
     getAnimals,
+    searchAnimals,
     sortList,
     sortAlpha,
     deleteColony,

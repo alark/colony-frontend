@@ -21,6 +21,7 @@ const EDITANIMAL = 'EDITANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
 const NOTE = 'NOTE';
+const EVENT = 'EVENT';
 
 axios.defaults.withCredentials = true;
 
@@ -31,7 +32,6 @@ const ProfileProvider = ({ children }) => {
     switch (type) {
       case LOGIN: {
         // Store the profile data in the state
-        console.log(payload);
         return { ...prevState, loggedIn: true, ...payload };
       }
 
@@ -48,14 +48,12 @@ const ProfileProvider = ({ children }) => {
       case DELETE: {
         const colonies = payload.sharedTable ? [...prevState.sharedColonies] : [...prevState.ownedColonies];
         const newList = colonies.filter((item, index) => item.colonyId !== payload.colonyId);
-        console.log('Deleted Colony ID: ', payload);
         return payload.sharedTable ? { ...prevState, sharedColonies: newList } : { ...prevState, ownedColonies: newList };
       }
 
       case DELETEANIMAL: {
         const animals = [...prevState.animals];
         const newList = animals.filter((item, index) => item.animalUUID !== payload);
-        console.log('Deleted Animal ID: ', payload);
         return { ...prevState, animals: newList };
       }
 
@@ -97,7 +95,6 @@ const ProfileProvider = ({ children }) => {
       case EDITANIMAL: {
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalUUID);
-        console.log('here');
         // Get index of animal to edit
         if (targetIndex !== -1) {
           animals[targetIndex] = payload; // Store edited animal
@@ -110,7 +107,6 @@ const ProfileProvider = ({ children }) => {
       case IMAGEUPLOAD: {
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
-        console.log('here');
         // Get index of animal to edit
         if (targetIndex !== -1) {
           animals[targetIndex].imageLinks.push(payload.url); // Store edited animal
@@ -123,10 +119,21 @@ const ProfileProvider = ({ children }) => {
       case NOTE: {
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
-        console.log('here');
         // Get index of animal to edit
         if (targetIndex !== -1) {
           animals[targetIndex].notes.push(payload.note); // Store edited animal
+        }
+        return {
+          ...prevState, animals,
+        };
+      }
+
+      case EVENT: {
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          animals[targetIndex].events.push(payload.eventInfo); // Store edited animal
         }
         return {
           ...prevState, animals,
@@ -215,6 +222,12 @@ const useProfileProvider = () => {
       dispatch({ type: NOTE, payload: data });
     });
 
+  const storeEvent = request => axios
+    .post(`${BASE_URL}/animals/storeEvent`, request)
+    .then(({ data }) => {
+      dispatch({ type: EVENT, payload: data });
+    });
+
 
   const sortList = (sortBy) => {
     dispatch({ type: SORT, payload: sortBy });
@@ -240,6 +253,7 @@ const useProfileProvider = () => {
     shareColony,
     storeImageLink,
     storeNote,
+    storeEvent,
   };
 };
 

@@ -139,6 +139,9 @@ const AddAnimal = () => {
       break;
       */
 
+      //TODO: motherId and fatherId, check that the ID is numeric, exists, and is the correct Gender
+      //TODO: genes? ?? 
+
       case 'mouseId':
         setErrors(prevState => ({...prevState, [name]:
           numRegex.test(value)

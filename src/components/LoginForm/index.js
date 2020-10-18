@@ -10,7 +10,7 @@ import { auth as auth_ } from 'firebase';
 import { auth } from 'components/FirebaseConfig';
 
 const Login = () => {
-  const { login } = useProfileProvider();
+  const { login, getAllTags, state: { listOfTags } } = useProfileProvider();
   const { register } = useProfileProvider();
 
   const [userDetails, setUserDetails] = useState({});

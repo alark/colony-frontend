@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Button, Card, CardActions, CardContent, CardMedia, IconButton, List, ListItem, ListItemText, Grid, Breadcrumbs, Link, Container, CssBaseline, Divider, Snackbar, Tab, Tabs, TextField, Typography, CardActionArea } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
-
+const { getList } = require('components/Tags/index');
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -103,6 +103,14 @@ const useStyles2 = makeStyles(theme => ({
   },
 }));
 
+const useStylesTag = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    maxWidth: 500,
+  },
+}));
+
 const gridStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -115,12 +123,41 @@ const gridStyles = makeStyles((theme) => ({
   },
 }));
 
+//formatting for the tag box
+const ITEM_HEIGHT = 75;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tagList, theme) {
+  if(tag === undefined){
+    return;
+  }
+  return {
+    fontWeight:
+      tagList.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+const defaultTags = getList().sort();
+
 const SingleAnimal = (props) => {
   const classes = useStyles();
   const classesTwo = useStyles2();
   const classesGrid = gridStyles();
+  const themeTag = useTheme();
+  const classesTag = useStylesTag();
+
   const {
-    logout, editAnimal, storeNote, state,
+    logout, editAnimal, storeNote, storeEvent, addNewToTag, state,
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
@@ -129,8 +166,12 @@ const SingleAnimal = (props) => {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const { colonyName, colonyId } = state;
   const [notes, setNotes] = useState('');
+  const [event, setEvent] = useState('');
+  const [date, setDate] = useState('');
   const [open, setOpen] = React.useState(false);
   const [notesOpen, setNotesOpen] = React.useState(false);
+  const [eventOpen, setEventOpen] = React.useState(false);
+  const [selectedTags, setselectedTags] = React.useState([]);
 
   /** Traits */
   const [animalId, setAnimalId] = useState('');
@@ -148,6 +189,7 @@ const SingleAnimal = (props) => {
   const [gene2, setGene2] = useState('');
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
+  const [tagList, setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
   const [currentImage, setCurrentImage] = React.useState(0);
@@ -159,16 +201,36 @@ const SingleAnimal = (props) => {
   currentAnimal.imageLinks
     .splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
 
-  const animalNotes = currentAnimal.notes
-    .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
+  const animalNotes = currentAnimal.notes.filter((item, index) => currentAnimal.notes.indexOf(item) === index);
+
+  const animalEvents = currentAnimal.events.filter((item, index) => currentAnimal.events.indexOf(item) === index);
 
   animalNotes.sort((a, b) => {
     return b.timestamp - a.timestamp;
   });
 
-  console.log('Current animal', currentAnimal);
+  animalEvents.sort((a, b) => {
+    return b.timestamp - a.timestamp;
+  });
 
-  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod) => {
+  const handleTagChange = (event) => {
+    setselectedTags(event.target.value);
+  }
+
+  const addTagToAnimal = (newTags) => {  
+      if(typeof currentAnimal.tags !== "object"){
+        currentAnimal.tags = [];
+      }  
+      newTags.forEach(function(item){
+        if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
+          currentAnimal.tags.push(item);
+        }
+      });  
+
+      setTagList(currentAnimal.tags);
+    }
+
+  const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
     setAnimalId(id);
     setGender(gen);
     setLitter(litt);
@@ -211,6 +273,18 @@ const SingleAnimal = (props) => {
     setNotesOpen(false);
   };
 
+  const handleEventClick = () => {
+    setEventOpen(true);
+  };
+
+  const handleEventClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setEventOpen(false);
+  };
+
   const handleNextImage = () => {
     const index = currentImage + 1;
     if (index < currentAnimal.imageLinks.length) {
@@ -227,6 +301,9 @@ const SingleAnimal = (props) => {
 
   const saveChanges = async (event) => {
     event.preventDefault();
+
+    addTagToAnimal(selectedTags);
+
     const animal = {
       animalUUID: currentAnimal.animalUUID,
       mouseId: animalId,
@@ -241,20 +318,36 @@ const SingleAnimal = (props) => {
       fatherId: father,
       motherId: mother,
       notes: animalNotes,
+      events: animalEvents,
       gene1: gene1,
       gene2: gene2,
       gene3: gene3,
       imageLinks: currentAnimal.imageLinks,
       tod: tod,
+      tags: currentAnimal.tags,
     };
+
     const request = { animal, colonyId };
     editAnimal(request);
+
+    currentAnimal.tags.forEach(item => {
+      const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
+      addNewToTag(tagData);
+    });
     handleClick();
   };
 
   const defaultLink = 'https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg';
 
   const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : defaultLink;
+
+  const onEventsAdded = (event) => {
+    setEvent(event.target.value);
+  }
+
+  const onDateAdded = (date) => {
+    setDate(date.target.value);
+  }
 
   const onNotesAdded = (event) => {
     setNotes(event.target.value);
@@ -267,8 +360,15 @@ const SingleAnimal = (props) => {
     handleNotesClick();
   };
 
-  const convertTimeStamp = timestamp => (new Date(timestamp)).toLocaleString();
+  const onSaveEvent = () => {
+    const currEvent = { event, timestamp: date };
+    const myEvent = { colonyId, animalId: currentAnimal.animalUUID, eventInfo: currEvent };
+    console.log(myEvent);
+    storeEvent(myEvent);
+    handleEventClick();
+  };
 
+  const convertTimeStamp = timestamp => (new Date(timestamp)).toLocaleString();
 
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
@@ -284,7 +384,7 @@ const SingleAnimal = (props) => {
       {
         isDefault ?
           null :
-          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3, currentAnimal.tod)}
+          defaultTraits(currentAnimal.mouseId, currentAnimal.gender, currentAnimal.litter, currentAnimal.dobMonth, currentAnimal.dobDay, currentAnimal.dobYear, currentAnimal.dodMonth, currentAnimal.dodDay, currentAnimal.dodYear, currentAnimal.fatherId, currentAnimal.motherId, currentAnimal.gene1, currentAnimal.gene2, currentAnimal.gene3, currentAnimal.tod, currentAnimal.tags)}
       <div className={classes.root} style={{ textAlign: 'left' }}>
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
           <Link color="inherit" onClick={() => setRedirectToLogin(true)}>
@@ -527,6 +627,47 @@ const SingleAnimal = (props) => {
                           </div>
                         </Grid>
                       </Grid>
+                      <Grid container>
+                        <Grid item xs>
+                          <div>
+                            <FormControl className={classesTag.formControl}>
+                              <InputLabel
+                                id="tag-label"
+                              >Tags</InputLabel>
+                              <Select
+                                labelId="tag-label"
+                                id="multiple-tag"
+                                multiple  
+                                value={selectedTags}
+                                onChange={handleTagChange}
+                                input={<Input id="select-multiple-tag"/>}
+                                renderValue={(selected) => selected.join(', ')}
+                                MenuProps={MenuProps}
+                              > 
+                                {defaultTags.map((tag) => (
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+                                    <Checkbox checked={selectedTags.indexOf(tag) > -1} />
+                                    <ListItemText primary={tag} />
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="Tags"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="currentTags"
+                              defaultValue={currentAnimal.tags}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
                     </div>
                     :
                     <div className={classesGrid.root}>
@@ -754,11 +895,53 @@ const SingleAnimal = (props) => {
                           </div>
                         </Grid>
                       </Grid>
+
+                      <Grid container>
+                        <Grid item xs>
+                        <div>
+                            <FormControl className={classesTag.formControl}>
+                              <InputLabel id="tag-label">Tags</InputLabel>
+                              <Select
+                                disabled
+                                labelId="tag-label"
+                                id="multiple-tag"
+                                multiple
+                                value={selectedTags}
+                                onChange={handleTagChange}
+                                input={<Input id="select-multiple-tag" />}
+                                renderValue={(selected) => selected.join(', ')}
+                                MenuProps={MenuProps}
+                              >
+                                {defaultTags.map((tag) => (
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+                                    <Checkbox checked={selectedTags.indexOf(tag) > -1} />
+                                    <ListItemText primary={tag} />
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </div>
+                        </Grid>
+                        <Grid item xs>
+                          <div className={classesGrid.paper}>
+                            <TextField
+                              disabled
+                              label="currentTags"
+                              variant="outlined"
+                              size="small"
+                              margin="normal"
+                              name="currentTags"
+                              defaultValue={currentAnimal.tags}
+                            />
+                          </div>
+                        </Grid>
+                      </Grid>
                     </div>
                 }
               </form>
 
               <div className={classesTwo.controls}>
+                
                 {
                   accessRights ?
                     <Button
@@ -770,7 +953,6 @@ const SingleAnimal = (props) => {
                     </Button>
                     : null
                 }
-
                 <Button
                   onClick={() => {
                     setRedirectToAnimals(true);
@@ -794,6 +976,7 @@ const SingleAnimal = (props) => {
             <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
               <Tab label={<span style={{ color: 'black' }}>Notes</span>} {...a11yProps(0)} />
               <Tab label={<span style={{ color: 'black' }}>Gallery</span>} {...a11yProps(1)} />
+              <Tab label={<span style={{ color: 'black' }}>Events</span>} {...a11yProps(2)} />
             </Tabs>
 
             <TabPanel value={tab} index={0}>
@@ -856,6 +1039,55 @@ const SingleAnimal = (props) => {
                   </CardActionArea>
                 </Card> : null
               }
+            </TabPanel>
+            <TabPanel value={tab} index={2}>
+              <div>
+                <TextField
+                    id="filled-full-width"
+                    label="Event Info"
+                    style={{ margin: 8 }}
+                    className={classesTwo.textField}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    onChange={onEventsAdded}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                />
+
+                <input type="date" id="event-time"
+                  name="meeting-time" 
+                  onChange={onDateAdded}
+                />
+
+                <Button variant="contained" color="primary" onClick={onSaveEvent}>
+                  Save Event
+                  </Button>
+                <Snackbar open={eventOpen} autoHideDuration={6000} onClose={handleEventClose}>
+                  <Alert onClose={handleEventClose} severity="success">
+                    Event saved successfully!
+                  </Alert>
+                </Snackbar>
+              </div>
+
+              <div className={classes.root}>
+                <List component="nav" aria-label="main mailbox folders">
+                  {
+                    animalEvents.map((event, index) => (
+                      <div key={index}>
+                        <ListItem button>
+                          <ListItemText
+                            primary={<Typography color="textPrimary">{event.event}</Typography>}
+                            secondary={convertTimeStamp(event.timestamp)}
+                          />
+                        </ListItem>
+                        <Divider />
+                      </div>
+                    ))
+                  }
+                </List>
+              </div>
             </TabPanel>
           </AppBar>
         </div>

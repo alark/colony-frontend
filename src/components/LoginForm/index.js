@@ -8,15 +8,26 @@ import GoogleButton from 'react-google-button';
 import { auth as auth_ } from 'firebase';
 import { auth } from 'components/FirebaseConfig';
 
+const { addToList } = require('components/Tags/index');
+
 const Login = () => {
-  const { login } = useProfileProvider();
+  const { login, getAllTags, state: { listOfTags } } = useProfileProvider();
   const { register } = useProfileProvider();
+
   const [userDetails, setUserDetails] = useState({});
   const [redirectToRegister, setRedirectToRegister] = useState(false);
   const [redirectToDashboard, setRedirectToDashboard] = useState(false);
 
+  function checkAllTags(){
+    if(listOfTags === undefined){
+      importTags();
+    }
+  }
+
   /** Material-UI */
-  const useStyles = makeStyles(theme => ({
+  const useStyles = makeStyles(theme => (
+    checkAllTags(),
+    {
     paper: {
       marginTop: theme.spacing(8),
       display: 'flex',
@@ -36,10 +47,18 @@ const Login = () => {
     },
   }));
 
+  const importTags = async () => {
+    if(listOfTags === undefined){
+      await getAllTags();
+    }
+  }
+
   const classes = useStyles();
 
   const attemptLogin = (event) => {
     event.preventDefault();
+
+    addToList(listOfTags);
 
     const { email, password } = userDetails;
     auth.signInWithEmailAndPassword(email, password).catch(function(error) {
@@ -157,3 +176,8 @@ const Login = () => {
 };
 
 export default Login;
+
+
+
+
+// printAllTags();

@@ -2,7 +2,8 @@ import firebase from 'firebase';
 import 'firebase/storage';
 import 'firebase/auth';
 
-var firebaseConfig = {
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
   apiKey: "AIzaSyCjfmxLhQ1MamquPmk3C_3DGQzLCud5dEY",
   authDomain: "animal-colony-project.firebaseapp.com",
   databaseURL: "https://animal-colony-project.firebaseio.com",

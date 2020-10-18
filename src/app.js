@@ -7,6 +7,7 @@ import ColonyPage from 'features/ColonyPage';
 import Registration from 'features/Registration';
 import Animals from './components/Animals';
 import SingleAnimal from './components/SingleAnimal';
+import AddAnimal from './components/AddAnimal';
 
 
 /**
@@ -21,6 +22,7 @@ const App = () => (
         <ProtectedRoute path="/dashboard/colony" component={ColonyPage} />
         <ProtectedRoute path="/animals/:id" component={Animals} />
         <ProtectedRoute path="/animal/:id" component={SingleAnimal} />
+        <ProtectedRoute path="/addanimal" component={AddAnimal} />
         <Route exact path="/" component={HomePage} />
         <Route exact path="/registration" component={Registration} />
       </Switch>

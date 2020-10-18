@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Avatar } from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -13,10 +13,17 @@ import { blue, red } from '@material-ui/core/colors';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import TableFooter from '@material-ui/core/TableFooter';
 import TablePagination from '@material-ui/core/TablePagination';
-
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Add from '@material-ui/icons/Add';
+import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Redirect } from 'react-router-dom';
+const { addNewToList } = require('components/Tags/index');
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -139,7 +146,9 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
-  const { state, getAnimals, deleteAnimal } = useProfileProvider();
+  const [addDialog, setAddDialogOpen] = React.useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const { state, getAnimals, deleteAnimal, createTag} = useProfileProvider();
   const {
     animals, accessRights, colonyId, colonySize, colonyName,
   } = state;
@@ -154,6 +163,19 @@ const Animals = () => {
     await getAnimals(request, accessRights, colonyName, colonySize);
     setPage(newPage);
   };
+
+  const openAddDialog = () => {
+    setAddDialogOpen(true);
+  };
+
+  const closeAddDialog = () => {
+    setAddDialogOpen(false);
+  };
+
+  const updateNewTagName = ({ target: { value } }) => {
+    setNewTagName(value);
+  };
+
 
   const handleOpenModal = (animal) => {
     setCurrentAnimal(animal);
@@ -171,9 +193,19 @@ const Animals = () => {
     await deleteAnimal(request);
   };
 
+  const displayNotes = (noteObj) => {
+    var result = '';
+    for(var i in noteObj){
+      if(i !== '0'){
+        result = result.concat(", ");
+      }
+      result = result.concat(noteObj[i]["notes"]);
+    }
+    return result;
+  }
+
   if (redirectToDetails) {
     return (<Redirect
-      // to={`/animal/${currentAnimal.mouseId}`}
       to={{
         pathname: `/animal/${currentAnimal.mouseId}`,
         state: { animal: currentAnimal },
@@ -181,12 +213,66 @@ const Animals = () => {
     />);
   }
 
+  const handleAddTagButton = async () => {
+    const tagData = { tagName: newTagName };
+    await createTag(tagData);
+
+    addNewToList(newTagName);
+
+    closeAddDialog();
+  }
+
+  function displayTags(tags){
+    if(typeof tags === 'object'){
+      return tags.join(', ');
+    }
+    else{
+      return('');
+    }
+
+  if (redirectToAdd) {
+    console.log("redirect to add");
+    console.log(redirectToAdd);
+    return (<Redirect
+      to={{
+        pathname: `/addanimal`,
+      }}
+    />);
+  }
 
   return (
     <Container component="main" style={{ padding: 8 }}>
       <CssBaseline />
       <h1>Colony: {colonyName}</h1>
       <h2>Access:{permissions}</h2>
+
+      <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
+        Add Tag
+      </Button>
+      <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
+            <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                  Enter tag name below and click Save to save
+              </DialogContentText>
+              <br />
+              <div>
+                <TextField variant="outlined" margin="dense" size="small" name="tagName" label="New Tag" onChange={updateNewTagName} />
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button color="primary" variant="contained" onClick={handleAddTagButton} startIcon={<CheckCircle />}>Save</Button>
+            </DialogActions>
+          </Dialog>
+      <Button
+          color="inherit"
+          variant="outlined"
+          onClick={() => {
+          setRedirectToAdd(true);
+        }}
+        >
+          Add Animal
+        </Button>
 
       <TableContainer className={classes.table} component={Paper}>
         <Table className={classes.table} aria-label="custom pagination table">
@@ -198,12 +284,12 @@ const Animals = () => {
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Father&nbsp;ID</TableCell>
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Mother&nbsp;ID</TableCell>
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Date&nbsp; of&nbsp; Birth</TableCell>
+              <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>Tags</TableCell>
               <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }} />
             </TableRow>
           </TableBody>
           <TableBody>
-            {(animals
-            ).map(animal => (
+            {(animals).map(animal => (
               <TableRow key={animal.mouseId}>
                 <TableCell
                   style={{ cursor: 'pointer', borderRight: '1px solid rgba(224, 224, 224, 1)' }}
@@ -231,6 +317,9 @@ const Animals = () => {
                 </TableCell>
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <span>{animal.dobMonth}/{animal.dobDay}/{animal.dobYear}</span>
+                </TableCell>
+                <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
+                  {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <Button
@@ -306,7 +395,7 @@ const Animals = () => {
                     ID: {currentAnimal.mouseId}
                   </Typography>
                 }
-                subheader={`Notes: ${currentAnimal.notes}`}
+                subheader={`Notes: ${displayNotes(currentAnimal.notes)}`}
               />
             </div>
             <div className={classes.content}>
@@ -354,6 +443,9 @@ const Animals = () => {
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
                   <strong>TOD:</strong> {currentAnimal.tod}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>Tags:</strong> {displayTags(currentAnimal.tags)}
                 </Typography>
               </CardContent>
             </div>

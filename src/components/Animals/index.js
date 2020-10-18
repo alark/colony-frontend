@@ -146,6 +146,7 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
+  const [redirectToAdd, setRedirectToAdd] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
   const { state, getAnimals, deleteAnimal, createTag} = useProfileProvider();

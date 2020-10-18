@@ -156,6 +156,7 @@ const ProfileProvider = ({ children }) => {
         return {
           ...prevState, animals,
         };
+      }
 
       case TAG: {
         return { ...prevState, tagName: payload.tagName, mouseList: payload.mouseList,};

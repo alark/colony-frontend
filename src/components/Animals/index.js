@@ -229,6 +229,7 @@ const Animals = () => {
     else{
       return('');
     }
+  }
 
   if (redirectToAdd) {
     console.log("redirect to add");

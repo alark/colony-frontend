@@ -9,7 +9,7 @@
     "acorn": "^8.0.1",
     "axios": "^0.19.2",
     "emailjs-com": "^2.6.3",
-    "firebase": "^7.21.0",
+    "firebase": "^7.24.0",
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.11",
     "prop-types": "^15.7.2",

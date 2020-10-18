@@ -382,6 +382,7 @@ const Animals = () => {
       >
         <div style={{ top: '20%', left: '20%' }} className={classes.paper}>
 
+
           <Card className={classes.root}>
 
             <div>

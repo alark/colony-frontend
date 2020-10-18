@@ -157,7 +157,7 @@ const SingleAnimal = (props) => {
   const classesTag = useStylesTag();
 
   const {
-    logout, editAnimal, storeNote, addNewToTag, state,
+    logout, editAnimal, storeNote, storeEvent, addNewToTag, state,
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
@@ -166,8 +166,11 @@ const SingleAnimal = (props) => {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
   const { colonyName, colonyId } = state;
   const [notes, setNotes] = useState('');
+  const [event, setEvent] = useState('');
+  const [date, setDate] = useState('');
   const [open, setOpen] = React.useState(false);
   const [notesOpen, setNotesOpen] = React.useState(false);
+  const [eventOpen, setEventOpen] = React.useState(false);
   const [selectedTags, setselectedTags] = React.useState([]);
 
   /** Traits */
@@ -198,10 +201,15 @@ const SingleAnimal = (props) => {
   currentAnimal.imageLinks
     .splice(0, currentAnimal.imageLinks.length, ...(new Set(currentAnimal.imageLinks)));
 
-  const animalNotes = currentAnimal.notes
-    .filter((item, index) => currentAnimal.notes.indexOf(item) === index);
+  const animalNotes = currentAnimal.notes.filter((item, index) => currentAnimal.notes.indexOf(item) === index);
+
+  const animalEvents = currentAnimal.events.filter((item, index) => currentAnimal.events.indexOf(item) === index);
 
   animalNotes.sort((a, b) => {
+    return b.timestamp - a.timestamp;
+  });
+
+  animalEvents.sort((a, b) => {
     return b.timestamp - a.timestamp;
   });
 
@@ -265,6 +273,18 @@ const SingleAnimal = (props) => {
     setNotesOpen(false);
   };
 
+  const handleEventClick = () => {
+    setEventOpen(true);
+  };
+
+  const handleEventClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setEventOpen(false);
+  };
+
   const handleNextImage = () => {
     const index = currentImage + 1;
     if (index < currentAnimal.imageLinks.length) {
@@ -298,6 +318,7 @@ const SingleAnimal = (props) => {
       fatherId: father,
       motherId: mother,
       notes: animalNotes,
+      events: animalEvents,
       gene1: gene1,
       gene2: gene2,
       gene3: gene3,
@@ -320,6 +341,14 @@ const SingleAnimal = (props) => {
 
   const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : defaultLink;
 
+  const onEventsAdded = (event) => {
+    setEvent(event.target.value);
+  }
+
+  const onDateAdded = (date) => {
+    setDate(date.target.value);
+  }
+
   const onNotesAdded = (event) => {
     setNotes(event.target.value);
   };
@@ -329,6 +358,14 @@ const SingleAnimal = (props) => {
     const myNotes = { colonyId, animalId: currentAnimal.animalUUID, note };
     storeNote(myNotes);
     handleNotesClick();
+  };
+
+  const onSaveEvent = () => {
+    const currEvent = { event, timestamp: date };
+    const myEvent = { colonyId, animalId: currentAnimal.animalUUID, eventInfo: currEvent };
+    console.log(myEvent);
+    storeEvent(myEvent);
+    handleEventClick();
   };
 
   const convertTimeStamp = timestamp => (new Date(timestamp)).toLocaleString();
@@ -904,6 +941,7 @@ const SingleAnimal = (props) => {
               </form>
 
               <div className={classesTwo.controls}>
+                
                 {
                   accessRights ?
                     <Button
@@ -915,7 +953,6 @@ const SingleAnimal = (props) => {
                     </Button>
                     : null
                 }
-
                 <Button
                   onClick={() => {
                     setRedirectToAnimals(true);
@@ -939,6 +976,7 @@ const SingleAnimal = (props) => {
             <Tabs value={tab} onChange={handleTabChange} aria-label="simple tabs example">
               <Tab label={<span style={{ color: 'black' }}>Notes</span>} {...a11yProps(0)} />
               <Tab label={<span style={{ color: 'black' }}>Gallery</span>} {...a11yProps(1)} />
+              <Tab label={<span style={{ color: 'black' }}>Events</span>} {...a11yProps(2)} />
             </Tabs>
 
             <TabPanel value={tab} index={0}>
@@ -1001,6 +1039,55 @@ const SingleAnimal = (props) => {
                   </CardActionArea>
                 </Card> : null
               }
+            </TabPanel>
+            <TabPanel value={tab} index={2}>
+              <div>
+                <TextField
+                    id="filled-full-width"
+                    label="Event Info"
+                    style={{ margin: 8 }}
+                    className={classesTwo.textField}
+                    fullWidth
+                    margin="normal"
+                    variant="outlined"
+                    onChange={onEventsAdded}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                />
+
+                <input type="date" id="event-time"
+                  name="meeting-time" 
+                  onChange={onDateAdded}
+                />
+
+                <Button variant="contained" color="primary" onClick={onSaveEvent}>
+                  Save Event
+                  </Button>
+                <Snackbar open={eventOpen} autoHideDuration={6000} onClose={handleEventClose}>
+                  <Alert onClose={handleEventClose} severity="success">
+                    Event saved successfully!
+                  </Alert>
+                </Snackbar>
+              </div>
+
+              <div className={classes.root}>
+                <List component="nav" aria-label="main mailbox folders">
+                  {
+                    animalEvents.map((event, index) => (
+                      <div key={index}>
+                        <ListItem button>
+                          <ListItemText
+                            primary={<Typography color="textPrimary">{event.event}</Typography>}
+                            secondary={convertTimeStamp(event.timestamp)}
+                          />
+                        </ListItem>
+                        <Divider />
+                      </div>
+                    ))
+                  }
+                </List>
+              </div>
             </TabPanel>
           </AppBar>
         </div>

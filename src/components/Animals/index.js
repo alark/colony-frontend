@@ -85,7 +85,6 @@ function TablePaginationActions(props) {
   );
 }
 
-
 const useStyles = makeStyles(theme => ({
   table: {
     width: '100%',
@@ -146,7 +145,6 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
-  const [redirectToAdd, setRedirectToAdd] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
   const { state, getAnimals, deleteAnimal, createTag} = useProfileProvider();
@@ -176,7 +174,6 @@ const Animals = () => {
   const updateNewTagName = ({ target: { value } }) => {
     setNewTagName(value);
   };
-
 
   const handleOpenModal = (animal) => {
     setCurrentAnimal(animal);

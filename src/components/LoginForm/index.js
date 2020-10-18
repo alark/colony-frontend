@@ -3,11 +3,12 @@ import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
 import { Button, TextField, Link, Container, CssBaseline, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-const { addToList } = require('components/Tags/index');
 import GoogleButton from 'react-google-button';
 //don't get me started on this
 import { auth as auth_ } from 'firebase';
 import { auth } from 'components/FirebaseConfig';
+
+const { addToList } = require('components/Tags/index');
 
 const Login = () => {
   const { login, getAllTags, state: { listOfTags } } = useProfileProvider();
@@ -51,12 +52,12 @@ const Login = () => {
       await getAllTags();
     }
   }
-  
+
   const classes = useStyles();
 
   const attemptLogin = (event) => {
     event.preventDefault();
-    
+
     addToList(listOfTags);
 
     const { email, password } = userDetails;

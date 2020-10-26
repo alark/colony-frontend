@@ -1,5 +1,8 @@
+import Gallery from "react-photo-gallery";
+// import ImageGallery from 'react-image-gallery';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
+// import { render } from "react-dom";
 import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
@@ -8,7 +11,15 @@ import { useProfileProvider } from 'contexts/profile';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
+import Modal from '@material-ui/core/Modal';
+
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import { ClassSharp } from "@material-ui/icons";
+
 const { getList } = require('components/Tags/index');
+
+
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -101,6 +112,23 @@ const useStyles2 = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  gridList: {
+    width: '100%',
+    height: 500,
+  },
+  gridListTile: {
+
+  },
+  modal: {
+    position: 'absolute',
+    width: 600,
+    height: 'auto',
+    // backgroundColor: theme.palette.background.paper,
+    // border: '2px solid #000',
+    // boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+    margin: 'auto',
+  },
 }));
 
 const useStylesTag = makeStyles((theme) => ({
@@ -172,6 +200,8 @@ const SingleAnimal = (props) => {
   const [notesOpen, setNotesOpen] = React.useState(false);
   const [eventOpen, setEventOpen] = React.useState(false);
   const [selectedTags, setselectedTags] = React.useState([]);
+  const [selectedImage, setselectedImage] = React.useState(null);
+  const [openModal, setModalOpen] = React.useState(false);
 
   /** Traits */
   const [animalId, setAnimalId] = useState('');
@@ -204,6 +234,8 @@ const SingleAnimal = (props) => {
   const animalNotes = currentAnimal.notes.filter((item, index) => currentAnimal.notes.indexOf(item) === index);
 
   const animalEvents = currentAnimal.events.filter((item, index) => currentAnimal.events.indexOf(item) === index);
+
+  const BasicRows = () => <Gallery photos={currentAnimal.imageLinks} />;
 
   animalNotes.sort((a, b) => {
     return b.timestamp - a.timestamp;
@@ -297,6 +329,20 @@ const SingleAnimal = (props) => {
     if (index >= 0) {
       setCurrentImage(index);
     }
+  }
+
+  const handleModalOpen = () => {
+    console.log("handlemodalopen: selectedimg", selectedImage);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    console.log("handlemodalclose");
+    setModalOpen(false);
+  };
+
+  const handleModal = () => {
+    console.log("handlemodal");
   }
 
   const saveChanges = async (event) => {
@@ -1025,19 +1071,59 @@ const SingleAnimal = (props) => {
             <TabPanel value={tab} index={1}>
               <Uploader animalId={currentAnimal.animalUUID} />
               {
-                currentAnimal.imageLinks.length > 0 ?
-                <Card className={classesTwo.root}>
-                  <CardActionArea>
-                    <CardMedia style={{ align: 'center' }}>
-                      <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
-                    </CardMedia>
-                    <CardActions>
-                      <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
-                      <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
-                      {currentImage+1} / {currentAnimal.imageLinks.length}
-                    </CardActions>
-                  </CardActionArea>
-                </Card> : null
+                <div className={classesTwo.root}>
+                <GridList cellHeight={200} className={classesTwo.gridList} cols={8}>
+                  {currentAnimal.imageLinks.map((link) => (
+                    <GridListTile className={classesTwo.gridListTile} key={link} rows={0.5} cols={1}
+                      onClick={() => {
+                        setselectedImage(link) 
+                        handleModalOpen()
+                      }}
+                    >
+                      {/* () => setselectedImage(link) */}
+                      <img src={link} alt={"image"} />
+                    </GridListTile>
+                  ))}
+                </GridList>
+                 <Modal
+                  className={classesTwo.modal}
+                  open={openModal}
+                  onClose={handleModalClose}
+                  
+                >
+                  <div 
+                    position='absolute'
+                    width='100%'
+                    height='100%'
+                  >
+                    <img
+                      // position='relative'
+                      margin-left='auto'
+                      margin-right='auto'
+                      width='600'
+                      height='auto'
+                      display='block'
+                      
+                      src={selectedImage}
+                      alt={"image"}
+                    />
+                  </div>
+                </Modal>
+                </div>
+
+                // currentAnimal.imageLinks.length > 0 ?
+                // <Card className={classesTwo.root}>
+                //   <CardActionArea>
+                //     <CardMedia style={{ align: 'center' }}>
+                //       <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
+                //     </CardMedia>
+                //     <CardActions>
+                //       <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
+                //       <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
+                //       {currentImage+1} / {currentAnimal.imageLinks.length}
+                //     </CardActions>
+                //   </CardActionArea>
+                // </Card> : null
               }
             </TabPanel>
             <TabPanel value={tab} index={2}>

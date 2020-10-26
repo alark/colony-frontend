@@ -145,6 +145,7 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
+  const [redirectToAdd, setRedirectToAdd] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
   const { state, getAnimals, deleteAnimal, createTag} = useProfileProvider();
@@ -248,6 +249,7 @@ const Animals = () => {
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
         Add Tag
       </Button>
+      
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>

@@ -86,7 +86,7 @@ const Uploader = (props) => {
           <Button onClick={handleUpdate} startIcon={<CloudUploadIcon />}>Upload</Button>
         </DialogActions>
       </Dialog>
-      <div style={{ height: '100px' }}>
+      <div style={{ height: '25px' }}>
         {progress > 0 ? <progress value={progress} max="100" /> : ''}
         <p style={{ color: 'red' }}>{error}</p>
       </div>

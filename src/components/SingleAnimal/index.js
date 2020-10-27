@@ -114,20 +114,21 @@ const useStyles2 = makeStyles(theme => ({
   },
   gridList: {
     width: '100%',
-    height: 500,
+    height: 550,
   },
   gridListTile: {
-
+   
   },
   modal: {
-    position: 'absolute',
-    width: 600,
-    height: 'auto',
-    // backgroundColor: theme.palette.background.paper,
-    // border: '2px solid #000',
-    // boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3),
-    margin: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modal_paper: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(1, 1, 0),
   },
 }));
 
@@ -1072,16 +1073,15 @@ const SingleAnimal = (props) => {
               <Uploader animalId={currentAnimal.animalUUID} />
               {
                 <div className={classesTwo.root}>
-                <GridList cellHeight={200} className={classesTwo.gridList} cols={8}>
+                <GridList className={classesTwo.gridList} cols={8}>
                   {currentAnimal.imageLinks.map((link) => (
-                    <GridListTile className={classesTwo.gridListTile} key={link} rows={0.5} cols={1}
+                    <GridListTile className={classesTwo.gridListTile} key={link} cols={1} style={{ width: 200, height: 200 }}
                       onClick={() => {
                         setselectedImage(link) 
                         handleModalOpen()
                       }}
                     >
-                      {/* () => setselectedImage(link) */}
-                      <img src={link} alt={"image"} />
+                      <img style={{ width: 200, height: 'auto' }} src={link} alt={"image"} />
                     </GridListTile>
                   ))}
                 </GridList>
@@ -1095,12 +1095,12 @@ const SingleAnimal = (props) => {
                     position='absolute'
                     width='100%'
                     height='100%'
+                    className={classesTwo.modal_paper}
                   >
                     <img
-                      // position='relative'
                       margin-left='auto'
                       margin-right='auto'
-                      width='600'
+                      width='500'
                       height='auto'
                       display='block'
                       

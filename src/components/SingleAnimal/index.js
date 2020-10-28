@@ -17,7 +17,19 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { ClassSharp } from "@material-ui/icons";
 
+//image carousel imports
+import { AutoRotatingCarousel } from 'material-auto-rotating-carousel';
+// const Slide = require('./Slide').default;
+// import Slide from "react-swipeable-views";
+import { Slide } from 'material-auto-rotating-carousel';
+import ReactDOM from "react-dom";
+
+import Carousel from 'react-elastic-carousel';
+
+
+const { red, blue, green } = require('@material-ui/core/colors');
 const { getList } = require('components/Tags/index');
+
 
 
 
@@ -116,20 +128,21 @@ const useStyles2 = makeStyles(theme => ({
     width: '100%',
     height: 550,
   },
-  gridListTile: {
-   
-  },
   modal: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    width: 700,
+    height: 700,
+    margin: 'auto',
   },
   modal_paper: {
     backgroundColor: theme.palette.background.paper,
-    border: '2px solid #000',
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(1, 1, 0),
   },
+  carousel: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+  }
 }));
 
 const useStylesTag = makeStyles((theme) => ({
@@ -1072,43 +1085,44 @@ const SingleAnimal = (props) => {
             <TabPanel value={tab} index={1}>
               <Uploader animalId={currentAnimal.animalUUID} />
               {
-                <div className={classesTwo.root}>
-                <GridList className={classesTwo.gridList} cols={8}>
-                  {currentAnimal.imageLinks.map((link) => (
-                    <GridListTile className={classesTwo.gridListTile} key={link} cols={1} style={{ width: 200, height: 200 }}
-                      onClick={() => {
-                        setselectedImage(link) 
-                        handleModalOpen()
-                      }}
+                <div>
+                  <div className={classesTwo.root}>
+                    <GridList className={classesTwo.gridList} cols={8}>
+                      {currentAnimal.imageLinks.map((link) => (
+                        <GridListTile className={classesTwo.gridListTile} key={link} cols={1} style={{ width: 200, height: 200 }}
+                          onClick={() => {
+                            setselectedImage(link) 
+                            handleModalOpen()
+                          }}
+                        >
+                          <img style={{ width: 200, height: 'auto' }} src={link} alt={"image"} />
+                        </GridListTile>
+                      ))}
+                    </GridList>
+                  {/* </div>
+                  <div> */}
+                    <Modal
+                      className={classesTwo.modal}
+                      open={openModal}
+                      onClose={handleModalClose}
                     >
-                      <img style={{ width: 200, height: 'auto' }} src={link} alt={"image"} />
-                    </GridListTile>
-                  ))}
-                </GridList>
-                 <Modal
-                  className={classesTwo.modal}
-                  open={openModal}
-                  onClose={handleModalClose}
-                  
-                >
-                  <div 
-                    position='absolute'
-                    width='100%'
-                    height='100%'
-                    className={classesTwo.modal_paper}
-                  >
-                    <img
-                      margin-left='auto'
-                      margin-right='auto'
-                      width='500'
-                      height='auto'
-                      display='block'
-                      
-                      src={selectedImage}
-                      alt={"image"}
-                    />
+                    <Carousel className={classesTwo.carousel}>
+                      {currentAnimal.imageLinks.map((link) => (
+                        <div 
+                        className={classesTwo.modal_paper}
+                      >
+                        <img
+                        margin-left='auto'
+                        margin-right='auto'
+                        width='100%'
+                        display='block'
+                        src={link}
+                        alt={"image"} />
+                      </div>
+                      ))}
+                    </Carousel>
+                    </Modal>
                   </div>
-                </Modal>
                 </div>
 
                 // currentAnimal.imageLinks.length > 0 ?

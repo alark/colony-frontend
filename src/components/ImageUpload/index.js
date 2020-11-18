@@ -33,7 +33,7 @@ const Uploader = (props) => {
 // getUTCDay: ƒ getUTCDay()
 // getUTCHours: ƒ getUTCHours()
 // getUTCMilliseconds: ƒ getUTCMilliseconds()
-// getUTCMinutes: ƒ 
+// getUTCMinutes: ƒ
 // getUTCMonth: ƒ getUTCMonth()
 // getUTCSeconds: ƒ getUTCSeconds()
 
@@ -91,7 +91,7 @@ const Uploader = (props) => {
           'date': `${date}`,
         }
       };
-      
+
       // Upload the file with custom metadata to colony and animal specific folder
       const uploadTask = storage.ref(`images/${colonyId}/${animalId}/${date}/${image.name}`).put(image, metadata);
 

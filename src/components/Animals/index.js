@@ -145,11 +145,12 @@ const Animals = () => {
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
+  const [redirectToAdd, setRedirectToAdd] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [newTagName, setNewTagName] = useState('');
   const { state, getAnimals, deleteAnimal, createTag} = useProfileProvider();
   const {
-    animals, accessRights, colonyId, colonySize, colonyName,
+    animals, accessRights, colonyId, colonySize, colonyName, geneNames
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
@@ -159,7 +160,7 @@ const Animals = () => {
     const request = {
       colonyId, rowsPerPage, page: newPage,
     };
-    await getAnimals(request, accessRights, colonyName, colonySize);
+    await getAnimals(request, accessRights, colonyName, colonySize, geneNames);
     setPage(newPage);
   };
 
@@ -432,13 +433,13 @@ const Animals = () => {
                   <strong>DOD Year</strong> {currentAnimal.dodYear}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 1:</strong> {currentAnimal.gene1}
+                  <strong>{geneNames.gene1 || 'Gene 1'}:</strong> {currentAnimal.gene1}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 2:</strong> {currentAnimal.gene2}
+                  <strong>{geneNames.gene2 || 'Gene 2'}:</strong> {currentAnimal.gene2}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 3:</strong> {currentAnimal.gene3}
+                  <strong>{geneNames.gene3 || 'Gene 3'}:</strong> {currentAnimal.gene3}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
                   <strong>TOD:</strong> {currentAnimal.tod}

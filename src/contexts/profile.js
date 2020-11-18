@@ -92,7 +92,7 @@ const ProfileProvider = ({ children }) => {
       case ANIMALS: {
         // Store colony animals in the state
         return {
-          ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, animals: payload.animals,
+          ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, geneNames: payload.geneNames, animals: payload.animals,
         };
       }
 
@@ -209,12 +209,13 @@ const useProfileProvider = () => {
   const shareColony = shareInfo => axios
     .post(`${BASE_URL}/colony/share`, shareInfo);
 
-  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
+  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize, geneNames) => axios
     .post(`${BASE_URL}/animals`, pageInfo)
     .then(({ data }) => {
       data.accessRights = accessRights;
       data.colonyName = colonyName;
       data.colonySize = colonySize;
+      data.geneNames = geneNames ? geneNames : {gene1: 'Gene 1', gene2: 'Gene 2', gene3: 'Gene 3'};
       dispatch({ type: ANIMALS, payload: data });
     });
 

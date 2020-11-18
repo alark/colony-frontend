@@ -154,11 +154,12 @@ const ColoniesTable = () => {
     setPage(newPage);
   };
 
-  const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
+  const handleCellClick = async (colonyId, colonyName, colonySize, geneNames, rowsPerPage, page) => {
     const request = {
       colonyId, rowsPerPage, page,
     };
-    await getAnimals(request, true, colonyName, colonySize);
+    console.log(geneNames);
+    await getAnimals(request, true, colonyName, colonySize, geneNames);
     setRedirectToAnimals(true);
   };
 
@@ -184,7 +185,7 @@ const ColoniesTable = () => {
                 style={{ cursor: 'pointer' }}
                 component="th"
                 scope="row"
-                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, rowsPerPage, page)}
+                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, colony.geneNames, rowsPerPage, page)}
               >
                 <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>
@@ -261,4 +262,3 @@ const ColoniesTable = () => {
 };
 
 export default ColoniesTable;
-

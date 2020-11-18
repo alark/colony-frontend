@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Breadcrumbs, Card, CardContent, Link, TextField, Grid, Container, CssBaseline, Typography, Select, MenuItem, InputLabel } from '@material-ui/core';
+import { Button, Breadcrumbs, Card, CardContent, Link, TextField, Grid, Container, CssBaseline, Typography, Select, MenuItem, InputLabel, Popover } from '@material-ui/core';
+import PopupState, { bindHover, bindPopover } from 'material-ui-popup-state';
+import InfoIcon from '@material-ui/icons/Info';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
 import { auth } from 'components/FirebaseConfig';
@@ -28,6 +30,14 @@ const useStyles = makeStyles(theme => ({
   },
   error: {
     color: 'red',
+  },
+  popover: {
+    pointerEvents: 'none',
+  },
+  typography: {
+    subtitle1: {
+      fontSize: 12,
+    },
   },
 }));
 
@@ -90,12 +100,14 @@ const AddAnimal = () => {
   const classes = useStyles();
   const { logout, addAnimal, searchAnimals, state } = useProfileProvider();
   const [animalInfo, setAnimalInfo] = useState({});
+  const [fatherMouse, setFatherMouse] = useState({});
+  const [motherMouse, setMotherMouse] = useState({});
   const [errors, setErrors] = useState({});
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
-  const { colonyName, colonyId } = state;
+  const { colonyName, colonyId, geneNames } = state;
 
   const getErrors = () => {
     var errorString = "";
@@ -119,7 +131,7 @@ const AddAnimal = () => {
   const attemptAddAnimal = (event) => {
     // TODO: Check for 401 and redirect if 200.
     event.preventDefault();
-    if (validateForm()) { //TODO change condition
+    if (validateForm()) {
       const request = { animal: animalInfo, colonyId };
       addAnimal(request);
       setRedirectToAnimals(true);
@@ -153,21 +165,18 @@ const AddAnimal = () => {
       setErrors(prevState => ({...prevState, [name]:
         valid
         ? ''
-        : `Check ${name}: ${value} invalid for father ${name} of ${fatherGene} and mother ${name} of ${motherGene}`}));
+        : `Check ${geneNames[name]}: ${value} invalid for father ${geneNames[name]} of ${fatherGene} and mother ${geneNames[name]} of ${motherGene}`}));
     }
   }
 
   const checkAllGenes = (motherId, fatherId) => {
     if (animalInfo.gene1) {
-      console.log('check gene1');
       checkGenes('gene1', animalInfo.gene1, motherId, fatherId);
     }
     if (animalInfo.gene2) {
-      console.log('check gene2');
       checkGenes('gene2', animalInfo.gene2, motherId, fatherId);
     }
     if (animalInfo.gene3) {
-      console.log('check gene3');
       checkGenes('gene3', animalInfo.gene3, motherId, fatherId);
     }
   }
@@ -194,6 +203,9 @@ const AddAnimal = () => {
             animals.length !== 0
             ? ''
             : `Check father ID: Male mouse with ID ${value} not found in colony ${colonyName}`}));
+          if (animals.length !== 0) {
+            setFatherMouse(animals[0]);
+          }
         }
         if (animalInfo.motherId && !errors.motherId && !errors.fatherId) {
           checkAllGenes(animalInfo.motherId, value);
@@ -212,6 +224,9 @@ const AddAnimal = () => {
             animals.length !== 0
             ? ''
             : `Check mother ID: Female mouse with ID ${value} not found in colony ${colonyName}`}));
+          if (animals.length !== 0) {
+            setMotherMouse(animals[0]);
+          }
         }
         if (animalInfo.fatherId && !errors.motherId && !errors.fatherId) {
           checkAllGenes(value, animalInfo.fatherId);
@@ -236,6 +251,70 @@ const AddAnimal = () => {
     logout();
     return <Redirect to="/" />;
   }
+
+  function parentInfo(name) {
+    var mouse = {};
+    if (name==='father-info') {
+      mouse = fatherMouse;
+    }
+    else {
+      mouse = motherMouse;
+    }
+
+    if (mouse) {
+      return <>
+      <PopupState variant="popover" popupId={name}>
+      {(popupState) => (
+        <>
+          <InfoIcon {...bindHover(popupState)}>
+          </InfoIcon>
+          <Popover
+          {...bindPopover(popupState)}
+          className={classes.popover}
+          classes={{
+            paper: classes.paper,
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          disableRestoreFocus
+        >
+          <Card className={classes.root}>
+            <div className={classes.content}>
+              <CardContent className={classes.details}>
+                <Typography gutterBottom variant="h5" component="h2">
+                  ID: {mouse.mouseId}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>DOB:</strong> {mouse.dobMonth || '??'}/{mouse.dobDay || '??'}/{mouse.dobYear || '????'}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>DOD:</strong> {mouse.dodMonth || '??'}/{mouse.dodDay || '??'}/{mouse.dodYear || '????'}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>{geneNames.gene1 || 'Gene 1'}:</strong> {mouse.gene1}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>{geneNames.gene2 || 'Gene 2'}:</strong> {mouse.gene2}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>{geneNames.gene3 || 'Gene 3'}:</strong> {mouse.gene3}
+                </Typography>
+              </CardContent>
+            </div>
+          </Card>
+          </Popover>
+          </>
+      )}
+    </PopupState>
+    </>
+  }
+}
 
   return (
     <div>
@@ -400,6 +479,7 @@ const AddAnimal = () => {
                           label="Father ID"
                           onChange={updateInput}
                         />
+                        {parentInfo('father-info')}
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -412,11 +492,12 @@ const AddAnimal = () => {
                           label="Mother ID"
                           onChange={updateInput}
                         />
+                        {parentInfo('mother-info')}
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                        <InputLabel id="gene1-label">Gene 1</InputLabel>
+                        <InputLabel id="gene1-label">{geneNames.gene1}</InputLabel>
                         <Select
                           labelId="gene1-label"
                           name="gene1"
@@ -434,7 +515,7 @@ const AddAnimal = () => {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                      <InputLabel id="gene2-label">Gene 2</InputLabel>
+                      <InputLabel id="gene2-label">{geneNames.gene2}</InputLabel>
                       <Select
                         labelId="gene2-label"
                         name="gene2"
@@ -452,7 +533,7 @@ const AddAnimal = () => {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                      <InputLabel id="gene3-label">Gene 3</InputLabel>
+                      <InputLabel id="gene3-label">{geneNames.gene3}</InputLabel>
                       <Select
                         labelId="gene3-label"
                         name="gene3"

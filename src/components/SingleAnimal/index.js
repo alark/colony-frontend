@@ -1,3 +1,5 @@
+import Gallery from "react-photo-gallery";
+// import ImageGallery from 'react-image-gallery';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
@@ -10,6 +12,24 @@ import InfoIcon from '@material-ui/icons/Info';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
+import Modal from '@material-ui/core/Modal';
+
+import Image from 'material-ui-image'
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import { ClassSharp } from "@material-ui/icons";
+
+//image carousel imports
+import { AutoRotatingCarousel } from 'material-auto-rotating-carousel';
+// const Slide = require('./Slide').default;
+// import Slide from "react-swipeable-views";
+import { Slide } from 'material-auto-rotating-carousel';
+import ReactDOM from "react-dom";
+
+import Carousel from 'react-elastic-carousel';
+
+
+const { red, blue, green } = require('@material-ui/core/colors');
 const { getList } = require('components/Tags/index');
 
 const numRegex = RegExp('^\\d*$');
@@ -81,6 +101,22 @@ const useStyles2 = makeStyles(theme => ({
   root: {
     display: 'flex',
   },
+  sidebar: {
+    display: 'block',
+    width: '15%',
+    height: 'auto',
+    float: 'left',
+    alignItems: 'center',
+    padding: '5px 5px 5px 5px',
+  },
+  slideshowButton: {
+    width: '90px',
+    height: '40px',
+    margin: 'auto',
+    display: 'block',
+    borderRadius: '4px',
+    fontSize: '16px',
+  },
   details: {
     display: 'flex',
     flex: 1,
@@ -111,6 +147,28 @@ const useStyles2 = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  gridList: {
+    width: '100%',
+    height: 'auto',
+    marginLeft: '5%',
+    // background: 'cyan',
+    //height: 500,
+  },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 800,
+    height: 800,
+    margin: 'auto',
+  },
+  modal_paper: {
+    backgroundColor: theme.palette.background.paper,
+  },
+  carousel: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+  }
 }));
 
 const useStylesTag = makeStyles((theme) => ({
@@ -182,6 +240,10 @@ const SingleAnimal = (props) => {
   const [notesOpen, setNotesOpen] = React.useState(false);
   const [eventOpen, setEventOpen] = React.useState(false);
   const [selectedTags, setselectedTags] = React.useState([]);
+  const [selectedImage, setselectedImage] = React.useState({});
+  const [openSlide, setSlideOpen] = React.useState(false);
+  const [openModal, setModalOpen] = React.useState(false);
+  const [selectedList, setSelectedList] = React.useState([]);
 
   const [animalInfo, setAnimalInfo] = useState({});
 
@@ -205,6 +267,10 @@ const SingleAnimal = (props) => {
 
   const animalEvents = currentAnimal.events.filter((item, index) => currentAnimal.events.indexOf(item) === index);
 
+  const animalImages = currentAnimal.imageLinks.filter((item, index) => currentAnimal.imageLinks.indexOf(item) === index);
+
+  // const BasicRows = () => <Gallery photos={currentAnimal.imageLinks} />;
+
   animalNotes.sort((a, b) => {
     return b.timestamp - a.timestamp;
   });
@@ -212,6 +278,35 @@ const SingleAnimal = (props) => {
   animalEvents.sort((a, b) => {
     return b.timestamp - a.timestamp;
   });
+
+  animalImages.sort((a, b) => {
+    return b.timestamp - a.timestamp;
+  });
+
+  console.log("animalImages", animalImages);
+  const imageBuckets = [];
+  const separate = (list) => {
+    if(list === undefined || list.length <= 0){
+      return null;
+    }
+    else{
+      var key = list[0].date;
+      var temp = [];
+      list.forEach(element => {
+        if(element.date === key){
+          temp.push(element);     
+        }
+        else{
+          key = element.date;
+          imageBuckets.push(temp);
+          temp = [element]; 
+        }
+      });
+      imageBuckets.push(temp);
+    }
+  }
+  separate(animalImages);
+  console.log("imagebuckets: ", imageBuckets);
 
   const handleTagChange = (event) => {
     setselectedTags(event.target.value);
@@ -424,6 +519,30 @@ const SingleAnimal = (props) => {
       setAnimalInfo(prevState => ({ ...prevState, [name]: value }));
   };
 
+  const handleSlideOpen = (list) => {
+    setSelectedList(list);
+    setSlideOpen(true);
+  };
+
+  const handleSlideClose = () => {
+    console.log("handle slide close");
+    setSlideOpen(false);
+  };
+
+  const handleModalOpen = () => {
+    console.log("handle modal open: selectedimg", selectedImage);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    console.log("handlemodalclose");
+    setModalOpen(false);
+  };
+
+  const handleModal = () => {
+    console.log("handlemodal");
+  }
+
   const saveChanges = async (event) => {
     event.preventDefault();
 
@@ -469,7 +588,7 @@ const SingleAnimal = (props) => {
 
   const defaultLink = 'https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg';
 
-  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : defaultLink;
+  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0].url : defaultLink;
 
   const onEventsAdded = (event) => {
     setEvent(event.target.value);
@@ -1261,20 +1380,128 @@ const SingleAnimal = (props) => {
             </TabPanel>
             <TabPanel value={tab} index={1}>
               <Uploader animalId={currentAnimal.animalUUID} />
-              {
-                currentAnimal.imageLinks.length > 0 ?
-                <Card className={classesTwo.root}>
-                  <CardActionArea>
-                    <CardMedia style={{ align: 'center' }}>
-                      <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
-                    </CardMedia>
-                    <CardActions>
-                      <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
-                      <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
-                      {currentImage+1} / {currentAnimal.imageLinks.length}
-                    </CardActions>
-                  </CardActionArea>
-                </Card> : null
+              { (imageBuckets.length > 0) && <div>
+                {imageBuckets.map((sublist) => (
+                  <div>
+                    <hr style={{width:'100%', borderTop: '2px solid #ccc', borderRadius: '2px'}}/>
+                    
+                    <div className={classesTwo.root} style={{width: '100%', marginTop: '1%'}}>
+                      <div className={classesTwo.sidebar}>
+                      {/* <div style={{display: 'block'}}> */}
+                        <p style={{fontSize:'15px', color: 'black', textAlign: 'center' }}><b>{sublist[0].date}</b></p>
+                      {/* </div> */}
+                        {/* <div> */}
+                          {(sublist.length > 0) && <button className={classesTwo.slideshowButton} onClick={() => {
+                                handleSlideOpen(sublist)
+                              }}>Slideshow</button>}
+                        {/* </div> */}
+                      </div>
+                      <div style={{width: '100%', marginLeft: '1%', borderLeft: '2px solid #ccc', paddingLeft: '1%'}}>
+                        <GridList className={classesTwo.gridList} cols={8}>
+                          {console.log("sublist len", sublist.length)}
+
+                          {sublist.map((element) => (
+                            <GridListTile 
+                              className={classesTwo.gridListTile}
+                              key={sublist.indexOf(element)}
+                              cols={1}
+                              style={{ width: 100, height: 100}}
+                              onClick={() => {
+                                console.log("element: ", element);
+                                console.log("index of: ", sublist.indexOf(element))
+                                setselectedImage(element) 
+                                handleModalOpen()
+                              }}
+                            >
+                              <Image style={{ border: '1px solid #aaa', borderRadius: '4px', width: '100', height: 'auto'}} src={element.url}></Image>
+                              {/* <img ,
+                                , width: 100, height: 'auto' }} src={element.url} alt={"image"} /> */}
+                            </GridListTile>
+                          ))}
+                        </GridList>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                 
+                <Modal
+                  className={classesTwo.modal}
+                  open={openModal}
+                  onClose={handleModalClose}
+                >
+                  <div 
+                    position='absolute'
+                    height='600'
+                    className={classesTwo.modal_paper}
+                  >
+                    <img
+                      margin-left='auto'
+                      margin-right='auto'
+                      height='500'
+                      display='block'
+                      border='5px solid #555'
+                      src={selectedImage.url}
+                      alt={"image"}
+                    />
+                    <div style={{marginLeft: '10px'}}>
+                      <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
+                      <p style={{ textAlign:'left', fontSize:'12px' }}>Time: {convertTimeStamp(selectedImage.timestamp)}</p>
+                      <p style={{ textAlign:'left', fontSize:'12px' }}>Note: {selectedImage.note}</p>
+                    </div>
+                  </div>
+                </Modal>
+
+                <Modal
+                  className={classesTwo.modal}
+                  open={openSlide}
+                  onClose={handleSlideClose}
+                >
+                  <Carousel className={classesTwo.carousel}>
+                    {selectedList.map((elem) => (
+                      <div 
+                        key={selectedList.indexOf(elem)}
+                        className={classesTwo.modal_paper}
+                        objectFit='contain'
+                      >
+                        <div background='grey' width='650px' height='650px'>
+                          <img
+                          margin-left='10%'
+                          margin-right='10%'
+                          margin-top="auto"
+                          width='auto'
+                          height='500px'
+                          position='absolute'
+
+                          // display='inline-block'
+                          border='5px solid #555'
+                          src={elem.url}
+                          alt={"image"} />
+                        </div>
+                        <div>
+                          <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
+                          <p style={{ textAlign:'left', fontSize:'12px' }}>Time: {convertTimeStamp(elem.timestamp)}</p>
+                          <p style={{ textAlign:'left', fontSize:'12px' }}>Note: {elem.note}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </Carousel>
+                </Modal>
+              </div>
+                // </div>
+
+                // currentAnimal.imageLinks.length > 0 ?
+                // <Card className={classesTwo.root}>
+                //   <CardActionArea>
+                //     <CardMedia style={{ align: 'center' }}>
+                //       <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
+                //     </CardMedia>
+                //     <CardActions>
+                //       <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
+                //       <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
+                //       {currentImage+1} / {currentAnimal.imageLinks.length}
+                //     </CardActions>
+                //   </CardActionArea>
+                // </Card> : null
               }
             </TabPanel>
             <TabPanel value={tab} index={2}>

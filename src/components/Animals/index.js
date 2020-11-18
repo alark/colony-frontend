@@ -249,6 +249,7 @@ const Animals = () => {
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
         Add Tag
       </Button>
+      
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>

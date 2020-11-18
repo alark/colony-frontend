@@ -119,12 +119,12 @@ const SharedColoniesTable = () => {
     setPage(newPage);
   };
 
-  const handleCellClick = async (colonyId, colonyName, colonySize, accessRights) => {
+  const handleCellClick = async (colonyId, colonyName, colonySize, geneNames, accessRights) => {
     const request = {
       colonyId, rowsPerPage, page,
     };
 
-    await getAnimals(request, accessRights, colonyName, colonySize);
+    await getAnimals(request, accessRights, colonyName, colonySize, geneNames);
     setRedirectToAnimals(true);
   };
 
@@ -145,7 +145,7 @@ const SharedColoniesTable = () => {
                 style={{ cursor: 'pointer' }}
                 component="th"
                 scope="row"
-                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, colony.accessRights)}
+                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, colony.geneNames, colony.accessRights)}
               >
                 <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>

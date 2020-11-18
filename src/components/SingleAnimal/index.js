@@ -1,14 +1,38 @@
+import Gallery from "react-photo-gallery";
+// import ImageGallery from 'react-image-gallery';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useProfileProvider } from 'contexts/profile';
+import PopupState, { bindHover, bindPopover } from 'material-ui-popup-state';
+import InfoIcon from '@material-ui/icons/Info';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
+import Modal from '@material-ui/core/Modal';
+
+import Image from 'material-ui-image'
+import GridList from '@material-ui/core/GridList';
+import GridListTile from '@material-ui/core/GridListTile';
+import { ClassSharp } from "@material-ui/icons";
+
+//image carousel imports
+import { AutoRotatingCarousel } from 'material-auto-rotating-carousel';
+// const Slide = require('./Slide').default;
+// import Slide from "react-swipeable-views";
+import { Slide } from 'material-auto-rotating-carousel';
+import ReactDOM from "react-dom";
+
+import Carousel from 'react-elastic-carousel';
+
+
+const { red, blue, green } = require('@material-ui/core/colors');
 const { getList } = require('components/Tags/index');
+
+const numRegex = RegExp('^\\d*$');
 
 function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -54,7 +78,13 @@ const useStyles = makeStyles(theme => ({
   },
   primary: {
     color: 'black',
-  }
+  },
+  error: {
+    color: 'red',
+  },
+  popover: {
+    pointerEvents: 'none',
+  },
 }));
 
 const useStyles2 = makeStyles(theme => ({
@@ -70,6 +100,22 @@ const useStyles2 = makeStyles(theme => ({
   },
   root: {
     display: 'flex',
+  },
+  sidebar: {
+    display: 'block',
+    width: '15%',
+    height: 'auto',
+    float: 'left',
+    alignItems: 'center',
+    padding: '5px 5px 5px 5px',
+  },
+  slideshowButton: {
+    width: '90px',
+    height: '40px',
+    margin: 'auto',
+    display: 'block',
+    borderRadius: '4px',
+    fontSize: '16px',
   },
   details: {
     display: 'flex',
@@ -101,6 +147,28 @@ const useStyles2 = makeStyles(theme => ({
     maxWidth: 360,
     backgroundColor: theme.palette.background.paper,
   },
+  gridList: {
+    width: '100%',
+    height: 'auto',
+    marginLeft: '5%',
+    // background: 'cyan',
+    //height: 500,
+  },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 800,
+    height: 800,
+    margin: 'auto',
+  },
+  modal_paper: {
+    backgroundColor: theme.palette.background.paper,
+  },
+  carousel: {
+    backgroundColor: theme.palette.background.paper,
+    border: '2px solid #000',
+  }
 }));
 
 const useStylesTag = makeStyles((theme) => ({
@@ -157,14 +225,14 @@ const SingleAnimal = (props) => {
   const classesTag = useStylesTag();
 
   const {
-    logout, editAnimal, storeNote, storeEvent, addNewToTag, state,
+    logout, editAnimal, storeNote, storeEvent, addNewToTag, searchAnimals, state,
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  const { colonyName, colonyId } = state;
+  const { colonyName, colonyId, geneNames } = state;
   const [notes, setNotes] = useState('');
   const [event, setEvent] = useState('');
   const [date, setDate] = useState('');
@@ -172,24 +240,17 @@ const SingleAnimal = (props) => {
   const [notesOpen, setNotesOpen] = React.useState(false);
   const [eventOpen, setEventOpen] = React.useState(false);
   const [selectedTags, setselectedTags] = React.useState([]);
+  const [selectedImage, setselectedImage] = React.useState({});
+  const [openSlide, setSlideOpen] = React.useState(false);
+  const [openModal, setModalOpen] = React.useState(false);
+  const [selectedList, setSelectedList] = React.useState([]);
 
-  /** Traits */
-  const [animalId, setAnimalId] = useState('');
-  const [gender, setGender] = useState('');
-  const [litter, setLitter] = useState('');
-  const [month, setMonth] = useState('');
-  const [day, setDay] = useState('');
-  const [year, setYear] = useState('');
-  const [deathMonth, setDeathMonth] = useState('');
-  const [deathDay, setDeathDay] = useState('');
-  const [deathYear, setDeathYear] = useState('');
-  const [father, setFather] = useState('');
-  const [mother, setMother] = useState('');
-  const [gene1, setGene1] = useState('');
-  const [gene2, setGene2] = useState('');
-  const [gene3, setGene3] = useState('');
-  const [tod, setTod] = useState('');
-  // eslint-disable-next-line
+  const [animalInfo, setAnimalInfo] = useState({});
+
+  const [fatherMouse, setFatherMouse] = useState({});
+  const [motherMouse, setMotherMouse] = useState({});
+  const [errors, setErrors] = useState({});
+
   const [tagList, setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
@@ -206,6 +267,10 @@ const SingleAnimal = (props) => {
 
   const animalEvents = currentAnimal.events.filter((item, index) => currentAnimal.events.indexOf(item) === index);
 
+  const animalImages = currentAnimal.imageLinks.filter((item, index) => currentAnimal.imageLinks.indexOf(item) === index);
+
+  // const BasicRows = () => <Gallery photos={currentAnimal.imageLinks} />;
+
   animalNotes.sort((a, b) => {
     return b.timestamp - a.timestamp;
   });
@@ -214,39 +279,70 @@ const SingleAnimal = (props) => {
     return b.timestamp - a.timestamp;
   });
 
+  animalImages.sort((a, b) => {
+    return b.timestamp - a.timestamp;
+  });
+
+  console.log("animalImages", animalImages);
+  const imageBuckets = [];
+  const separate = (list) => {
+    if(list === undefined || list.length <= 0){
+      return null;
+    }
+    else{
+      var key = list[0].date;
+      var temp = [];
+      list.forEach(element => {
+        if(element.date === key){
+          temp.push(element);     
+        }
+        else{
+          key = element.date;
+          imageBuckets.push(temp);
+          temp = [element]; 
+        }
+      });
+      imageBuckets.push(temp);
+    }
+  }
+  separate(animalImages);
+  console.log("imagebuckets: ", imageBuckets);
+
   const handleTagChange = (event) => {
     setselectedTags(event.target.value);
   }
 
-  const addTagToAnimal = (newTags) => {  
+  const addTagToAnimal = (newTags) => {
       if(typeof currentAnimal.tags !== "object"){
         currentAnimal.tags = [];
-      }  
+      }
       newTags.forEach(function(item){
         if(typeof currentAnimal.tags === "object" && !currentAnimal.tags.includes(item)){
           currentAnimal.tags.push(item);
         }
-      });  
+      });
 
       setTagList(currentAnimal.tags);
     }
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
-    setAnimalId(id);
-    setGender(gen);
-    setLitter(litt);
-    setMonth(mo);
-    setDay(da);
-    setYear(yr);
-    setDeathMonth(deathMo);
-    setDeathDay(deathDa);
-    setDeathYear(deathYr);
-    setFather(fth);
-    setMother(mth);
-    setGene1(gn1);
-    setGene2(gn2);
-    setGene3(gn3);
-    setTod(tod);
+    setAnimalInfo(prevState => ({ ...prevState, animalId: id }));
+    setAnimalInfo(prevState => ({ ...prevState, gender: gen }));
+    setAnimalInfo(prevState => ({ ...prevState, litter: litt }));
+    setAnimalInfo(prevState => ({ ...prevState, dobMonth: mo }));
+    setAnimalInfo(prevState => ({ ...prevState, dobDay: da }));
+    setAnimalInfo(prevState => ({ ...prevState, dobMonth: mo }));
+    setAnimalInfo(prevState => ({ ...prevState, dobYear: yr }));
+    setAnimalInfo(prevState => ({ ...prevState, dodMonth: deathMo }));
+    setAnimalInfo(prevState => ({ ...prevState, dodDay: deathDa }));
+    setAnimalInfo(prevState => ({ ...prevState, dodYear: deathYr }));
+    setAnimalInfo(prevState => ({ ...prevState, fatherId: fth }));
+    setAnimalInfo(prevState => ({ ...prevState, motherId: mth }));
+    setAnimalInfo(prevState => ({ ...prevState, gene1: gn1 }));
+    setAnimalInfo(prevState => ({ ...prevState, gene2: gn2 }));
+    setAnimalInfo(prevState => ({ ...prevState, gene3: gn3 }));
+    setAnimalInfo(prevState => ({ ...prevState, tod: tod }));
+
     setDefault(true);
   };
 
@@ -300,6 +396,153 @@ const SingleAnimal = (props) => {
     }
   }
 
+  const getErrors = () => {
+    var errorString = "";
+    Object.values(errors).forEach(
+      // if we have an error string set valid to false
+      (val) => errorString = errorString + val + "\n"
+    );
+    return errorString;
+  }
+
+  const validateForm = () => {
+    let valid = true;
+
+    Object.values(errors).forEach(
+      // if we have an error string set valid to false
+      (val) => val.length > 0 && (valid = false)
+    );
+    return valid;
+  }
+  const defaultGenes = ["+/+", "+/-", "-/-"];
+
+  const checkGenes = async (name, value, motherId, fatherId) => {
+      var valid = true;
+
+      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: fatherId}});
+      const father = animals[0];
+      const fatherGene = father[name];
+
+      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}});
+      const mother = animals[0];
+      const motherGene = mother[name];
+
+      if (fatherGene && motherGene) {
+        if (value === '+/-') {
+            valid = fatherGene !== motherGene || fatherGene === '+/-';
+        }
+        else if (value === '-/-') {
+            valid = motherGene.includes('-') && fatherGene.includes('-');
+        }
+        else if (value === '+/+') {
+            valid = motherGene.includes('+') && fatherGene.includes('+');
+        }
+
+      setErrors(prevState => ({...prevState, [name]:
+        valid
+        ? ''
+        : `Check ${geneNames[name]}: ${value} invalid for father ${geneNames[name]} of ${fatherGene} and mother ${geneNames[name]} of ${motherGene}`}));
+    }
+  }
+
+  const checkAllGenes = (motherId, fatherId) => {
+    if (animalInfo.gene1) {
+      checkGenes('gene1', animalInfo.gene1, motherId, fatherId);
+    }
+    if (animalInfo.gene2) {
+      checkGenes('gene2', animalInfo.gene2, motherId, fatherId);
+    }
+    if (animalInfo.gene3) {
+      checkGenes('gene3', animalInfo.gene3, motherId, fatherId);
+    }
+  }
+
+  const updateInput = async ({ target: { name, value } }) => {
+    switch(name) {
+      case 'gene1':
+      case 'gene2':
+      case 'gene3':
+        if (animalInfo.motherId && animalInfo.fatherId && !errors.motherId && !errors.fatherId) {
+          checkGenes(name, value, animalInfo.motherId, animalInfo.fatherId);
+        }
+        break;
+      case 'fatherId':
+        if (!numRegex.test(value)) {
+          setErrors(prevState => ({...prevState, [name]:
+          'Father ID should be numeric.'}));
+        }
+        else {
+          const criteria = {gender: 'M', mouseId: value};
+          const searchInfo = {colonyId, searchCriteria: criteria};
+          const {animals} = await searchAnimals(searchInfo);
+          setErrors(prevState => ({...prevState, [name]:
+            animals.length !== 0
+            ? ''
+            : `Check father ID: Male mouse with ID ${value} not found in colony ${colonyName}`}));
+          if (animals.length !== 0) {
+            setFatherMouse(animals[0]);
+          }
+        }
+        if (animalInfo.motherId && !errors.motherId && !errors.fatherId) {
+          checkAllGenes(animalInfo.motherId, value);
+        }
+        break;
+      case 'motherId':
+        if (!numRegex.test(value)) {
+          setErrors(prevState => ({...prevState, [name]:
+          'Mother ID should be numeric.'}));
+        }
+        else {
+          const criteria = {gender: 'F', mouseId: value};
+          const searchInfo = {colonyId, searchCriteria: criteria};
+          const {animals} = await searchAnimals(searchInfo);
+          setErrors(prevState => ({...prevState, [name]:
+            animals.length !== 0
+            ? ''
+            : `Check mother ID: Female mouse with ID ${value} not found in colony ${colonyName}`}));
+          if (animals.length !== 0) {
+            setMotherMouse(animals[0]);
+          }
+        }
+        if (animalInfo.fatherId && !errors.motherId && !errors.fatherId) {
+          checkAllGenes(value, animalInfo.fatherId);
+        }
+        break;
+      case 'mouseId':
+        setErrors(prevState => ({...prevState, [name]:
+          numRegex.test(value)
+          ? ''
+          : 'Mouse ID should be numeric.'}));
+        break;
+      }
+
+      setAnimalInfo(prevState => ({ ...prevState, [name]: value }));
+  };
+
+  const handleSlideOpen = (list) => {
+    setSelectedList(list);
+    setSlideOpen(true);
+  };
+
+  const handleSlideClose = () => {
+    console.log("handle slide close");
+    setSlideOpen(false);
+  };
+
+  const handleModalOpen = () => {
+    console.log("handle modal open: selectedimg", selectedImage);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    console.log("handlemodalclose");
+    setModalOpen(false);
+  };
+
+  const handleModal = () => {
+    console.log("handlemodal");
+  }
+
   const saveChanges = async (event) => {
     event.preventDefault();
 
@@ -307,40 +550,45 @@ const SingleAnimal = (props) => {
 
     const animal = {
       animalUUID: currentAnimal.animalUUID,
-      mouseId: animalId,
-      gender: gender,
-      litter: litter,
-      dobMonth: month,
-      dobDay: day,
-      dobYear: year,
-      dodMonth: deathMonth,
-      dodDay: deathDay,
-      dodYear: deathYear,
-      fatherId: father,
-      motherId: mother,
+      mouseId: animalInfo.animalId,
+      gender: animalInfo.gender,
+      litter: animalInfo.litter,
+      dobMonth: animalInfo.dobMonth,
+      dobDay: animalInfo.dobDay,
+      dobYear: animalInfo.dobYear,
+      dodMonth: animalInfo.dobMonth,
+      dodDay: animalInfo.dobDay,
+      dodYear: animalInfo.dodYear,
+      fatherId: animalInfo.fatherId,
+      motherId: animalInfo.motherId,
       notes: animalNotes,
       events: animalEvents,
-      gene1: gene1,
-      gene2: gene2,
-      gene3: gene3,
+      gene1: animalInfo.gene1,
+      gene2: animalInfo.gene2,
+      gene3: animalInfo.gene3,
       imageLinks: currentAnimal.imageLinks,
-      tod: tod,
+      tod: animalInfo.tod,
       tags: currentAnimal.tags,
     };
 
-    const request = { animal, colonyId };
-    editAnimal(request);
+    console.log(animal);
 
-    currentAnimal.tags.forEach(item => {
-      const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
-      addNewToTag(tagData);
-    });
-    handleClick();
+    if (validateForm()) {
+      const request = { animal, colonyId };
+      editAnimal(request);
+
+      currentAnimal.tags.forEach(item => {
+        const tagData = { tagName: item, mouse: currentAnimal.animalUUID};
+        addNewToTag(tagData);
+      });
+
+      handleClick();
+    }
   };
 
   const defaultLink = 'https://d17fnq9dkz9hgj.cloudfront.net/uploads/2012/11/106564123-rats-mice-care-253x169.jpg';
 
-  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0] : defaultLink;
+  const avatarLink = currentAnimal.imageLinks.length !== 0 ? currentAnimal.imageLinks[0].url : defaultLink;
 
   const onEventsAdded = (event) => {
     setEvent(event.target.value);
@@ -379,6 +627,70 @@ const SingleAnimal = (props) => {
     logout();
     return <Redirect to="/" />;
   }
+
+  function parentInfo(name) {
+    var mouse = {};
+    if (name==='father-info') {
+      mouse = fatherMouse;
+    }
+    else {
+      mouse = motherMouse;
+    }
+
+    if (mouse) {
+      return <>
+      <PopupState variant="popover" popupId={name}>
+      {(popupState) => (
+        <>
+          <InfoIcon {...bindHover(popupState)}>
+          </InfoIcon>
+          <Popover
+          {...bindPopover(popupState)}
+          className={classes.popover}
+          classes={{
+            paper: classes.paper,
+          }}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          disableRestoreFocus
+        >
+          <Card className={classes.root}>
+            <div className={classes.content}>
+              <CardContent className={classes.details}>
+                <Typography gutterBottom variant="h5" component="h2">
+                  ID: {mouse.mouseId}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>DOB:</strong> {mouse.dobMonth || '??'}/{mouse.dobDay || '??'}/{mouse.dobYear || '????'}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>DOD:</strong> {mouse.dodMonth || '??'}/{mouse.dodDay || '??'}/{mouse.dodYear || '????'}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>{geneNames.gene1 || 'Gene 1'}:</strong> {mouse.gene1}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>{geneNames.gene2 || 'Gene 2'}:</strong> {mouse.gene2}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary">
+                  <strong>{geneNames.gene3 || 'Gene 3'}:</strong> {mouse.gene3}
+                </Typography>
+              </CardContent>
+            </div>
+          </Card>
+          </Popover>
+          </>
+      )}
+    </PopupState>
+    </>
+  }
+}
 
   return (
     <div>
@@ -429,21 +741,25 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="mouseId"
                               defaultValue={currentAnimal.mouseId}
-                              onChange={event => setAnimalId(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              label="Gender"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gender"
-                              defaultValue={currentAnimal.gender}
-                              onChange={event => setGender(event.target.value)}
-                            />
+                          <InputLabel id="gender-label">Gender</InputLabel>
+                          <Select
+                            labelId="gender-label"
+                            name="gender"
+                            variant="outlined"
+                            size="small"
+                            value={animalInfo.gender || currentAnimal.gender || ''}
+                            onChange={updateInput}
+                          >
+                            <MenuItem value={undefined}>NA</MenuItem>
+                            <MenuItem value={"M"}>(M)ale</MenuItem>
+                            <MenuItem value={"F"}>(F)emale</MenuItem>
+                            </Select>
                           </div>
                         </Grid>
                         <Grid item xs>
@@ -455,7 +771,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="tod"
                               defaultValue={currentAnimal.tod}
-                              onChange={event => setTod(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -471,7 +787,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dobMonth"
                               defaultValue={currentAnimal.dobMonth}
-                              onChange={event => setMonth(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -484,7 +800,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dobDay"
                               defaultValue={currentAnimal.dobDay}
-                              onChange={event => setDay(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -497,7 +813,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dobYear"
                               defaultValue={currentAnimal.dobYear}
-                              onChange={event => setYear(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -513,7 +829,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dodMonth"
                               defaultValue={currentAnimal.dodMonth}
-                              onChange={event => setDeathMonth(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -526,7 +842,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dodDay"
                               defaultValue={currentAnimal.dodDay}
-                              onChange={event => setDeathDay(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -539,7 +855,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dodYear"
                               defaultValue={currentAnimal.dodYear}
-                              onChange={event => setDeathYear(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -555,7 +871,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="litter"
                               defaultValue={currentAnimal.litter}
-                              onChange={event => setLitter(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -568,8 +884,9 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="fatherId"
                               defaultValue={currentAnimal.fatherId}
-                              onChange={event => setFather(event.target.value)}
+                              onChange={updateInput}
                             />
+                            {parentInfo('father-info')}
                           </div>
                         </Grid>
                         <Grid item xs>
@@ -581,8 +898,9 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="motherId"
                               defaultValue={currentAnimal.motherId}
-                              onChange={event => setMother(event.target.value)}
+                              onChange={updateInput}
                             />
+                            {parentInfo('mother-info')}
                           </div>
                         </Grid>
                       </Grid>
@@ -590,41 +908,56 @@ const SingleAnimal = (props) => {
                       <Grid container>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              label="Gene 1"
+                          <InputLabel id="gene1-label">{geneNames.gene1}</InputLabel>
+                            <Select
+                              labelId="gene1-label"
                               variant="outlined"
                               size="small"
-                              margin="normal"
                               name="gene1"
-                              defaultValue={currentAnimal.gene1}
-                              onChange={event => setGene1(event.target.value)}
-                            />
+                              value={animalInfo.gene1 || currentAnimal.gene1}
+                              onChange={updateInput}
+                            >
+                            <MenuItem value={undefined}>NA</MenuItem>
+                            {defaultGenes.map(gene => (
+                                <MenuItem value={gene}>{gene}</MenuItem>
+                              ))}
+                            </Select>
                           </div>
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              label="Gene 2"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gene2"
-                              defaultValue={currentAnimal.gene2}
-                              onChange={event => setGene2(event.target.value)}
-                            />
+                          <InputLabel id="gene2-label">{geneNames.gene2}</InputLabel>
+                          <Select
+                            label="gene2-label"
+                            variant="outlined"
+                            size="small"
+                            name="gene2"
+                            value={animalInfo.gene2 || currentAnimal.gene2}
+                            onChange={updateInput}
+                          >
+                          <MenuItem value={undefined}>NA</MenuItem>
+                          {defaultGenes.map(gene => (
+                              <MenuItem value={gene}>{gene}</MenuItem>
+                            ))}
+                          </Select>
                           </div>
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              label="Gene 3"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gene3"
-                              defaultValue={currentAnimal.gene3}
-                              onChange={event => setGene3(event.target.value)}
-                            />
+                          <InputLabel id="gene3-label">{geneNames.gene3}</InputLabel>
+                          <Select
+                            labelId="gene3-label"
+                            variant="outlined"
+                            size="small"
+                            name="gene3"
+                            value={animalInfo.gene3 || currentAnimal.gene3}
+                            onChange={updateInput}
+                          >
+                          <MenuItem value={undefined}>NA</MenuItem>
+                          {defaultGenes.map(gene => (
+                              <MenuItem value={gene}>{gene}</MenuItem>
+                            ))}
+                          </Select>
                           </div>
                         </Grid>
                       </Grid>
@@ -638,13 +971,13 @@ const SingleAnimal = (props) => {
                               <Select
                                 labelId="tag-label"
                                 id="multiple-tag"
-                                multiple  
+                                multiple
                                 value={selectedTags}
                                 onChange={handleTagChange}
                                 input={<Input id="select-multiple-tag"/>}
                                 renderValue={(selected) => selected.join(', ')}
                                 MenuProps={MenuProps}
-                              > 
+                              >
                                 {defaultTags.map((tag) => (
                                   <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
                                     <Checkbox checked={selectedTags.indexOf(tag) > -1} />
@@ -683,22 +1016,25 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="mouseId"
                               defaultValue={currentAnimal.mouseId}
-                              onChange={event => setAnimalId(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              disabled
-                              label="Gender"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gender"
-                              defaultValue={currentAnimal.gender}
-                              onChange={event => setGender(event.target.value)}
-                            />
+                          <InputLabel id="gender-label">Gender</InputLabel>
+                          <Select
+                            labelId="gender-label"
+                            name="gender"
+                            variant="outlined"
+                            size="small"
+                            value={animalInfo.gender || currentAnimal.gender || ''}
+                            onChange={updateInput}
+                          >
+                            <MenuItem value={undefined}>NA</MenuItem>
+                            <MenuItem value={"M"}>(M)ale</MenuItem>
+                            <MenuItem value={"F"}>(F)emale</MenuItem>
+                            </Select>
                           </div>
                         </Grid>
                         <Grid item xs>
@@ -711,7 +1047,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="tod"
                               defaultValue={currentAnimal.tod}
-                              onChange={event => setTod(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -728,7 +1064,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dobMonth"
                               defaultValue={currentAnimal.dobMonth}
-                              onChange={event => setMonth(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -742,7 +1078,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dobDay"
                               defaultValue={currentAnimal.dobDay}
-                              onChange={event => setDay(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -756,7 +1092,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dobYear"
                               defaultValue={currentAnimal.dobYear}
-                              onChange={event => setYear(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -773,7 +1109,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dodMonth"
                               defaultValue={currentAnimal.dodMonth}
-                              onChange={event => setDeathMonth(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -787,7 +1123,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dodDay"
                               defaultValue={currentAnimal.dodDay}
-                              onChange={event => setDeathDay(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -801,7 +1137,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="dodYear"
                               defaultValue={currentAnimal.dodYear}
-                              onChange={event => setDeathYear(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -818,7 +1154,7 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="litter"
                               defaultValue={currentAnimal.litter}
-                              onChange={event => setLitter(event.target.value)}
+                              onChange={updateInput}
                             />
                           </div>
                         </Grid>
@@ -832,8 +1168,9 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="fatherId"
                               defaultValue={currentAnimal.fatherId}
-                              onChange={event => setFather(event.target.value)}
+                              onChange={updateInput}
                             />
+                            {parentInfo('father-info')}
                           </div>
                         </Grid>
                         <Grid item xs>
@@ -846,8 +1183,9 @@ const SingleAnimal = (props) => {
                               margin="normal"
                               name="motherId"
                               defaultValue={currentAnimal.motherId}
-                              onChange={event => setMother(event.target.value)}
+                              onChange={updateInput}
                             />
+                            {parentInfo('mother-info')}
                           </div>
                         </Grid>
                       </Grid>
@@ -855,44 +1193,59 @@ const SingleAnimal = (props) => {
                       <Grid container>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              disabled
-                              label="Gene 1"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gene1"
-                              defaultValue={currentAnimal.gene1}
-                              onChange={event => setGene1(event.target.value)}
-                            />
+                          <InputLabel id="gene1-label">{geneNames.gene1}</InputLabel>
+                          <Select
+                            labelId="gene1-label"
+                            variant="outlined"
+                            size="small"
+                            margin="normal"
+                            name="gene1"
+                            value={animalInfo.gene1 || currentAnimal.gene1}
+                            onChange={updateInput}
+                          >
+                          <MenuItem value={undefined}>NA</MenuItem>
+                          {defaultGenes.map(gene => (
+                              <MenuItem value={gene}>{gene}</MenuItem>
+                            ))}
+                          </Select>
                           </div>
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              disabled
-                              label="Gene 2"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gene2"
-                              defaultValue={currentAnimal.gene2}
-                              onChange={event => setGene2(event.target.value)}
-                            />
+                          <InputLabel id="gene2-label">{geneNames.gene2}</InputLabel>
+                          <Select
+                            labelId="gene2-label"
+                            variant="outlined"
+                            size="small"
+                            margin="normal"
+                            name="gene2"
+                            value={animalInfo.gene2 || currentAnimal.gene2}
+                            onChange={updateInput}
+                          >
+                          <MenuItem value={undefined}>NA</MenuItem>
+                          {defaultGenes.map(gene => (
+                              <MenuItem value={gene}>{gene}</MenuItem>
+                            ))}
+                          </Select>
                           </div>
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              disabled
-                              label="Gene 3"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="gene3"
-                              defaultValue={currentAnimal.gene3}
-                              onChange={event => setGene3(event.target.value)}
-                            />
+                          <InputLabel id="gene3-label">{geneNames.gene3}</InputLabel>
+                          <Select
+                            labelId="gene3-label"
+                            variant="outlined"
+                            size="small"
+                            margin="normal"
+                            name="gene3"
+                            value={animalInfo.gene3 || currentAnimal.gene3}
+                            onChange={updateInput}
+                          >
+                          <MenuItem value={undefined}>NA</MenuItem>
+                          {defaultGenes.map(gene => (
+                              <MenuItem value={gene}>{gene}</MenuItem>
+                            ))}
+                          </Select>
                           </div>
                         </Grid>
                       </Grid>
@@ -940,9 +1293,11 @@ const SingleAnimal = (props) => {
                     </div>
                 }
               </form>
+              <div className={classes.error}>
+                { !validateForm() ? getErrors() : null }
 
+              </div>
               <div className={classesTwo.controls}>
-                
                 {
                   accessRights ?
                     <Button
@@ -1025,20 +1380,128 @@ const SingleAnimal = (props) => {
             </TabPanel>
             <TabPanel value={tab} index={1}>
               <Uploader animalId={currentAnimal.animalUUID} />
-              {
-                currentAnimal.imageLinks.length > 0 ?
-                <Card className={classesTwo.root}>
-                  <CardActionArea>
-                    <CardMedia style={{ align: 'center' }}>
-                      <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
-                    </CardMedia>
-                    <CardActions>
-                      <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
-                      <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
-                      {currentImage+1} / {currentAnimal.imageLinks.length}
-                    </CardActions>
-                  </CardActionArea>
-                </Card> : null
+              { (imageBuckets.length > 0) && <div>
+                {imageBuckets.map((sublist) => (
+                  <div>
+                    <hr style={{width:'100%', borderTop: '2px solid #ccc', borderRadius: '2px'}}/>
+                    
+                    <div className={classesTwo.root} style={{width: '100%', marginTop: '1%'}}>
+                      <div className={classesTwo.sidebar}>
+                      {/* <div style={{display: 'block'}}> */}
+                        <p style={{fontSize:'15px', color: 'black', textAlign: 'center' }}><b>{sublist[0].date}</b></p>
+                      {/* </div> */}
+                        {/* <div> */}
+                          {(sublist.length > 0) && <button className={classesTwo.slideshowButton} onClick={() => {
+                                handleSlideOpen(sublist)
+                              }}>Slideshow</button>}
+                        {/* </div> */}
+                      </div>
+                      <div style={{width: '100%', marginLeft: '1%', borderLeft: '2px solid #ccc', paddingLeft: '1%'}}>
+                        <GridList className={classesTwo.gridList} cols={8}>
+                          {console.log("sublist len", sublist.length)}
+
+                          {sublist.map((element) => (
+                            <GridListTile 
+                              className={classesTwo.gridListTile}
+                              key={sublist.indexOf(element)}
+                              cols={1}
+                              style={{ width: 100, height: 100}}
+                              onClick={() => {
+                                console.log("element: ", element);
+                                console.log("index of: ", sublist.indexOf(element))
+                                setselectedImage(element) 
+                                handleModalOpen()
+                              }}
+                            >
+                              <Image style={{ border: '1px solid #aaa', borderRadius: '4px', width: '100', height: 'auto'}} src={element.url}></Image>
+                              {/* <img ,
+                                , width: 100, height: 'auto' }} src={element.url} alt={"image"} /> */}
+                            </GridListTile>
+                          ))}
+                        </GridList>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                 
+                <Modal
+                  className={classesTwo.modal}
+                  open={openModal}
+                  onClose={handleModalClose}
+                >
+                  <div 
+                    position='absolute'
+                    height='600'
+                    className={classesTwo.modal_paper}
+                  >
+                    <img
+                      margin-left='auto'
+                      margin-right='auto'
+                      height='500'
+                      display='block'
+                      border='5px solid #555'
+                      src={selectedImage.url}
+                      alt={"image"}
+                    />
+                    <div style={{marginLeft: '10px'}}>
+                      <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
+                      <p style={{ textAlign:'left', fontSize:'12px' }}>Time: {convertTimeStamp(selectedImage.timestamp)}</p>
+                      <p style={{ textAlign:'left', fontSize:'12px' }}>Note: {selectedImage.note}</p>
+                    </div>
+                  </div>
+                </Modal>
+
+                <Modal
+                  className={classesTwo.modal}
+                  open={openSlide}
+                  onClose={handleSlideClose}
+                >
+                  <Carousel className={classesTwo.carousel}>
+                    {selectedList.map((elem) => (
+                      <div 
+                        key={selectedList.indexOf(elem)}
+                        className={classesTwo.modal_paper}
+                        objectFit='contain'
+                      >
+                        <div background='grey' width='650px' height='650px'>
+                          <img
+                          margin-left='10%'
+                          margin-right='10%'
+                          margin-top="auto"
+                          width='auto'
+                          height='500px'
+                          position='absolute'
+
+                          // display='inline-block'
+                          border='5px solid #555'
+                          src={elem.url}
+                          alt={"image"} />
+                        </div>
+                        <div>
+                          <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
+                          <p style={{ textAlign:'left', fontSize:'12px' }}>Time: {convertTimeStamp(elem.timestamp)}</p>
+                          <p style={{ textAlign:'left', fontSize:'12px' }}>Note: {elem.note}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </Carousel>
+                </Modal>
+              </div>
+                // </div>
+
+                // currentAnimal.imageLinks.length > 0 ?
+                // <Card className={classesTwo.root}>
+                //   <CardActionArea>
+                //     <CardMedia style={{ align: 'center' }}>
+                //       <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
+                //     </CardMedia>
+                //     <CardActions>
+                //       <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
+                //       <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
+                //       {currentImage+1} / {currentAnimal.imageLinks.length}
+                //     </CardActions>
+                //   </CardActionArea>
+                // </Card> : null
               }
             </TabPanel>
             <TabPanel value={tab} index={2}>
@@ -1058,7 +1521,7 @@ const SingleAnimal = (props) => {
                 />
 
                 <input type="date" id="event-time"
-                  name="meeting-time" 
+                  name="meeting-time"
                   onChange={onDateAdded}
                 />
 

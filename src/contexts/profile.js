@@ -96,7 +96,7 @@ const ProfileProvider = ({ children }) => {
       case ANIMALS: {
         // Store colony animals in the state
         return {
-          ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, animals: payload.animals,
+          ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, geneNames: payload.geneNames, animals: payload.animals,
         };
       }
 
@@ -120,11 +120,13 @@ const ProfileProvider = ({ children }) => {
       }
 
       case IMAGEUPLOAD: {
+        console.log("payload in imgupload case", payload);
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
         // Get index of animal to edit
         if (targetIndex !== -1) {
-          animals[targetIndex].imageLinks.push(payload.url); // Store edited animal
+          console.log("imagearray", payload.imageArray);
+          animals[targetIndex].imageLinks.push(payload.imageArray); // Store edited animal
         }
         return {
           ...prevState, animals,
@@ -206,12 +208,13 @@ const useProfileProvider = () => {
   const shareColony = shareInfo => axios
     .post(`${BASE_URL}/colony/share`, shareInfo);
 
-  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
+  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize, geneNames) => axios
     .post(`${BASE_URL}/animals`, pageInfo)
     .then(({ data }) => {
       data.accessRights = accessRights;
       data.colonyName = colonyName;
       data.colonySize = colonySize;
+      data.geneNames = geneNames ? geneNames : {gene1: 'Gene 1', gene2: 'Gene 2', gene3: 'Gene 3'};
       dispatch({ type: ANIMALS, payload: data });
     });
 
@@ -248,7 +251,9 @@ const useProfileProvider = () => {
   const storeImageLink = request => axios
     .post(`${BASE_URL}/animals/storeImageLink`, request)
     .then(({ data }) => {
+      console.log("data:", data);
       dispatch({ type: IMAGEUPLOAD, payload: data });
+      console.log("called dispatch");
     });
 
   const storeNote = request => axios

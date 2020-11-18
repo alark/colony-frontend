@@ -152,7 +152,7 @@ const Animals = () => {
   const [newTagName, setNewTagName] = useState('');
   const { state, getAnimals, deleteAnimal, createTag, searchAnimals} = useProfileProvider();
   const {
-    animals, accessRights, colonyId, colonySize, colonyName,
+    animals, accessRights, colonyId, colonySize, colonyName, geneNames
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
@@ -161,7 +161,7 @@ const Animals = () => {
     const request = {
       colonyId, rowsPerPage, page: newPage,
     };
-    await getAnimals(request, accessRights, colonyName, colonySize);
+    await getAnimals(request, accessRights, colonyName, colonySize, geneNames);
     setPage(newPage);
   };
 
@@ -270,6 +270,7 @@ const Animals = () => {
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
         Add Tag
       </Button>
+      
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>
@@ -481,13 +482,13 @@ const Animals = () => {
                   <strong>DOD Year</strong> {currentAnimal.dodYear}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 1:</strong> {currentAnimal.gene1}
+                  <strong>{geneNames.gene1 || 'Gene 1'}:</strong> {currentAnimal.gene1}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 2:</strong> {currentAnimal.gene2}
+                  <strong>{geneNames.gene2 || 'Gene 2'}:</strong> {currentAnimal.gene2}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>Gene 3:</strong> {currentAnimal.gene3}
+                  <strong>{geneNames.gene3 || 'Gene 3'}:</strong> {currentAnimal.gene3}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
                   <strong>TOD:</strong> {currentAnimal.tod}

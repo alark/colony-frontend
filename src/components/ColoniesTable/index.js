@@ -50,6 +50,7 @@ function TablePaginationActions(props) {
     onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
 
+
   return (
 
     <div className={classes.root}>
@@ -140,7 +141,6 @@ const ColoniesTable = () => {
 
   const share = async () => {
     const data = { email: sharedUser, colonyId: sharedColony, accessRights: accessRightsShare };
-    console.log(data);
     await shareColony(data);
     closeShareDialog();
   };

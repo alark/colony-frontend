@@ -8,6 +8,7 @@
     "@material-ui/lab": "^4.0.0-alpha.51",
     "acorn": "^8.0.1",
     "axios": "^0.19.2",
+    "elasticsearch": "^16.7.1",
     "emailjs-com": "^2.6.3",
     "firebase": "^7.24.0",
     "material-ui-popup-state": "^1.7.0",

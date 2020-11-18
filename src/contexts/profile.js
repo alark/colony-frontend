@@ -123,11 +123,13 @@ const ProfileProvider = ({ children }) => {
       }
 
       case IMAGEUPLOAD: {
+        console.log("payload in imgupload case", payload);
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
         // Get index of animal to edit
         if (targetIndex !== -1) {
-          animals[targetIndex].imageLinks.push(payload.url); // Store edited animal
+          console.log("imagearray", payload.imageArray);
+          animals[targetIndex].imageLinks.push(payload.imageArray); // Store edited animal
         }
         return {
           ...prevState, animals,
@@ -252,7 +254,9 @@ const useProfileProvider = () => {
   const storeImageLink = request => axios
     .post(`${BASE_URL}/animals/storeImageLink`, request)
     .then(({ data }) => {
+      console.log("data:", data);
       dispatch({ type: IMAGEUPLOAD, payload: data });
+      console.log("called dispatch");
     });
 
   const storeNote = request => axios

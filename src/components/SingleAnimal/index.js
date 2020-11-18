@@ -189,6 +189,7 @@ const SingleAnimal = (props) => {
   const [gene2, setGene2] = useState('');
   const [gene3, setGene3] = useState('');
   const [tod, setTod] = useState('');
+  // eslint-disable-next-line
   const [tagList, setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);

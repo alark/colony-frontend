@@ -83,14 +83,16 @@ const gridStyles = makeStyles((theme) => ({
   },
 }));
 
-const AddAnimal = () => {
+const AdvancedSearch = () => {
   const classesGrid = gridStyles();
   const classesTwo = useStyles2();
   const classes = useStyles();
-  const { logout, addAnimal, state } = useProfileProvider();
+  const { logout, searchAnimals, state } = useProfileProvider();
   const [animalInfo, setAnimalInfo] = useState({});
+  const [searchResults, setSearchResults] = useState({});
   const [errors, setErrors] = useState({});
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
+  const [redirectToResultsPage, setRedirectToResultsPage] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
@@ -114,16 +116,11 @@ const AddAnimal = () => {
     return valid;
   }
 
-  const attemptAddAnimal = (event) => {
-    // TODO: Check for 401 and redirect if 200.
-    event.preventDefault();
-    console.log(errors);
-    console.log(validateForm());
-    if (validateForm()) { //TODO change condition
-      const request = { animal: animalInfo, colonyId };
-      addAnimal(request);
-      setRedirectToAnimals(true);
-    }
+  const searchWithCriteria = async(event) => {
+    const request = { colonyId: colonyId, searchCriteria: {animalInfo}};
+    var results = await searchAnimals(request);
+    setSearchResults(results);
+    setRedirectToResultsPage(true);
   };
 
   const updateInput = ({ target: { name, value } }) => {
@@ -159,10 +156,15 @@ const AddAnimal = () => {
     return <Redirect to="/dashboard/colony" />;
   } else if (redirectToColonies) {
     return <Redirect to="/dashboard" />;
+  } else if(redirectToResultsPage) {
+    return (<Redirect to={{
+      pathname: "/results",
+      state: {results: searchResults}
+    }}/>);
   } else if (redirectToLogin) {
     logout();
     return <Redirect to="/" />;
-  }
+  } 
 
   return (
     <div>
@@ -184,7 +186,7 @@ const AddAnimal = () => {
         <CssBaseline />
         <div className={classesTwo.paper}>
           <Typography component="h1" variant="h5">
-            Add Animal to {colonyName}
+            Search for animal(s) in {colonyName}
           </Typography>
 
           <Card className={classesTwo.root}>
@@ -379,13 +381,13 @@ const AddAnimal = () => {
 
             </div>
             <Button
-              type="submit"
               variant="contained"
               color="primary"
-              className={classes.submit}
-              onClick={attemptAddAnimal}
+              onClick={() => {
+                searchWithCriteria()
+              }}
             >
-              Add Animal
+              Search
             </Button>
             <Button
               onClick={() => {
@@ -404,4 +406,4 @@ const AddAnimal = () => {
   );
 };
 
-export default AddAnimal;
+export default AdvancedSearch;

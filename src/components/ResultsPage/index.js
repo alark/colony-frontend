@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar } from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar, FormControl, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, AppBar, Box, Breadcrumbs, CardActions, CardActionArea, CardMedia, Checkbox, Divider, Grid} from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -24,6 +24,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Redirect } from 'react-router-dom';
 const { addNewToList } = require('components/Tags/index');
+const { getList } = require('components/Tags/index');
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -137,31 +138,64 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const useStylesTag = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    maxWidth: 500,
+  },
+}));
 
-const Animals = () => {
+const ITEM_HEIGHT = 75;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tagList, theme) {
+  if(tag === undefined){
+    return;
+  }
+  return {
+    fontWeight:
+      tagList.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+const defaultTags = getList().sort();
+
+const ResultsPage = (props) => {
   const classes = useStyles();
+  const themeTag = useTheme();
+  const classesTag = useStylesTag();
   const [page, setPage] = React.useState(0);
-  const rowsPerPage = 10;
+  const searchResults = props.location.state.results;
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
-  const [redirectToAdd, setRedirectToAdd] = useState(false);
+  const [pageAnimals, setPageAnimals] = useState(searchResults.slice(0,11));
+  const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToSearch, setRedirectToSearch] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
+  const [selectedTags, setselectedTags] = React.useState([]);
   const [input, setInput] = useState('');
   const [newTagName, setNewTagName] = useState('');
-  const { state, getAnimals, deleteAnimal, createTag, searchAnimals} = useProfileProvider();
+  const { state, deleteAnimal, createTag, searchAnimals, addNewToTag, editAnimal} = useProfileProvider();
   const {
-    animals, accessRights, colonyId, colonySize, colonyName,
+    accessRights, colonyId, colonyName
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
 
   const handleChangePage = async (event, newPage) => {
-    const request = {
-      colonyId, rowsPerPage, page: newPage,
-    };
-    await getAnimals(request, accessRights, colonyName, colonySize);
+    setPageAnimals(searchResults.slice(newPage*10, (newPage+1)*10))
     setPage(newPage);
   };
 
@@ -192,12 +226,29 @@ const Animals = () => {
     setInput(val.target.value);
   };
 
+  const handleTagChange = (event) => {
+    setselectedTags(event.target.value);
+  }
+
   const deleteChosenAnimal = async (animalId) => {
     const request = {
       colonyId, animalId,
     };
     await deleteAnimal(request);
   };
+
+  const addTagToAnimal = (newTags) => {  
+    for(var i=0; i<searchResults.length; i++) {
+      if(typeof searchResults[i].tags !== "object"){
+        searchResults[i].tags = [];
+      }  
+      newTags.forEach(function(item){
+        if(typeof searchResults[i].tags === "object" && !searchResults[i].tags.includes(item)){
+          searchResults[i].tags.push(item);
+        }
+      });  
+    }
+  }
 
   const displayNotes = (noteObj) => {
     var result = '';
@@ -218,6 +269,9 @@ const Animals = () => {
       }}
     />);
   }
+  else if (redirectToAnimals) {
+    return <Redirect to="/dashboard/colony" />;
+  }
 
   const handleAddTagButton = async () => {
     const tagData = { tagName: newTagName };
@@ -229,11 +283,32 @@ const Animals = () => {
   }
 
   const handleSearch = async (input) => {
-    const searchCriteria = {colonyId: colonyId, searchCriteria: {animalInfo: {mouseId: input}}};
+    const searchCriteria = {colonyId: colonyId, searchCriteria: {mouseId: input}};
     var searchResults = await searchAnimals(searchCriteria); 
     const animal = searchResults[0];
     setCurrentAnimal(animal);
     setRedirectTodetails(true);
+  }
+
+  const handleTagAdd = async (event) => {
+    addTagToAnimal(selectedTags);
+
+    var allResultIds = [];
+    searchResults.forEach(mouse => {
+      allResultIds.push(mouse.animalUUID);
+    });
+
+    selectedTags.forEach(item => {
+      const tagData = { tagName: item, mouse: allResultIds};
+      addNewToTag(tagData);
+    });
+
+    for(var i=0; i<searchResults.length; i++) {
+      var request = {animal: searchResults[i], colonyId};
+      editAnimal(request);
+    }
+
+
   }
 
   function displayTags(tags){
@@ -243,14 +318,6 @@ const Animals = () => {
     else{
       return('');
     }
-  }
-
-  if (redirectToAdd) {
-    return (<Redirect
-      to={{
-        pathname: `/addanimal`,
-      }}
-    />);
   }
 
   if (redirectToSearch) {
@@ -266,10 +333,31 @@ const Animals = () => {
       <CssBaseline />
       <h1>Colony: {colonyName}</h1>
       <h2>Access:{permissions}</h2>
-
-      <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
-        Add Tag
-      </Button>
+      <div>
+        <FormControl className={classesTag.formControl}>
+          <InputLabel
+            id="tag-label"
+           >Tags</InputLabel>
+          <Select
+            labelId="tag-label"
+            id="multiple-tag"
+            multiple  
+            value={selectedTags}
+            onChange={handleTagChange}
+            input={<Input id="select-multiple-tag"/>}
+            renderValue={(selected) => selected.join(', ')}
+            MenuProps={MenuProps}
+            > 
+            {defaultTags.map((tag) => (
+              <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+              <Checkbox checked={selectedTags.indexOf(tag) > -1} />
+              <ListItemText primary={tag} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button color="primary" variant="contained" onClick={handleTagAdd} startIcon={<CheckCircle />}>Apply Tag(s) to Results</Button>
+      </div>
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>
@@ -285,15 +373,6 @@ const Animals = () => {
               <Button color="primary" variant="contained" onClick={handleAddTagButton} startIcon={<CheckCircle />}>Save</Button>
             </DialogActions>
           </Dialog>
-      <Button
-          color="inherit"
-          variant="outlined"
-          onClick={() => {
-          setRedirectToAdd(true);
-        }}
-        >
-          Add Animal
-        </Button>
 
       <input type="text"
         style={BarStyling}
@@ -337,7 +416,7 @@ const Animals = () => {
             </TableRow>
           </TableBody>
           <TableBody>
-            {(animals).map(animal => (
+            {(pageAnimals).map(animal => (
               <TableRow key={animal.mouseId}>
                 <TableCell
                   style={{ cursor: 'pointer', borderRight: '1px solid rgba(224, 224, 224, 1)' }}
@@ -407,7 +486,7 @@ const Animals = () => {
               <TablePagination
                 rowsPerPageOptions={[]}
                 colSpan={3}
-                count={colonySize}
+                count={searchResults.length}
                 rowsPerPage={10}
                 page={page}
                 SelectProps={{
@@ -420,6 +499,14 @@ const Animals = () => {
             </TableRow>
           </TableFooter>
         </Table>
+         <Button
+                  onClick={() => {
+                    setRedirectToAnimals(true);
+                  }}
+                  variant="outlined"
+                  color="primary"
+                >Back
+            </Button>
       </TableContainer>
 
       <Modal
@@ -512,4 +599,4 @@ const Animals = () => {
   );
 };
 
-export default Animals;
+export default ResultsPage;

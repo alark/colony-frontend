@@ -16,6 +16,7 @@ const Login = () => {
 
   const [userDetails, setUserDetails] = useState({});
   const [redirectToRegister, setRedirectToRegister] = useState(false);
+  // eslint-disable-next-line
   const [redirectToDashboard, setRedirectToDashboard] = useState(false);
 
   function checkAllTags(){
@@ -26,6 +27,7 @@ const Login = () => {
 
   /** Material-UI */
   const useStyles = makeStyles(theme => (
+    // eslint-disable-next-line
     checkAllTags(),
     {
     paper: {

@@ -61,6 +61,10 @@ const ProfileProvider = ({ children }) => {
         return { ...prevState, animals: newList };
       }
 
+      case SEARCH: {
+        return {...prevState, searchAnimals: payload};
+      }
+
       case SORT: {
         const colonies = [...prevState.ownedColonies];
         colonies.sort((a, b) => {
@@ -96,12 +100,6 @@ const ProfileProvider = ({ children }) => {
         };
       }
 
-      case SEARCH: {
-        return {
-          ...prevState, colonyId: payload.colonyId, searchResults: payload.animals,
-        }
-      }
-
       case EDITANIMAL: {
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalUUID);
@@ -118,7 +116,6 @@ const ProfileProvider = ({ children }) => {
       case ADDANIMAL: {
         const animals = [...prevState.animals];
         const newList = animals.concat(payload);
-        console.log('New Animal: ', payload.animalUUID);
         return { ...prevState, animals: newList };
       }
 
@@ -221,7 +218,7 @@ const useProfileProvider = () => {
   const searchAnimals = async (searchInfo) => axios
     .post(`${BASE_URL}/animals/search`, searchInfo)
     .then(({ data }) => {
-      dispatch({ type: SEARCH, payload: data });
+      return data;
   });
 
   const deleteColony = (colonyId, sharedTable) => axios

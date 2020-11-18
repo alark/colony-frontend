@@ -10,6 +10,7 @@
     "axios": "^0.19.2",
     "emailjs-com": "^2.6.3",
     "firebase": "^7.24.0",
+    "material-ui-popup-state": "^1.7.0",
     "material-auto-rotating-carousel": "^3.0.2",
     "material-ui-image": "^3.3.0",
     "node-cron": "^2.0.3",

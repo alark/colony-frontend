@@ -98,7 +98,7 @@ const ProfileProvider = ({ children }) => {
 
       case SEARCH: {
         return {
-          ...prevState, colonyId: payload.colonyId, searchResults: payload.animals,
+          ...prevState, searchResults: payload.searchResults,
         }
       }
 
@@ -221,7 +221,8 @@ const useProfileProvider = () => {
   const searchAnimals = async (searchInfo) => axios
     .post(`${BASE_URL}/animals/search`, searchInfo)
     .then(({ data }) => {
-      dispatch({ type: SEARCH, payload: data });
+      // dispatch({ type: SEARCH, payload: data });
+      return data;
   });
 
   const deleteColony = (colonyId, sharedTable) => axios

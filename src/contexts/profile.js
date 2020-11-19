@@ -61,6 +61,10 @@ const ProfileProvider = ({ children }) => {
         return { ...prevState, animals: newList };
       }
 
+      case SEARCH: {
+        return {...prevState, searchAnimals: payload};
+      }
+
       case SORT: {
         const colonies = [...prevState.ownedColonies];
         colonies.sort((a, b) => {
@@ -92,14 +96,8 @@ const ProfileProvider = ({ children }) => {
       case ANIMALS: {
         // Store colony animals in the state
         return {
-          ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, animals: payload.animals,
+          ...prevState, colonyId: payload.colonyId, accessRights: payload.accessRights, colonyName: payload.colonyName, colonySize: payload.colonySize, geneNames: payload.geneNames, animals: payload.animals,
         };
-      }
-
-      case SEARCH: {
-        return {
-          ...prevState, colonyId: payload.colonyId, searchResults: payload.animals,
-        }
       }
 
       case EDITANIMAL: {
@@ -118,7 +116,6 @@ const ProfileProvider = ({ children }) => {
       case ADDANIMAL: {
         const animals = [...prevState.animals];
         const newList = animals.concat(payload);
-        console.log('New Animal: ', payload.animalUUID);
         return { ...prevState, animals: newList };
       }
 
@@ -211,19 +208,20 @@ const useProfileProvider = () => {
   const shareColony = shareInfo => axios
     .post(`${BASE_URL}/colony/share`, shareInfo);
 
-  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize) => axios
+  const getAnimals = async (pageInfo, accessRights, colonyName, colonySize, geneNames) => axios
     .post(`${BASE_URL}/animals`, pageInfo)
     .then(({ data }) => {
       data.accessRights = accessRights;
       data.colonyName = colonyName;
       data.colonySize = colonySize;
+      data.geneNames = geneNames ? geneNames : {gene1: 'Gene 1', gene2: 'Gene 2', gene3: 'Gene 3'};
       dispatch({ type: ANIMALS, payload: data });
     });
 
   const searchAnimals = async (searchInfo) => axios
     .post(`${BASE_URL}/animals/search`, searchInfo)
     .then(({ data }) => {
-      dispatch({ type: SEARCH, payload: data });
+      return data;
   });
 
   const deleteColony = (colonyId, sharedTable) => axios

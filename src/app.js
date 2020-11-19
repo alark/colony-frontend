@@ -8,6 +8,8 @@ import Registration from 'features/Registration';
 import Animals from './components/Animals';
 import SingleAnimal from './components/SingleAnimal';
 import AddAnimal from './components/AddAnimal';
+import AdvancedSearch from './components/AdvancedSearch';
+import ResultsPage from './components/ResultsPage';
 
 
 /**
@@ -23,6 +25,8 @@ const App = () => (
         <ProtectedRoute path="/animals/:id" component={Animals} />
         <ProtectedRoute path="/animal/:id" component={SingleAnimal} />
         <ProtectedRoute path="/addanimal" component={AddAnimal} />
+        <ProtectedRoute path="/advancedsearch" component={AdvancedSearch} />
+        <ProtectedRoute path="/results" component={ResultsPage} />
         <Route exact path="/" component={HomePage} />
         <Route exact path="/registration" component={Registration} />
       </Switch>
@@ -33,9 +37,7 @@ const App = () => (
 
 const ProtectedRoute = (props) => {
   const { state: { loggedIn } } = useProfileProvider();
-
   if (!loggedIn) return <Redirect to="/" />;
-
   return (<Route {...props} />);
 };
 

@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Breadcrumbs, Card, CardContent, Link, TextField, Grid, Container, CssBaseline, Typography, Select, MenuItem, InputLabel, Popover } from '@material-ui/core';
-import PopupState, { bindHover, bindPopover } from 'material-ui-popup-state';
-import InfoIcon from '@material-ui/icons/Info';
+import { Button, Breadcrumbs, Card, CardContent, Link, TextField, Grid, Container, CssBaseline, Typography } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -29,14 +27,6 @@ const useStyles = makeStyles(theme => ({
   },
   error: {
     color: 'red',
-  },
-  popover: {
-    pointerEvents: 'none',
-  },
-  typography: {
-    subtitle1: {
-      fontSize: 12,
-    },
   },
 }));
 
@@ -93,20 +83,20 @@ const gridStyles = makeStyles((theme) => ({
   },
 }));
 
-const AddAnimal = () => {
+const AdvancedSearch = () => {
   const classesGrid = gridStyles();
   const classesTwo = useStyles2();
   const classes = useStyles();
-  const { logout, addAnimal, searchAnimals, state } = useProfileProvider();
+  const { logout, searchAnimals, state } = useProfileProvider();
   const [animalInfo, setAnimalInfo] = useState({});
-  const [fatherMouse, setFatherMouse] = useState({});
-  const [motherMouse, setMotherMouse] = useState({});
+  const [searchResults, setSearchResults] = useState({});
   const [errors, setErrors] = useState({});
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
+  const [redirectToResultsPage, setRedirectToResultsPage] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
-  const { colonyName, colonyId, geneNames } = state;
+  const { colonyName, colonyId } = state;
 
   const getErrors = () => {
     var errorString = "";
@@ -119,7 +109,6 @@ const AddAnimal = () => {
 
   const validateForm = () => {
     let valid = true;
-
     Object.values(errors).forEach(
       // if we have an error string set valid to false
       (val) => val.length > 0 && (valid = false)
@@ -127,193 +116,55 @@ const AddAnimal = () => {
     return valid;
   }
 
-  const attemptAddAnimal = (event) => {
-    // TODO: Check for 401 and redirect if 200.
-    event.preventDefault();
-    if (validateForm()) {
-      const request = { animal: animalInfo, colonyId };
-      addAnimal(request);
-      setRedirectToAnimals(true);
-    }
+  const searchWithCriteria = async(event) => {
+    const request = { colonyId: colonyId, searchCriteria: {animalInfo}};
+    var results = await searchAnimals(request);
+    setSearchResults(results);
+    setRedirectToResultsPage(true);
   };
 
-  const defaultGenes = ["+/+", "+/-", "-/-"];
-
-  const checkGenes = async (name, value, motherId, fatherId) => {
-      var valid = true;
-
-      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: fatherId}});
-      const father = animals[0];
-      const fatherGene = father[name];
-
-      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}});
-      const mother = animals[0];
-      const motherGene = mother[name];
-
-      if (fatherGene && motherGene) {
-        if (value === '+/-') {
-            valid = fatherGene !== motherGene || fatherGene === '+/-';
-        }
-        else if (value === '-/-') {
-            valid = motherGene.includes('-') && fatherGene.includes('-');
-        }
-        else if (value === '+/+') {
-            valid = motherGene.includes('+') && fatherGene.includes('+');
-        }
-
-      setErrors(prevState => ({...prevState, [name]:
-        valid
-        ? ''
-        : `Check ${geneNames[name]}: ${value} invalid for father ${geneNames[name]} of ${fatherGene} and mother ${geneNames[name]} of ${motherGene}`}));
-    }
-  }
-
-  const checkAllGenes = (motherId, fatherId) => {
-    if (animalInfo.gene1) {
-      checkGenes('gene1', animalInfo.gene1, motherId, fatherId);
-    }
-    if (animalInfo.gene2) {
-      checkGenes('gene2', animalInfo.gene2, motherId, fatherId);
-    }
-    if (animalInfo.gene3) {
-      checkGenes('gene3', animalInfo.gene3, motherId, fatherId);
-    }
-  }
-
-  const updateInput = async ({ target: { name, value } }) => {
+  const updateInput = ({ target: { name, value } }) => {
+    // eslint-disable-next-line
     switch(name) {
-      case 'gene1':
-      case 'gene2':
-      case 'gene3':
-        if (animalInfo.motherId && animalInfo.fatherId && !errors.motherId && !errors.fatherId) {
-          checkGenes(name, value, animalInfo.motherId, animalInfo.fatherId);
-        }
-        break;
-      case 'fatherId':
-        if (!numRegex.test(value)) {
-          setErrors(prevState => ({...prevState, [name]:
-          'Father ID should be numeric.'}));
-        }
-        else {
-          const criteria = {gender: 'M', mouseId: value};
-          const searchInfo = {colonyId, searchCriteria: criteria};
-          const {animals} = await searchAnimals(searchInfo);
-          setErrors(prevState => ({...prevState, [name]:
-            animals.length !== 0
-            ? ''
-            : `Check father ID: Male mouse with ID ${value} not found in colony ${colonyName}`}));
-          if (animals.length !== 0) {
-            setFatherMouse(animals[0]);
-          }
-        }
-        if (animalInfo.motherId && !errors.motherId && !errors.fatherId) {
-          checkAllGenes(animalInfo.motherId, value);
-        }
-        break;
-      case 'motherId':
-        if (!numRegex.test(value)) {
-          setErrors(prevState => ({...prevState, [name]:
-          'Mother ID should be numeric.'}));
-        }
-        else {
-          const criteria = {gender: 'F', mouseId: value};
-          const searchInfo = {colonyId, searchCriteria: criteria};
-          const {animals} = await searchAnimals(searchInfo);
-          setErrors(prevState => ({...prevState, [name]:
-            animals.length !== 0
-            ? ''
-            : `Check mother ID: Female mouse with ID ${value} not found in colony ${colonyName}`}));
-          if (animals.length !== 0) {
-            setMotherMouse(animals[0]);
-          }
-        }
-        if (animalInfo.fatherId && !errors.motherId && !errors.fatherId) {
-          checkAllGenes(value, animalInfo.fatherId);
-        }
-        break;
+      /*
+      case 'email':
+      errors.email =
+        validEmailRegex.test(value)
+          ? ''
+          : 'Email is not valid!';
+      break;
+      */
+
       case 'mouseId':
         setErrors(prevState => ({...prevState, [name]:
           numRegex.test(value)
           ? ''
-          : 'Mouse ID should be numeric.'}));
+          : 'Mouse ID should contain only numbers.'}));
         break;
-      }
+      case 'gender':
+        setErrors(prevState => ({...prevState, [name]:
+          value === 'M' || value === 'F'
+          ? ''
+          : 'Please enter \'M\' or \'F\' for gender.'}));
+        break;
+    }
 
-      setAnimalInfo(prevState => ({ ...prevState, [name]: value }));
+    setAnimalInfo(prevState => ({ ...prevState, [name]: value }));
   };
 
   if (redirectToAnimals) {
     return <Redirect to="/dashboard/colony" />;
   } else if (redirectToColonies) {
     return <Redirect to="/dashboard" />;
+  } else if(redirectToResultsPage) {
+    return (<Redirect to={{
+      pathname: "/results",
+      state: {results: searchResults}
+    }}/>);
   } else if (redirectToLogin) {
     logout();
     return <Redirect to="/" />;
-  }
-
-  function parentInfo(name) {
-    var mouse = {};
-    if (name==='father-info') {
-      mouse = fatherMouse;
-    }
-    else {
-      mouse = motherMouse;
-    }
-
-    if (mouse) {
-      return <>
-      <PopupState variant="popover" popupId={name}>
-      {(popupState) => (
-        <>
-          <InfoIcon {...bindHover(popupState)}>
-          </InfoIcon>
-          <Popover
-          {...bindPopover(popupState)}
-          className={classes.popover}
-          classes={{
-            paper: classes.paper,
-          }}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-          disableRestoreFocus
-        >
-          <Card className={classes.root}>
-            <div className={classes.content}>
-              <CardContent className={classes.details}>
-                <Typography gutterBottom variant="h5" component="h2">
-                  ID: {mouse.mouseId}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>DOB:</strong> {mouse.dobMonth || '??'}/{mouse.dobDay || '??'}/{mouse.dobYear || '????'}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>DOD:</strong> {mouse.dodMonth || '??'}/{mouse.dodDay || '??'}/{mouse.dodYear || '????'}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>{geneNames.gene1 || 'Gene 1'}:</strong> {mouse.gene1}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>{geneNames.gene2 || 'Gene 2'}:</strong> {mouse.gene2}
-                </Typography>
-                <Typography variant="subtitle1" color="textSecondary">
-                  <strong>{geneNames.gene3 || 'Gene 3'}:</strong> {mouse.gene3}
-                </Typography>
-              </CardContent>
-            </div>
-          </Card>
-          </Popover>
-          </>
-      )}
-    </PopupState>
-    </>
-  }
-}
+  } 
 
   return (
     <div>
@@ -335,7 +186,7 @@ const AddAnimal = () => {
         <CssBaseline />
         <div className={classesTwo.paper}>
           <Typography component="h1" variant="h5">
-            Add Animal to {colonyName}
+            Search for animal(s) in {colonyName}
           </Typography>
 
           <Card className={classesTwo.root}>
@@ -357,19 +208,14 @@ const AddAnimal = () => {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                        <InputLabel id="gender-label">Gender</InputLabel>
-                        <Select
-                          labelId="gender-label"
+                        <TextField
                           name="gender"
                           variant="outlined"
                           size="small"
-                          value={animalInfo.gender || ''}
+                          margin="normal"
+                          label="Gender"
                           onChange={updateInput}
-                        >
-                          <MenuItem value={undefined}>NA</MenuItem>
-                          <MenuItem value={"M"}>(M)ale</MenuItem>
-                          <MenuItem value={"F"}>(F)emale</MenuItem>
-                          </Select>
+                        />
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -478,7 +324,6 @@ const AddAnimal = () => {
                           label="Father ID"
                           onChange={updateInput}
                         />
-                        {parentInfo('father-info')}
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -491,61 +336,42 @@ const AddAnimal = () => {
                           label="Mother ID"
                           onChange={updateInput}
                         />
-                        {parentInfo('mother-info')}
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                        <InputLabel id="gene1-label">{geneNames.gene1}</InputLabel>
-                        <Select
-                          labelId="gene1-label"
+                        <TextField
                           name="gene1"
                           variant="outlined"
                           size="small"
-                          value={animalInfo.gene1 || ''}
+                          margin="normal"
+                          label="Gene 1"
                           onChange={updateInput}
-                        >
-                        <MenuItem value={undefined}>NA</MenuItem>
-                        {defaultGenes.map(gene => (
-                            <MenuItem value={gene}>{gene}</MenuItem>
-                          ))}
-                        </Select>
+                        />
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                      <InputLabel id="gene2-label">{geneNames.gene2}</InputLabel>
-                      <Select
-                        labelId="gene2-label"
-                        name="gene2"
-                        variant="outlined"
-                        size="small"
-                        value={animalInfo.gene2 || ''}
-                        onChange={updateInput}
-                      >
-                      <MenuItem value={undefined}>NA</MenuItem>
-                      {defaultGenes.map(gene => (
-                          <MenuItem value={gene}>{gene}</MenuItem>
-                        ))}
-                      </Select>
+                        <TextField
+                          name="gene2"
+                          variant="outlined"
+                          size="small"
+                          margin="normal"
+                          label="Gene 2"
+                          onChange={updateInput}
+                        />
                       </div>
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <div className={classesGrid.paper}>
-                      <InputLabel id="gene3-label">{geneNames.gene3}</InputLabel>
-                      <Select
-                        labelId="gene3-label"
-                        name="gene3"
-                        variant="outlined"
-                        size="small"
-                        value={animalInfo.gene3 || ''}
-                        onChange={updateInput}
-                      >
-                      <MenuItem value={undefined}>NA</MenuItem>
-                      {defaultGenes.map(gene => (
-                          <MenuItem value={gene}>{gene}</MenuItem>
-                        ))}
-                      </Select>
+                        <TextField
+                          name="gene3"
+                          variant="outlined"
+                          size="small"
+                          margin="normal"
+                          label="Gene 3"
+                          onChange={updateInput}
+                        />
                       </div>
                     </Grid>
                   </Grid>
@@ -555,13 +381,13 @@ const AddAnimal = () => {
 
             </div>
             <Button
-              type="submit"
               variant="contained"
               color="primary"
-              className={classes.submit}
-              onClick={attemptAddAnimal}
+              onClick={() => {
+                searchWithCriteria()
+              }}
             >
-              Add Animal
+              Search
             </Button>
             <Button
               onClick={() => {
@@ -580,4 +406,4 @@ const AddAnimal = () => {
   );
 };
 
-export default AddAnimal;
+export default AdvancedSearch;

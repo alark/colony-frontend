@@ -60,6 +60,7 @@ const Colonies = () => {
   } = useProfileProvider();
   const [file, setFile] = useState('');
   const [fileName, setFileName] = useState('');
+  const [geneNames, setGeneNames] = useState({gene1: 'Gene 1', gene2: 'Gene 2', gene3:'Gene 3'});
   const [addDialog, setAddDialogOpen] = React.useState(false);
   const [tab, setTab] = React.useState(0);
   const tabClasses = tabStyle();
@@ -99,7 +100,7 @@ const Colonies = () => {
 
     reader.onload = async () => {
       const load = reader.result;
-      const data = { payload: load, name: fileName };
+      const data = { payload: load, name: fileName, geneNames };
       if (!isBlank(fileName.trim())) {
         await addColony(data);
       } else {
@@ -118,7 +119,7 @@ const Colonies = () => {
   };
 
   const createNew = async () => {
-    const data = { payload: "", name: fileName };
+    const data = { payload: "", name: fileName, geneNames };
     await addColony(data);
     closeAddDialog();
   };
@@ -137,6 +138,10 @@ const Colonies = () => {
  */
   const updateInputFileName = ({ target: { value } }) => {
     setFileName(value);
+  };
+
+  const updateGeneNames = ({ target: { name, value } }) => {
+    setGeneNames(prevState => ({ ...prevState, [name]: value }));
   };
 
   const headers = 'mouseId,gender,litter,fatherId,motherId,dobMonth,dobDay,dobYear,dodMonth,dodDay,dodYear,tod,notes,gene1,gene2,gene3';
@@ -205,7 +210,7 @@ const Colonies = () => {
               <DialogContentText>
                   Upload an animal colony along with its name.
                   A colony should be in this format along with the headers at the top of the file.
-                  Or, enter a name and click "Create New" to add a colony from scratch. 
+                  Or, enter a name and click "Create New" to add a colony from scratch.
               </DialogContentText>
               <br />
               <DialogContentText>
@@ -222,6 +227,15 @@ const Colonies = () => {
               <input type="file" name="file" onChange={chooseFile} />
               <div>
                 <TextField variant="outlined" margin="dense" size="small" name="colonyName" label="Colony Name" onChange={updateInputFileName} />
+              </div>
+              <div>
+                <TextField variant="outlined" margin="dense" size="small" name="gene1" label="Gene 1 Name" onChange={updateGeneNames} />
+              </div>
+              <div>
+                <TextField variant="outlined" margin="dense" size="small" name="gene2" label="Gene 2 Name" onChange={updateGeneNames} />
+              </div>
+              <div>
+                <TextField variant="outlined" margin="dense" size="small" name="gene3" label="Gene 3 Name" onChange={updateGeneNames} />
               </div>
             </DialogContent>
             <DialogActions>

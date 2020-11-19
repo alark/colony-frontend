@@ -1228,7 +1228,6 @@ const SingleAnimal = (props) => {
                       <div 
                         key={selectedList.indexOf(elem)}
                         className={classesTwo.modal_paper}
-                        objectFit='contain'
                       >
                         <div background='grey' width='650px' height='650px'>
                           <img

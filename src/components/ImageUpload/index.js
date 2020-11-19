@@ -22,12 +22,8 @@ const Uploader = (props) => {
     const file = e.target.files[0];
 
     console.log("file", file);
-    const lastModDate = file.lastModifiedDate;
-    var dateString = new Date("" + lastModDate.getUTCFullYear() + "/" + (lastModDate.getUTCMonth()+1) +
-    "/" + lastModDate.getUTCDate() + " " + lastModDate.getUTCHours() + ":" + lastModDate.getUTCMinutes() +
-    ":" + lastModDate.getUTCSeconds());
-
-    console.log(dateString);
+    const dateString = new Date(file.lastModified);
+    console.log("datestring", dateString);
 
 //     getUTCDate: ƒ getUTCDate()
 // getUTCDay: ƒ getUTCDay()

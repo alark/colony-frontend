@@ -243,7 +243,7 @@ const SingleAnimal = (props) => {
   const [motherMouse, setMotherMouse] = useState({});
   const [errors, setErrors] = useState({});
 
-  const [setTagList] = React.useState([]);
+  const [tagList, setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
 
@@ -515,7 +515,7 @@ const SingleAnimal = (props) => {
     console.log("handlemodalclose");
     setModalOpen(false);
   };
-  
+
   const saveChanges = async (event) => {
     event.preventDefault();
 

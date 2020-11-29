@@ -1,6 +1,11 @@
 const tagList = [];
 
 const addToList = (inputList) => {
+    console.log("taglist:", tagList);
+    console.log("inputlist:", inputList);
+    if(inputList === undefined) {
+        inputList = [];
+    }
     inputList.forEach(element => {
         tagList.push(element);
     });

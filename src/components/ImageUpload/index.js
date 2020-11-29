@@ -5,7 +5,6 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 import Add from '@material-ui/icons/Add';
 
-
 const Uploader = (props) => {
   const [image, setImage] = useState(null);
   const [note, setNote] = useState(null);
@@ -21,36 +20,35 @@ const Uploader = (props) => {
   const handleChange = (e) => {
     const file = e.target.files[0];
 
-    console.log("file", file);
-    const dateString = new Date(file.lastModified);
-    console.log("datestring", dateString);
-
-//     getUTCDate: ƒ getUTCDate()
-// getUTCDay: ƒ getUTCDay()
-// getUTCHours: ƒ getUTCHours()
-// getUTCMilliseconds: ƒ getUTCMilliseconds()
-// getUTCMinutes: ƒ
-// getUTCMonth: ƒ getUTCMonth()
-// getUTCSeconds: ƒ getUTCSeconds()
-
-    // console.log("file.lastModifiedDate", file.lastModifiedDate);
-    // console.log("file.lastModifiedDate.toDateString()", file.lastModifiedDate.toDateString());
-
-    // const temp = new String(file.lastModifiedDate.toDateString());
-    // var newdate = temp.slice(4);
-    // console.log("newdate", newdate);
-    console.log("typeog file.lastmodified:", typeof file.lastModified);
-    setTimestamp(file.lastModified);
-    setDate(dateString.toDateString());
+    if(file === undefined){
+      setImage(null);
+      setNote(null);
+      setTimestamp(null);
+      setDate(null);
+    }
 
     if (file) {
+      console.log("file2", file);
+      const dateString = new Date(file.lastModified);
+      console.log("datestring", dateString);
+      setTimestamp(file.lastModified);
+      setDate(dateString.toDateString());
+
       const fileType = file.type;
       const validImageTypes = ['image/gif', 'image/jpeg', 'image/png'];
       if (validImageTypes.includes(fileType)) {
         setError('');
         setImage(file);
+  
+  
+
       } else {
-        setError('Please select an image to upload');
+        setError('Acceptable formats are .jpeg, .gif, .png');
+        setImage(null);
+        setNote(null);
+        setTimestamp(null);
+        setDate(null);
+        setNote(null);
       }
     }
   };
@@ -75,6 +73,9 @@ const Uploader = (props) => {
     console.log("note is: ", note);
     if (image) {
 
+      console.log("image", image);
+      console.log("name", image.name);
+      console.log("image.name", image.name);
       console.log("date: ", date);
       console.log("timestamp: ", timestamp);
 
@@ -85,8 +86,12 @@ const Uploader = (props) => {
           'note': `${note}`,
           timestamp: `${timestamp}`,
           'date': `${date}`,
+          'name': `${image.name}`
         }
       };
+
+      const name = image.name;
+      console.log("custommetadata", metadata.customMetadata);
 
       // Upload the file with custom metadata to colony and animal specific folder
       const uploadTask = storage.ref(`images/${colonyId}/${animalId}/${date}/${image.name}`).put(image, metadata);
@@ -107,14 +112,14 @@ const Uploader = (props) => {
             .getDownloadURL()
             .then((url) => {
               console.log('url', url);
-              storeImageLink({ colonyId, animalId, url, timestamp, date, note });
+              storeImageLink({ colonyId, animalId, url, timestamp, date, note, name });
               console.log("called storeimage link");
               setProgress(0);
             });
         },
       );
     } else {
-      setError('Error please choose an image to upload');
+      setError('Error: please choose an image to upload');
       setImage(null);
       setNote(null);
       setTimestamp(null);
@@ -132,13 +137,14 @@ const Uploader = (props) => {
         <DialogTitle id="form-dialog-title">Upload Image</DialogTitle>
         <DialogContent>
           <DialogContentText>
-              Upload an image for this animal
+              Upload an image for this animal.
           </DialogContentText>
           <div>
             <input type="file" name="file" onChange={handleChange} />
           </div>
           <div>
             <TextField variant="outlined" margin="dense" size="small" name="text" label="Add Image Note" onChange={handleNoteChange} />
+            <p style={{ color: 'red' }}>{error}</p>
           </div>
         </DialogContent>
         <DialogActions>

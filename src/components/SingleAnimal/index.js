@@ -1,8 +1,6 @@
-import Gallery from "react-photo-gallery";
-// import ImageGallery from 'react-image-gallery';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -17,19 +15,10 @@ import Modal from '@material-ui/core/Modal';
 import Image from 'material-ui-image'
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { ClassSharp } from "@material-ui/icons";
-
-//image carousel imports
-import { AutoRotatingCarousel } from 'material-auto-rotating-carousel';
-// const Slide = require('./Slide').default;
-// import Slide from "react-swipeable-views";
-import { Slide } from 'material-auto-rotating-carousel';
-import ReactDOM from "react-dom";
+import DeleteIcon from "@material-ui/icons/Delete";
 
 import Carousel from 'react-elastic-carousel';
 
-
-const { red, blue, green } = require('@material-ui/core/colors');
 const { getList } = require('components/Tags/index');
 
 const numRegex = RegExp('^\\d*$');
@@ -110,12 +99,12 @@ const useStyles2 = makeStyles(theme => ({
     padding: '5px 5px 5px 5px',
   },
   slideshowButton: {
-    width: '90px',
+    width: '120px',
     height: '40px',
     margin: 'auto',
     display: 'block',
     borderRadius: '4px',
-    fontSize: '16px',
+    fontSize: '14px',
   },
   details: {
     display: 'flex',
@@ -151,8 +140,6 @@ const useStyles2 = makeStyles(theme => ({
     width: '100%',
     height: 'auto',
     marginLeft: '5%',
-    // background: 'cyan',
-    //height: 500,
   },
   modal: {
     display: 'flex',
@@ -225,7 +212,7 @@ const SingleAnimal = (props) => {
   const classesTag = useStylesTag();
 
   const {
-    logout, editAnimal, storeNote, storeEvent, addNewToTag, searchAnimals, state,
+    logout, editAnimal, storeNote, storeEvent, addNewToTag, searchAnimals, deleteImageLink, state,
   } = useProfileProvider();
   const { accessRights } = state;
   const currentAnimal = props.location.state.animal;
@@ -244,6 +231,7 @@ const SingleAnimal = (props) => {
   const [openSlide, setSlideOpen] = React.useState(false);
   const [openModal, setModalOpen] = React.useState(false);
   const [selectedList, setSelectedList] = React.useState([]);
+  const [deleteDialog, setDeleteOpen] = React.useState(false);
 
   const [animalInfo, setAnimalInfo] = useState({});
 
@@ -381,6 +369,33 @@ const SingleAnimal = (props) => {
 
     setEventOpen(false);
   };
+
+  const handleDeleteOpen = () => {
+    console.log("handle delete open");
+    setDeleteOpen(true);
+  };
+
+  const handleDeleteClose = () => {
+    console.log("cancelled delete");
+    setDeleteOpen(false);
+  };
+
+  const deleteAndClose = () => {
+    console.log("confirmed delete for image:", selectedImage);
+    deleteChosenImage(currentAnimal.animalUUID);
+    setDeleteOpen(false);
+    setModalOpen(false);
+  }
+
+  const deleteChosenImage = async (animalId) => {
+    const imageObject = selectedImage;
+    setselectedImage({});
+    console.log("deleting image: ", imageObject);
+    const request = {
+      colonyId, animalId, imageObject
+    };
+    await deleteImageLink(request);
+    };
 
   const handleNextImage = () => {
     const index = currentImage + 1;
@@ -538,10 +553,6 @@ const SingleAnimal = (props) => {
     console.log("handlemodalclose");
     setModalOpen(false);
   };
-
-  const handleModal = () => {
-    console.log("handlemodal");
-  }
 
   const saveChanges = async (event) => {
     event.preventDefault();
@@ -1380,21 +1391,17 @@ const SingleAnimal = (props) => {
             </TabPanel>
             <TabPanel value={tab} index={1}>
               <Uploader animalId={currentAnimal.animalUUID} />
-              { (imageBuckets.length > 0) && <div>
+              { (imageBuckets.length > 0) && <div style={{height:'500px', overflow: 'auto'}}>
                 {imageBuckets.map((sublist) => (
                   <div>
                     <hr style={{width:'100%', borderTop: '2px solid #ccc', borderRadius: '2px'}}/>
                     
                     <div className={classesTwo.root} style={{width: '100%', marginTop: '1%'}}>
                       <div className={classesTwo.sidebar}>
-                      {/* <div style={{display: 'block'}}> */}
                         <p style={{fontSize:'15px', color: 'black', textAlign: 'center' }}><b>{sublist[0].date}</b></p>
-                      {/* </div> */}
-                        {/* <div> */}
-                          {(sublist.length > 0) && <button className={classesTwo.slideshowButton} onClick={() => {
+                          {(sublist.length > 0) && <Button variant="contained" color="primary" className={classesTwo.slideshowButton} onClick={() => {
                                 handleSlideOpen(sublist)
-                              }}>Slideshow</button>}
-                        {/* </div> */}
+                              }}>Slideshow</Button>}
                       </div>
                       <div style={{width: '100%', marginLeft: '1%', borderLeft: '2px solid #ccc', paddingLeft: '1%'}}>
                         <GridList className={classesTwo.gridList} cols={8}>
@@ -1413,9 +1420,16 @@ const SingleAnimal = (props) => {
                                 handleModalOpen()
                               }}
                             >
-                              <Image style={{ border: '1px solid #aaa', borderRadius: '4px', width: '100', height: 'auto'}} src={element.url}></Image>
-                              {/* <img ,
-                                , width: 100, height: 'auto' }} src={element.url} alt={"image"} /> */}
+                              <Image
+                                style={{
+                                  border: '1px solid #aaa',
+                                  borderRadius: '4px',
+                                  width: '100',
+                                  height: 'auto',
+                                }}
+                                src={element.url}
+                              >
+                              </Image>
                             </GridListTile>
                           ))}
                         </GridList>
@@ -1431,23 +1445,39 @@ const SingleAnimal = (props) => {
                 >
                   <div 
                     position='absolute'
-                    height='600'
                     className={classesTwo.modal_paper}
                   >
-                    <img
-                      margin-left='auto'
-                      margin-right='auto'
-                      height='500'
+                    <img             
+                      loading='lazy'
                       display='block'
-                      border='5px solid #555'
+                      width='600'
+                      height='auto'
+                      padding='10'
                       src={selectedImage.url}
-                      alt={"image"}
-                    />
+                      />
                     <div style={{marginLeft: '10px'}}>
                       <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
                       <p style={{ textAlign:'left', fontSize:'12px' }}>Time: {convertTimeStamp(selectedImage.timestamp)}</p>
                       <p style={{ textAlign:'left', fontSize:'12px' }}>Note: {selectedImage.note}</p>
                     </div>
+                    {
+                    accessRights ?
+                      <IconButton
+                        aria-label="delete"
+                        style={{marginLeft: '90%'}}
+                        onClick={() => {
+                          if (accessRights) {
+                            console.log("clicked delete");
+                            handleDeleteOpen();
+                          } else {
+                            console.log('User does not have write access');
+                          }
+                        }}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                      : null
+                    }
                   </div>
                 </Modal>
 
@@ -1455,6 +1485,8 @@ const SingleAnimal = (props) => {
                   className={classesTwo.modal}
                   open={openSlide}
                   onClose={handleSlideClose}
+                  width='500'
+                  height='500'
                 >
                   <Carousel className={classesTwo.carousel}>
                     {selectedList.map((elem) => (
@@ -1462,21 +1494,21 @@ const SingleAnimal = (props) => {
                         key={selectedList.indexOf(elem)}
                         className={classesTwo.modal_paper}
                       >
-                        <div background='grey' width='650px' height='650px'>
+                        <div width='600px' height='600px'>
                           <img
-                          margin-left='10%'
-                          margin-right='10%'
-                          margin-top="auto"
-                          width='auto'
-                          height='500px'
-                          position='absolute'
-
-                          // display='inline-block'
-                          border='5px solid #555'
-                          src={elem.url}
-                          alt={"image"} />
+                            loading='lazy'
+                            margin-left='10%'
+                            margin-right='10%'
+                            margin-top="auto"
+                            width='600'
+                            height='auto'
+                            position='absolute'
+                            border='2px solid #aaa' 
+                            src={elem.url}
+                            alt={elem.note}
+                          />
                         </div>
-                        <div>
+                        <div style={{marginLeft: '10px'}}>
                           <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
                           <p style={{ textAlign:'left', fontSize:'12px' }}>Time: {convertTimeStamp(elem.timestamp)}</p>
                           <p style={{ textAlign:'left', fontSize:'12px' }}>Note: {elem.note}</p>
@@ -1485,6 +1517,26 @@ const SingleAnimal = (props) => {
                     ))}
                   </Carousel>
                 </Modal>
+                
+                <Dialog
+                  open={deleteDialog}
+                  onClose={handleDeleteClose}
+                >
+                  <DialogTitle>Confirm Delete</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Are you sure you want to delete this image?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={deleteAndClose} color="primary">
+                      Delete
+                    </Button>
+                    <Button onClick={handleDeleteClose} color="primary" autoFocus>
+                      Cancel
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </div>
                 // </div>
 

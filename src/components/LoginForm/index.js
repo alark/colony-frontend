@@ -19,16 +19,27 @@ const Login = () => {
   // eslint-disable-next-line
   const [redirectToDashboard, setRedirectToDashboard] = useState(false);
 
-  function checkAllTags(){
+  const checkAllTags = async () => {
     if(listOfTags === undefined){
-      importTags();
+      // importTags();
+      await importTags().then(function() {
+        console.log("completed await import tags");
+      }).catch(function(error) {
+        console.log("error in await import tags");
+        console.error(error);
+      });
+    }
+    else{
+      console.log("list of tags is not undefined: ", undefined);
     }
   }
+
+  
 
   /** Material-UI */
   const useStyles = makeStyles(theme => (
     // eslint-disable-next-line
-    checkAllTags(),
+    // checkAllTags(),
     {
     paper: {
       marginTop: theme.spacing(8),
@@ -50,10 +61,23 @@ const Login = () => {
   }));
 
   const importTags = async () => {
+    console.log("listoftags before getalltags:", listOfTags);
     if(listOfTags === undefined){
-      await getAllTags();
+      // await getAllTags();
+      console.log("awaiting getallTags");
+      await getAllTags().then(function() {
+        console.log("getalltags succeeded");
+        console.log("listoftags is now:", listOfTags);
+      }).catch(function(error) {
+        console.log("error in importtags: ", error);
+        console.error(error);
+      });
     }
   }
+
+  // //call checkall tags
+  console.log("calling checkalltags");
+  checkAllTags();
 
   const classes = useStyles();
 
@@ -81,6 +105,8 @@ const Login = () => {
 
   const googleLogin = (event) => {
     event.preventDefault();
+
+    // addToList(listOfTags);
 
     var provider = new auth_.GoogleAuthProvider();
     auth_().signInWithPopup(provider).then(function(result) {

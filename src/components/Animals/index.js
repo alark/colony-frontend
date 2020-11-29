@@ -148,8 +148,10 @@ const Animals = () => {
   const [redirectToAdd, setRedirectToAdd] = useState(false);
   const [redirectToSearch, setRedirectToSearch] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
+  const [deleteDialog, setDeleteDialog] = React.useState(false);
   const [input, setInput] = useState('');
   const [newTagName, setNewTagName] = useState('');
+  const [deleteAnimalObj, setDeleteAnimalObj] = useState({});
   const { state, getAnimals, deleteAnimal, createTag, searchAnimals} = useProfileProvider();
   const {
     animals, accessRights, colonyId, colonySize, colonyName, geneNames
@@ -191,6 +193,23 @@ const Animals = () => {
   const handleInputChange = (val) => {
     setInput(val.target.value);
   };
+
+  const handleDeleteClose = () => {
+    console.log("cancelled delete");
+    setDeleteDialog(false);
+    setDeleteAnimalObj({});
+  }
+  const handleDeleteOpen = (animal) => {
+    console.log("handle delete open");
+    setDeleteDialog(true);
+    setDeleteAnimalObj(animal);
+  };
+
+  const deleteAndClose = () => {
+    console.log("confirmed delete for animal:", deleteAnimalObj.mouseId);
+    deleteChosenAnimal(deleteAnimalObj.animalUUID);
+    setDeleteDialog(false);
+  }
 
   const deleteChosenAnimal = async (animalId) => {
     const request = {
@@ -387,7 +406,7 @@ const Animals = () => {
                         className={classes.margin}
                         onClick={() => {
                           if (accessRights) {
-                            deleteChosenAnimal(animal.animalUUID);
+                            handleDeleteOpen(animal);
                           } else {
                             console.log('User does not have write access');
                           }
@@ -397,6 +416,27 @@ const Animals = () => {
                       </IconButton>
                       : null
                   }
+
+                <Dialog
+                  open={deleteDialog}
+                  onClose={handleDeleteClose}
+                >
+                  <DialogTitle>Confirm Delete</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Are you sure you want to delete animal {deleteAnimalObj.mouseId}?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={deleteAndClose} color="primary">
+                      Delete
+                    </Button>
+                    <Button onClick={handleDeleteClose} color="primary" autoFocus>
+                      Cancel
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+
 
                 </TableCell>
               </TableRow>

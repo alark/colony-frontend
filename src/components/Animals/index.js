@@ -22,6 +22,7 @@ import Add from '@material-ui/icons/Add';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { Redirect } from 'react-router-dom';
 const { addNewToList } = require('components/Tags/index');
 
@@ -220,6 +221,8 @@ const Animals = () => {
   }
 
   const handleAddTagButton = async () => {
+    console.log(animals);
+
     const tagData = { tagName: newTagName };
     await createTag(tagData);
 
@@ -230,7 +233,7 @@ const Animals = () => {
 
   const handleSearch = async (input) => {
     const searchCriteria = {colonyId: colonyId, searchCriteria: {animalInfo: {mouseId: input}}};
-    var searchResults = await searchAnimals(searchCriteria); 
+    var searchResults = await searchAnimals(searchCriteria);
     const animal = searchResults[0];
     setCurrentAnimal(animal);
     setRedirectTodetails(true);
@@ -270,7 +273,7 @@ const Animals = () => {
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
         Add Tag
       </Button>
-      
+
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>
@@ -371,33 +374,37 @@ const Animals = () => {
                   {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    onClick={() => {
-                      setCurrentAnimal(animal);
-                      setRedirectTodetails(true);
-                    }}
-                  >Profile
-                  </Button>
-                  {
-                    accessRights ?
-                      <IconButton
-                        aria-label="delete"
-                        className={classes.margin}
-                        onClick={() => {
-                          if (accessRights) {
-                            deleteChosenAnimal(animal.animalUUID);
-                          } else {
-                            console.log('User does not have write access');
-                          }
-                        }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                      : null
-                  }
-
+                    {
+                      animal.fileErrors ?
+                        <ErrorOutlineIcon style={{ color: red[500] }}/>
+                        : null
+                    }
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={() => {
+                        setCurrentAnimal(animal);
+                        setRedirectTodetails(true);
+                      }}
+                    >Profile
+                    </Button>
+                    {
+                      accessRights ?
+                        <IconButton
+                          aria-label="delete"
+                          className={classes.margin}
+                          onClick={() => {
+                            if (accessRights) {
+                              deleteChosenAnimal(animal.animalUUID);
+                            } else {
+                              console.log('User does not have write access');
+                            }
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        : null
+                    }
                 </TableCell>
               </TableRow>
             ))}

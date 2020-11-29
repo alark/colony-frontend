@@ -203,6 +203,8 @@ const useProfileProvider = () => {
     .post(`${BASE_URL}/colony`, newColony)
     .then(({ data }) => {
       dispatch({ type: COLONY, payload: data });
+      console.log(data);
+      return data;
     });
 
   const shareColony = shareInfo => axios
@@ -211,6 +213,7 @@ const useProfileProvider = () => {
   const getAnimals = async (pageInfo, accessRights, colonyName, colonySize, geneNames) => axios
     .post(`${BASE_URL}/animals`, pageInfo)
     .then(({ data }) => {
+      console.log(data);
       data.accessRights = accessRights;
       data.colonyName = colonyName;
       data.colonySize = colonySize;
@@ -221,6 +224,7 @@ const useProfileProvider = () => {
   const searchAnimals = async (searchInfo) => axios
     .post(`${BASE_URL}/animals/search`, searchInfo)
     .then(({ data }) => {
+      console.log(data);
       return data;
   });
 

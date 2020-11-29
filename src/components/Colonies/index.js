@@ -97,12 +97,17 @@ const Colonies = () => {
     }
 
     let check = true;
+    // let resData = {};
 
     reader.onload = async () => {
       const load = reader.result;
       const data = { payload: load, name: fileName, geneNames };
       if (!isBlank(fileName.trim())) {
-        await addColony(data);
+        const resData = await addColony(data);
+        console.log(resData);
+        if (resData.fileErrorsFound) {
+          alert('Errors found in file! Please click on colony to correct errors.');
+        }
       } else {
         check = false;
         alert('Name can not be blank or just spaces!');

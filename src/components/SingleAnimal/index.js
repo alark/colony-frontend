@@ -1,8 +1,7 @@
-import Gallery from "react-photo-gallery";
 // import ImageGallery from 'react-image-gallery';
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -10,26 +9,19 @@ import { useProfileProvider } from 'contexts/profile';
 import PopupState, { bindHover, bindPopover } from 'material-ui-popup-state';
 import InfoIcon from '@material-ui/icons/Info';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
 import Modal from '@material-ui/core/Modal';
 
 import Image from 'material-ui-image'
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { ClassSharp } from "@material-ui/icons";
 
 //image carousel imports
-import { AutoRotatingCarousel } from 'material-auto-rotating-carousel';
 // const Slide = require('./Slide').default;
 // import Slide from "react-swipeable-views";
-import { Slide } from 'material-auto-rotating-carousel';
-import ReactDOM from "react-dom";
-
 import Carousel from 'react-elastic-carousel';
 
 
-const { red, blue, green } = require('@material-ui/core/colors');
 const { getList } = require('components/Tags/index');
 
 const numRegex = RegExp('^\\d*$');
@@ -251,10 +243,9 @@ const SingleAnimal = (props) => {
   const [motherMouse, setMotherMouse] = useState({});
   const [errors, setErrors] = useState({});
 
-  const [tagList, setTagList] = React.useState([]);
+  const [setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
-  const [currentImage, setCurrentImage] = React.useState(0);
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -381,20 +372,6 @@ const SingleAnimal = (props) => {
 
     setEventOpen(false);
   };
-
-  const handleNextImage = () => {
-    const index = currentImage + 1;
-    if (index < currentAnimal.imageLinks.length) {
-      setCurrentImage(index);
-    }
-  }
-
-  const handlePreviousImage = () => {
-    const index = currentImage - 1;
-    if (index >= 0) {
-      setCurrentImage(index);
-    }
-  }
 
   const getErrors = () => {
     var errorString = "";
@@ -538,11 +515,7 @@ const SingleAnimal = (props) => {
     console.log("handlemodalclose");
     setModalOpen(false);
   };
-
-  const handleModal = () => {
-    console.log("handlemodal");
-  }
-
+  
   const saveChanges = async (event) => {
     event.preventDefault();
 
@@ -610,7 +583,7 @@ const SingleAnimal = (props) => {
   };
 
   const onSaveEvent = () => {
-    const currEvent = { event, timestamp: date };
+    const currEvent = { event, timestamp: new Date(date + " 00:00:00").getTime()};
     const myEvent = { colonyId, animalId: currentAnimal.animalUUID, eventInfo: currEvent };
     console.log(myEvent);
     storeEvent(myEvent);

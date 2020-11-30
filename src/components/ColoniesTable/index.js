@@ -158,7 +158,7 @@ const ColoniesTable = () => {
     const request = {
       colonyId, rowsPerPage, page,
     };
-    console.log(geneNames);
+    console.log(colonyId);
     await getAnimals(request, true, colonyName, colonySize, geneNames);
     setRedirectToAnimals(true);
   };

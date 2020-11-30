@@ -21,6 +21,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import Add from '@material-ui/icons/Add';
 import { Redirect } from 'react-router-dom';
 const { addNewToList } = require('components/Tags/index');
 const { getList } = require('components/Tags/index');
@@ -192,6 +193,10 @@ const ResultsPage = (props) => {
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
+
+  const openAddDialog = () => {
+    setAddDialogOpen(true);
+  };
 
   const handleChangePage = async (event, newPage) => {
     setPageAnimals(searchResults.slice(newPage*10, (newPage+1)*10))

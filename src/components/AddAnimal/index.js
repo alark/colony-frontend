@@ -142,11 +142,11 @@ const AddAnimal = () => {
   const checkGenes = async (name, value, motherId, fatherId) => {
       var valid = true;
 
-      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: fatherId}});
+      var animals = await searchAnimals({colonyId, searchCriteria: {mouseId: fatherId}});
       const father = animals[0];
       const fatherGene = father[name];
 
-      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}});
+      var animals = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}});
       const mother = animals[0];
       const motherGene = mother[name];
 

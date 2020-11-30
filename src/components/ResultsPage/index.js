@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar, FormControl, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, AppBar, Box, Breadcrumbs, CardActions, CardActionArea, CardMedia, Checkbox, Divider, Grid} from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar, FormControl, Input, InputLabel, ListItemText, MenuItem, Select, Checkbox} from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -18,7 +18,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Add from '@material-ui/icons/Add';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -201,10 +200,6 @@ const ResultsPage = (props) => {
 
   const BarStyling = {width:"20rem",background:"#F2F1F9", border:"none", padding:"0.5rem"};
 
-  const openAddDialog = () => {
-    setAddDialogOpen(true);
-  };
-
   const closeAddDialog = () => {
     setAddDialogOpen(false);
   };
@@ -241,10 +236,11 @@ const ResultsPage = (props) => {
     for(var i=0; i<searchResults.length; i++) {
       if(typeof searchResults[i].tags !== "object"){
         searchResults[i].tags = [];
-      }  
+      }
+      var curr = searchResults[i];  
       newTags.forEach(function(item){
-        if(typeof searchResults[i].tags === "object" && !searchResults[i].tags.includes(item)){
-          searchResults[i].tags.push(item);
+        if(typeof curr.tags === "object" && !curr.tags.includes(item)){
+          curr.tags.push(item);
         }
       });  
     }

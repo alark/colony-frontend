@@ -393,6 +393,11 @@ const Animals = () => {
                   {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
+                  {
+                    animal.fileErrors ?
+                      <ErrorOutlineIcon style={{ color: red[500] }}/>
+                      : null
+                  }
                   <Button
                     variant="outlined"
                     color="primary"

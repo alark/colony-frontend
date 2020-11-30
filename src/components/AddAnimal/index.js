@@ -147,6 +147,7 @@ const AddAnimal = () => {
       const fatherGene = father[name];
 
       var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}, tags: []});
+
       const mother = animals[0];
       const motherGene = mother[name];
 

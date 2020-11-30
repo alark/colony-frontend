@@ -1,8 +1,6 @@
 const tagList = [];
 
 const addToList = (inputList) => {
-    console.log("taglist:", tagList);
-    console.log("inputlist:", inputList);
     if(inputList === undefined) {
         inputList = [];
     }

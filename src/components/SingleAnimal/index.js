@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { AppBar, Box, Breadcrumbs, Button, Card, CardActions, CardActionArea, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { AppBar, Box, Breadcrumbs, Button, Card, CardContent, CardMedia, Checkbox, Container, CssBaseline, Divider, Grid, FormControl, IconButton, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Popover, Select, Snackbar, Tab, Tabs, TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -8,7 +8,6 @@ import { useProfileProvider } from 'contexts/profile';
 import PopupState, { bindHover, bindPopover } from 'material-ui-popup-state';
 import InfoIcon from '@material-ui/icons/Info';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import NavigateBeforeIcon from '@material-ui/icons/NavigateBefore';
 import Uploader from 'components/ImageUpload';
 import Modal from '@material-ui/core/Modal';
 
@@ -162,7 +161,7 @@ const useStylesTag = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     minWidth: 120,
-    maxWidth: 500,
+    maxWidth: 325,
   },
 }));
 
@@ -204,6 +203,15 @@ function getStyles(tag, tagList, theme) {
 
 const defaultTags = getList().sort();
 
+function displayTags(tags){
+  if(typeof tags === 'object'){
+    return tags.join(', ');
+  }
+  else{
+    return('');
+  }
+}
+
 const SingleAnimal = (props) => {
   const classes = useStyles();
   const classesTwo = useStyles2();
@@ -242,7 +250,6 @@ const SingleAnimal = (props) => {
   const [tagList, setTagList] = React.useState([]);
   const [isDefault, setDefault] = useState(false);
   const [tab, setTab] = React.useState(0);
-  const [currentImage, setCurrentImage] = React.useState(0);
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -271,7 +278,6 @@ const SingleAnimal = (props) => {
     return b.timestamp - a.timestamp;
   });
 
-  console.log("animalImages", animalImages);
   const imageBuckets = [];
   const separate = (list) => {
     if(list === undefined || list.length <= 0){
@@ -294,7 +300,6 @@ const SingleAnimal = (props) => {
     }
   }
   separate(animalImages);
-  console.log("imagebuckets: ", imageBuckets);
 
   const handleTagChange = (event) => {
     setselectedTags(event.target.value);
@@ -371,17 +376,14 @@ const SingleAnimal = (props) => {
   };
 
   const handleDeleteOpen = () => {
-    console.log("handle delete open");
     setDeleteOpen(true);
   };
 
   const handleDeleteClose = () => {
-    console.log("cancelled delete");
     setDeleteOpen(false);
   };
 
   const deleteAndClose = () => {
-    console.log("confirmed delete for image:", selectedImage);
     deleteChosenImage(currentAnimal.animalUUID);
     setDeleteOpen(false);
     setModalOpen(false);
@@ -390,26 +392,11 @@ const SingleAnimal = (props) => {
   const deleteChosenImage = async (animalId) => {
     const imageObject = selectedImage;
     setselectedImage({});
-    console.log("deleting image: ", imageObject);
     const request = {
       colonyId, animalId, imageObject
     };
     await deleteImageLink(request);
     };
-
-  const handleNextImage = () => {
-    const index = currentImage + 1;
-    if (index < currentAnimal.imageLinks.length) {
-      setCurrentImage(index);
-    }
-  }
-
-  const handlePreviousImage = () => {
-    const index = currentImage - 1;
-    if (index >= 0) {
-      setCurrentImage(index);
-    }
-  }
 
   const getErrors = () => {
     var errorString = "";
@@ -540,17 +527,14 @@ const SingleAnimal = (props) => {
   };
 
   const handleSlideClose = () => {
-    console.log("handle slide close");
     setSlideOpen(false);
   };
 
   const handleModalOpen = () => {
-    console.log("handle modal open: selectedimg", selectedImage);
     setModalOpen(true);
   };
 
   const handleModalClose = () => {
-    console.log("handlemodalclose");
     setModalOpen(false);
   };
 
@@ -930,7 +914,7 @@ const SingleAnimal = (props) => {
                             >
                             <MenuItem value={undefined}>NA</MenuItem>
                             {defaultGenes.map(gene => (
-                                <MenuItem value={gene}>{gene}</MenuItem>
+                                <MenuItem key={defaultGenes.indexOf(gene)} value={gene}>{gene}</MenuItem>
                               ))}
                             </Select>
                           </div>
@@ -948,7 +932,7 @@ const SingleAnimal = (props) => {
                           >
                           <MenuItem value={undefined}>NA</MenuItem>
                           {defaultGenes.map(gene => (
-                              <MenuItem value={gene}>{gene}</MenuItem>
+                              <MenuItem key={defaultGenes.indexOf(gene)} value={gene}>{gene}</MenuItem>
                             ))}
                           </Select>
                           </div>
@@ -966,7 +950,7 @@ const SingleAnimal = (props) => {
                           >
                           <MenuItem value={undefined}>NA</MenuItem>
                           {defaultGenes.map(gene => (
-                              <MenuItem value={gene}>{gene}</MenuItem>
+                              <MenuItem key={defaultGenes.indexOf(gene)} value={gene}>{gene}</MenuItem>
                             ))}
                           </Select>
                           </div>
@@ -1001,15 +985,16 @@ const SingleAnimal = (props) => {
                         </Grid>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
-                            <TextField
-                              disabled
-                              label="Tags"
-                              variant="outlined"
-                              size="small"
-                              margin="normal"
-                              name="currentTags"
-                              defaultValue={currentAnimal.tags}
-                            />
+                          <TextField
+                            disabled
+                            id="outlined-multiline-static"
+                            label="Applied Tags"
+                            multiline
+                            rows={4}
+                            style={{width:'40ch',}}
+                            defaultValue={displayTags(currentAnimal.tags)}
+                            variant="outlined"
+                          />
                           </div>
                         </Grid>
                       </Grid>
@@ -1393,9 +1378,8 @@ const SingleAnimal = (props) => {
               <Uploader animalId={currentAnimal.animalUUID} />
               { (imageBuckets.length > 0) && <div style={{height:'500px', overflow: 'auto'}}>
                 {imageBuckets.map((sublist) => (
-                  <div>
+                  <div key={imageBuckets.indexOf(sublist)}>
                     <hr style={{width:'100%', borderTop: '2px solid #ccc', borderRadius: '2px'}}/>
-                    
                     <div className={classesTwo.root} style={{width: '100%', marginTop: '1%'}}>
                       <div className={classesTwo.sidebar}>
                         <p style={{fontSize:'15px', color: 'black', textAlign: 'center' }}><b>{sublist[0].date}</b></p>
@@ -1405,7 +1389,6 @@ const SingleAnimal = (props) => {
                       </div>
                       <div style={{width: '100%', marginLeft: '1%', borderLeft: '2px solid #ccc', paddingLeft: '1%'}}>
                         <GridList className={classesTwo.gridList} cols={8}>
-                          {console.log("sublist len", sublist.length)}
 
                           {sublist.map((element) => (
                             <GridListTile 
@@ -1414,8 +1397,6 @@ const SingleAnimal = (props) => {
                               cols={1}
                               style={{ width: 100, height: 100}}
                               onClick={() => {
-                                console.log("element: ", element);
-                                console.log("index of: ", sublist.indexOf(element))
                                 setselectedImage(element) 
                                 handleModalOpen()
                               }}
@@ -1454,6 +1435,7 @@ const SingleAnimal = (props) => {
                       height='auto'
                       padding='10'
                       src={selectedImage.url}
+                      alt={selectedImage.note}
                       />
                     <div style={{marginLeft: '10px'}}>
                       <p style={{ textAlign:'left', fontSize:'15px' }}>Photo Information</p>
@@ -1467,10 +1449,9 @@ const SingleAnimal = (props) => {
                         style={{marginLeft: '90%'}}
                         onClick={() => {
                           if (accessRights) {
-                            console.log("clicked delete");
                             handleDeleteOpen();
                           } else {
-                            console.log('User does not have write access');
+                            console.log('User does not have write access.');
                           }
                         }}
                       >
@@ -1538,21 +1519,6 @@ const SingleAnimal = (props) => {
                   </DialogActions>
                 </Dialog>
               </div>
-                // </div>
-
-                // currentAnimal.imageLinks.length > 0 ?
-                // <Card className={classesTwo.root}>
-                //   <CardActionArea>
-                //     <CardMedia style={{ align: 'center' }}>
-                //       <img src={currentAnimal.imageLinks[currentImage]} alt={currentImage} style={{ display:'block', marginLeft:'auto', marginRight: 'auto', width: '50%', height: '50%' }} />
-                //     </CardMedia>
-                //     <CardActions>
-                //       <IconButton aria-label="prev" onClick={handlePreviousImage}><NavigateBeforeIcon /></IconButton>
-                //       <IconButton aria-label="next" onClick={handleNextImage}><NavigateNextIcon /></IconButton>
-                //       {currentImage+1} / {currentAnimal.imageLinks.length}
-                //     </CardActions>
-                //   </CardActionArea>
-                // </Card> : null
               }
             </TabPanel>
             <TabPanel value={tab} index={2}>

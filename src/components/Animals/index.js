@@ -386,7 +386,7 @@ const Animals = () => {
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <span>{animal.dobMonth}/{animal.dobDay}/{animal.dobYear}</span>
                 </TableCell>
-                <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
+                <TableCell align="right" style={{ maxWidth: 300, borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>

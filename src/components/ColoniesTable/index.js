@@ -213,6 +213,7 @@ const ColoniesTable = () => {
 
                   </DialogActions>
                 </Dialog>
+
                 <IconButton
                   aria-label="delete"
                   onClick={() => {
@@ -221,18 +222,24 @@ const ColoniesTable = () => {
                 >
                   <DeleteIcon />
                 </IconButton>
-                <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
-                  <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
+                <Dialog
+                  open={deleteDialog}
+                  onClose={closeDeleteDialog}
+                >
+                  <DialogTitle>Confirm Delete</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Are you sure you want to delete {deleteColony}?
+                    </DialogContentText>
+                  </DialogContent>
+                  {console.log("opened delete dialog")}
                   <DialogActions>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => {
-                        deleteEntry();
-                      }}
-                    >
+                    <Button onClick={deleteEntry} color="primary">
                       Delete
-                  </Button>
+                    </Button>
+                    <Button onClick={closeDeleteDialog} color="primary" autoFocus>
+                      Cancel
+                    </Button>
                   </DialogActions>
                 </Dialog>
               </TableCell>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar, FormControl, Input, InputLabel, Link, List, ListItem, ListItemText, MenuItem, Select, Snackbar, Tab, Tabs, AppBar, Box, Breadcrumbs, CardActions, CardActionArea, CardMedia, Checkbox, Divider, Grid} from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar, FormControl, Input, InputLabel, ListItemText, MenuItem, Select, Checkbox} from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -357,6 +357,7 @@ const ResultsPage = (props) => {
           </Select>
         </FormControl>
         <Button color="primary" variant="contained" onClick={handleTagAdd} startIcon={<CheckCircle />}>Apply Tag(s) to Results</Button>
+        <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>New Tag</Button>
       </div>
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
@@ -445,7 +446,7 @@ const ResultsPage = (props) => {
                 <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   <span>{animal.dobMonth}/{animal.dobDay}/{animal.dobYear}</span>
                 </TableCell>
-                <TableCell align="right" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
+                <TableCell align="right" style={{ maxWidth: 300, borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
                   {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>

@@ -197,7 +197,7 @@ const AddAnimal = () => {
         else {
           const criteria = {gender: 'M', mouseId: value};
           const searchInfo = {colonyId, searchCriteria: criteria};
-          const {animals} = await searchAnimals(searchInfo);
+          const animals = await searchAnimals(searchInfo);
           setErrors(prevState => ({...prevState, [name]:
             animals.length !== 0
             ? ''
@@ -218,7 +218,7 @@ const AddAnimal = () => {
         else {
           const criteria = {gender: 'F', mouseId: value};
           const searchInfo = {colonyId, searchCriteria: criteria};
-          const {animals} = await searchAnimals(searchInfo);
+          const animals = await searchAnimals(searchInfo);
           setErrors(prevState => ({...prevState, [name]:
             animals.length !== 0
             ? ''

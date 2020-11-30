@@ -15,7 +15,6 @@ import Image from 'material-ui-image'
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import DeleteIcon from "@material-ui/icons/Delete";
-
 import Carousel from 'react-elastic-carousel';
 
 const { getList } = require('components/Tags/index');
@@ -72,6 +71,9 @@ const useStyles = makeStyles(theme => ({
   },
   popover: {
     pointerEvents: 'none',
+  },
+  error: {
+    color: 'red',
   },
 }));
 
@@ -288,12 +290,12 @@ const SingleAnimal = (props) => {
       var temp = [];
       list.forEach(element => {
         if(element.date === key){
-          temp.push(element);     
+          temp.push(element);
         }
         else{
           key = element.date;
           imageBuckets.push(temp);
-          temp = [element]; 
+          temp = [element];
         }
       });
       imageBuckets.push(temp);
@@ -319,13 +321,13 @@ const SingleAnimal = (props) => {
     }
 
   const defaultTraits = (id, gen, litt, mo, da, yr, deathMo, deathDa, deathYr, fth, mth, gn1, gn2, gn3, tod, tags) => {
-    setAnimalInfo(prevState => ({ ...prevState, animalId: id }));
+    setAnimalInfo(prevState => ({ ...prevState, mouseId: id }));
     setAnimalInfo(prevState => ({ ...prevState, gender: gen }));
     setAnimalInfo(prevState => ({ ...prevState, litter: litt }));
     setAnimalInfo(prevState => ({ ...prevState, dobMonth: mo }));
     setAnimalInfo(prevState => ({ ...prevState, dobDay: da }));
     setAnimalInfo(prevState => ({ ...prevState, dobMonth: mo }));
-    setAnimalInfo(prevState => ({ ...prevState, dobYear: yr }));
+    setAnimalInfo(prevState => ({ ...prevState, dodYear: yr }));
     setAnimalInfo(prevState => ({ ...prevState, dodMonth: deathMo }));
     setAnimalInfo(prevState => ({ ...prevState, dodDay: deathDa }));
     setAnimalInfo(prevState => ({ ...prevState, dodYear: deathYr }));
@@ -421,11 +423,11 @@ const SingleAnimal = (props) => {
   const checkGenes = async (name, value, motherId, fatherId) => {
       var valid = true;
 
-      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: fatherId}});
+      var animals = await searchAnimals({colonyId, searchCriteria: {mouseId: fatherId}});
       const father = animals[0];
       const fatherGene = father[name];
 
-      var {animals} = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}});
+      var animals = await searchAnimals({colonyId, searchCriteria: {mouseId: motherId}});
       const mother = animals[0];
       const motherGene = mother[name];
 
@@ -476,7 +478,7 @@ const SingleAnimal = (props) => {
         else {
           const criteria = {gender: 'M', mouseId: value};
           const searchInfo = {colonyId, searchCriteria: criteria};
-          const {animals} = await searchAnimals(searchInfo);
+          const animals = await searchAnimals(searchInfo);
           setErrors(prevState => ({...prevState, [name]:
             animals.length !== 0
             ? ''
@@ -485,7 +487,7 @@ const SingleAnimal = (props) => {
             setFatherMouse(animals[0]);
           }
         }
-        if (animalInfo.motherId && !errors.motherId && !errors.fatherId) {
+        if (name == 'motherId' && !errors.motherId && !errors.fatherId) {
           checkAllGenes(animalInfo.motherId, value);
         }
         break;
@@ -497,7 +499,8 @@ const SingleAnimal = (props) => {
         else {
           const criteria = {gender: 'F', mouseId: value};
           const searchInfo = {colonyId, searchCriteria: criteria};
-          const {animals} = await searchAnimals(searchInfo);
+          const animals = await searchAnimals(searchInfo);
+          console.log(animals);
           setErrors(prevState => ({...prevState, [name]:
             animals.length !== 0
             ? ''
@@ -506,7 +509,7 @@ const SingleAnimal = (props) => {
             setMotherMouse(animals[0]);
           }
         }
-        if (animalInfo.fatherId && !errors.motherId && !errors.fatherId) {
+        if (name == 'fatherId' && !errors.motherId && !errors.fatherId) {
           checkAllGenes(value, animalInfo.fatherId);
         }
         break;
@@ -545,14 +548,14 @@ const SingleAnimal = (props) => {
 
     const animal = {
       animalUUID: currentAnimal.animalUUID,
-      mouseId: animalInfo.animalId,
+      mouseId: animalInfo.mouseId,
       gender: animalInfo.gender,
       litter: animalInfo.litter,
       dobMonth: animalInfo.dobMonth,
       dobDay: animalInfo.dobDay,
       dobYear: animalInfo.dobYear,
-      dodMonth: animalInfo.dobMonth,
-      dodDay: animalInfo.dobDay,
+      dodMonth: animalInfo.dodMonth,
+      dodDay: animalInfo.dodDay,
       dodYear: animalInfo.dodYear,
       fatherId: animalInfo.fatherId,
       motherId: animalInfo.motherId,
@@ -605,7 +608,7 @@ const SingleAnimal = (props) => {
   };
 
   const onSaveEvent = () => {
-    const currEvent = { event, timestamp: date };
+    const currEvent = { event, timestamp: new Date(date + " 00:00:00").getTime()};
     const myEvent = { colonyId, animalId: currentAnimal.animalUUID, eventInfo: currEvent };
     console.log(myEvent);
     storeEvent(myEvent);
@@ -726,6 +729,18 @@ const SingleAnimal = (props) => {
                 {
                   accessRights ?
                     <div className={classesGrid.root}>
+                      <>
+                      {
+                        currentAnimal.fileErrors ?
+                        <>
+                          <Typography className={classes.error}> Errors found in file: </Typography>
+                          <ul className={classes.error}>
+                            {currentAnimal.fileErrors.map((error) => <li key={error}> {error} </li>)}
+                          </ul>
+                        </>
+                        : null
+                      }
+                      </>
                       <Grid container>
                         <Grid item xs>
                           <div className={classesGrid.paper}>
@@ -1391,7 +1406,7 @@ const SingleAnimal = (props) => {
                         <GridList className={classesTwo.gridList} cols={8}>
 
                           {sublist.map((element) => (
-                            <GridListTile 
+                            <GridListTile
                               className={classesTwo.gridListTile}
                               key={sublist.indexOf(element)}
                               cols={1}
@@ -1418,13 +1433,13 @@ const SingleAnimal = (props) => {
                     </div>
                   </div>
                 ))}
-                 
+
                 <Modal
                   className={classesTwo.modal}
                   open={openModal}
                   onClose={handleModalClose}
                 >
-                  <div 
+                  <div
                     position='absolute'
                     className={classesTwo.modal_paper}
                   >
@@ -1471,7 +1486,7 @@ const SingleAnimal = (props) => {
                 >
                   <Carousel className={classesTwo.carousel}>
                     {selectedList.map((elem) => (
-                      <div 
+                      <div
                         key={selectedList.indexOf(elem)}
                         className={classesTwo.modal_paper}
                       >

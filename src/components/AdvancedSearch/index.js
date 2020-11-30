@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Breadcrumbs, Card, CardContent, Link, TextField, Grid, Container, CssBaseline, Typography } from '@material-ui/core';
+import { Button, Breadcrumbs, Card, CardContent, Link, TextField, Grid, Container, CssBaseline, Typography, FormControl, Select, Input, InputLabel, MenuItem, Checkbox, ListItemText } from '@material-ui/core';
 import NavigateNextIcon from '@material-ui/icons/NavigateNext';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+
+const { getList } = require('components/Tags/index');
 
 const numRegex = RegExp('^\\d*$');
 
@@ -71,6 +73,37 @@ const useStyles2 = makeStyles(theme => ({
   },
 }));
 
+const ITEM_HEIGHT = 75;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tagList, theme) {
+  if(tag === undefined){
+    return;
+  }
+  return {
+    fontWeight:
+      tagList.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+const useStylesTag = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    maxWidth: 500,
+  },
+}));
+
 const gridStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
@@ -83,14 +116,19 @@ const gridStyles = makeStyles((theme) => ({
   },
 }));
 
+const defaultTags = getList().sort();
+
 const AdvancedSearch = () => {
   const classesGrid = gridStyles();
   const classesTwo = useStyles2();
   const classes = useStyles();
+  const classesTag = useStylesTag();
+  const themeTag = useTheme();
   const { logout, searchAnimals, state } = useProfileProvider();
   const [animalInfo, setAnimalInfo] = useState({});
   const [searchResults, setSearchResults] = useState({});
   const [errors, setErrors] = useState({});
+  const [selectedTags, setselectedTags] = React.useState([]);
   const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToResultsPage, setRedirectToResultsPage] = useState(false);
   const [redirectToColonies, setRedirectToColonies] = useState(false);
@@ -107,6 +145,10 @@ const AdvancedSearch = () => {
     return errorString;
   }
 
+  const handleTagChange = (event) => {
+    setselectedTags(event.target.value);
+  }
+
   const validateForm = () => {
     let valid = true;
     Object.values(errors).forEach(
@@ -115,9 +157,9 @@ const AdvancedSearch = () => {
     );
     return valid;
   }
-
   const searchWithCriteria = async(event) => {
-    const request = { colonyId: colonyId, searchCriteria: {animalInfo}};
+    const request = { colonyId: colonyId, searchCriteria: {animalInfo}, tags: selectedTags};
+    console.log(request.tags);
     var results = await searchAnimals(request);
     setSearchResults(results);
     setRedirectToResultsPage(true);
@@ -150,6 +192,7 @@ const AdvancedSearch = () => {
     }
 
     setAnimalInfo(prevState => ({ ...prevState, [name]: value }));
+    return 0;
   };
 
   if (redirectToAnimals) {
@@ -374,7 +417,45 @@ const AdvancedSearch = () => {
                         />
                       </div>
                     </Grid>
+                    
                   </Grid>
+                  <div>
+                    <TextField
+                      id="filled-full-width"
+                      name="text"
+                      variant="outlined"
+                      size="medium"
+                      fullWidth
+                      margin="normal"
+                      label="Search for Events and Notes"
+                      onChange={updateInput}
+                    />
+                  </div>
+                  <div>
+                            <FormControl className={classesTag.formControl}>
+                              <InputLabel
+                                id="tag-label"
+                              >Tags</InputLabel>
+                              <Select
+                                labelId="tag-label"
+                                id="multiple-tag"
+                                multiple
+                                value={selectedTags}
+                                onChange={handleTagChange}
+                                input={<Input id="select-multiple-tag"/>}
+                                renderValue={(selected) => selected.join(', ')}
+                                MenuProps={MenuProps}
+                              >
+                                {defaultTags.map((tag) => (
+                                  <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+                                    <Checkbox checked={selectedTags.indexOf(tag) > -1} />
+                                    <ListItemText primary={tag} />
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </div>
+
                 </div>
             <div className={classes.error}>
               { !validateForm() ? getErrors() : null }

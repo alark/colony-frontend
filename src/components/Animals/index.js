@@ -22,6 +22,7 @@ import Add from '@material-ui/icons/Add';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import { Redirect } from 'react-router-dom';
 const { addNewToList } = require('components/Tags/index');
 
@@ -239,6 +240,8 @@ const Animals = () => {
   }
 
   const handleAddTagButton = async () => {
+    console.log(animals);
+
     const tagData = { tagName: newTagName };
     await createTag(tagData);
 
@@ -249,7 +252,7 @@ const Animals = () => {
 
   const handleSearch = async (input) => {
     const searchCriteria = {colonyId: colonyId, searchCriteria: {animalInfo: {mouseId: input}}};
-    var searchResults = await searchAnimals(searchCriteria); 
+    var searchResults = await searchAnimals(searchCriteria);
     const animal = searchResults[0];
     setCurrentAnimal(animal);
     setRedirectTodetails(true);
@@ -289,7 +292,7 @@ const Animals = () => {
       <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
         Add Tag
       </Button>
-      
+
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>
@@ -417,27 +420,25 @@ const Animals = () => {
                       : null
                   }
 
-                <Dialog
-                  open={deleteDialog}
-                  onClose={handleDeleteClose}
-                >
-                  <DialogTitle>Confirm Delete</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      Are you sure you want to delete animal {deleteAnimalObj.mouseId}?
-                    </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={deleteAndClose} color="primary">
-                      Delete
-                    </Button>
-                    <Button onClick={handleDeleteClose} color="primary" autoFocus>
-                      Cancel
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-
-
+                  <Dialog
+                    open={deleteDialog}
+                    onClose={handleDeleteClose}
+                  >
+                    <DialogTitle>Confirm Delete</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Are you sure you want to delete animal {deleteAnimalObj.mouseId}?
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={deleteAndClose} color="primary">
+                        Delete
+                      </Button>
+                      <Button onClick={handleDeleteClose} color="primary" autoFocus>
+                        Cancel
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                 </TableCell>
               </TableRow>
             ))}

@@ -507,7 +507,7 @@ const AddAnimal = () => {
                         >
                         <MenuItem value={undefined}>NA</MenuItem>
                         {defaultGenes.map(gene => (
-                            <MenuItem value={gene}>{gene}</MenuItem>
+                            <MenuItem key={defaultGenes.indexOf(gene)} value={gene}>{gene}</MenuItem>
                           ))}
                         </Select>
                       </div>
@@ -525,7 +525,7 @@ const AddAnimal = () => {
                       >
                       <MenuItem value={undefined}>NA</MenuItem>
                       {defaultGenes.map(gene => (
-                          <MenuItem value={gene}>{gene}</MenuItem>
+                          <MenuItem key={defaultGenes.indexOf(gene)} value={gene}>{gene}</MenuItem>
                         ))}
                       </Select>
                       </div>
@@ -543,7 +543,7 @@ const AddAnimal = () => {
                       >
                       <MenuItem value={undefined}>NA</MenuItem>
                       {defaultGenes.map(gene => (
-                          <MenuItem value={gene}>{gene}</MenuItem>
+                          <MenuItem key={defaultGenes.indexOf(gene)} value={gene}>{gene}</MenuItem>
                         ))}
                       </Select>
                       </div>
@@ -569,6 +569,7 @@ const AddAnimal = () => {
               }}
               variant="outlined"
               color="primary"
+              className={classes.submit}
             >Back
             </Button>
           </form>

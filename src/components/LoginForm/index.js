@@ -19,16 +19,20 @@ const Login = () => {
   // eslint-disable-next-line
   const [redirectToDashboard, setRedirectToDashboard] = useState(false);
 
-  function checkAllTags(){
+  const checkAllTags = async () => {
     if(listOfTags === undefined){
-      importTags();
+      await importTags().then(function() {
+      }).catch(function(error) {
+        console.error(error);
+      });
     }
   }
+
+  
 
   /** Material-UI */
   const useStyles = makeStyles(theme => (
     // eslint-disable-next-line
-    checkAllTags(),
     {
     paper: {
       marginTop: theme.spacing(8),
@@ -51,9 +55,16 @@ const Login = () => {
 
   const importTags = async () => {
     if(listOfTags === undefined){
-      await getAllTags();
+      await getAllTags().then(function() {
+      }).catch(function(error) {
+        console.error(error);
+      });
     }
   }
+
+  //call checkall tags
+  checkAllTags();
+
 
   const classes = useStyles();
 
@@ -81,6 +92,8 @@ const Login = () => {
 
   const googleLogin = (event) => {
     event.preventDefault();
+
+    addToList(listOfTags);
 
     var provider = new auth_.GoogleAuthProvider();
     auth_().signInWithPopup(provider).then(function(result) {
@@ -178,8 +191,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
-
-
-// printAllTags();

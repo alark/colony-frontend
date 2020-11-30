@@ -21,6 +21,7 @@ const EDITANIMAL = 'EDITANIMAL';
 const ADDANIMAL = 'ADDANIMAL';
 const DELETEANIMAL = 'DELETEANIMAL';
 const IMAGEUPLOAD = 'IMAGEUPLOAD';
+const IMAGEDELETE = 'IMAGEDELETE';
 const NOTE = 'NOTE';
 const EVENT = 'EVENT';
 const TAG = 'TAG';
@@ -120,13 +121,47 @@ const ProfileProvider = ({ children }) => {
       }
 
       case IMAGEUPLOAD: {
-        console.log("payload in imgupload case", payload);
         const animals = [...prevState.animals];
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
+        console.log("adding image to animal", payload.imageArray);
         // Get index of animal to edit
         if (targetIndex !== -1) {
-          console.log("imagearray", payload.imageArray);
+          console.log("animal links:", animals[targetIndex].imageLinks);
           animals[targetIndex].imageLinks.push(payload.imageArray); // Store edited animal
+        }
+        console.log("added image to animal");
+        return {
+          ...prevState, animals,
+        };
+      }
+
+      case IMAGEDELETE: {
+        const animals = [...prevState.animals];
+        const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
+       
+        const image = payload.imageObject;
+
+        console.log("target animal:", targetIndex);
+        console.log("target image:", image);
+
+        // Get index of animal to edit
+        if (targetIndex !== -1) {
+          const imageIndex = animals[targetIndex].imageLinks.findIndex(elem => {
+            if(elem.url === image.url && elem.note === image.note
+              && elem.timestamp === image.timestamp && elem.date === image.date){
+                return true;
+              }
+              return false;
+          });
+          
+          console.log("imageindex", imageIndex);
+          if(imageIndex !== -1){
+            console.log("before splice", animals[targetIndex].imageLinks);
+
+            animals[targetIndex].imageLinks.splice(imageIndex, 1);;
+
+            console.log("after splice", animals[targetIndex].imageLinks);
+          }
         }
         return {
           ...prevState, animals,
@@ -138,6 +173,7 @@ const ProfileProvider = ({ children }) => {
         const targetIndex = animals.findIndex(item => item.animalUUID === payload.animalId);
         // Get index of animal to edit
         if (targetIndex !== -1) {
+          console.log("push note: ", payload.note);
           animals[targetIndex].notes.push(payload.note); // Store edited animal
         }
         return {
@@ -260,6 +296,21 @@ const useProfileProvider = () => {
       console.log("called dispatch");
     });
 
+/*
+    const deleteAnimal = request => axios
+    .post(`${BASE_URL}/animals/delete`, request)
+    .then(() => {
+      dispatch({ type: DELETEANIMAL, payload: request.animalId });
+    });
+*/
+  const deleteImageLink = (request) => axios
+    .post(`${BASE_URL}/animals/deleteImageLink`, request)
+    .then(() => {
+      // console.log("data in delete:", data);
+      dispatch({ type: IMAGEDELETE, payload: request });
+      console.log("called dispatch on delete");
+    });
+
   const storeNote = request => axios
     .post(`${BASE_URL}/animals/storeNote`, request)
     .then(({ data }) => {
@@ -321,6 +372,7 @@ const useProfileProvider = () => {
     addAnimal,
     shareColony,
     storeImageLink,
+    deleteImageLink,
     storeNote,
     storeEvent,
     getTag,

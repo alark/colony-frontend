@@ -1,18 +1,23 @@
 import firebase from 'firebase';
 import 'firebase/storage';
+import 'firebase/auth';
 
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'AIzaSyCv8FAn2HZzu1RAa6-EwSHOqgiyhr9ZlGs',
-  authDomain: 'animal-colony-76d9b.firebaseapp.com',
-  databaseURL: 'https://animal-colony-76d9b.firebaseio.com',
-  projectId: 'animal-colony-76d9b',
-  storageBucket: 'animal-colony-76d9b.appspot.com',
-  messagingSenderId: '289026487338',
-  appId: '1:289026487338:web:e294ae051c2c75ab6e3f53',
+  apiKey: "AIzaSyCjfmxLhQ1MamquPmk3C_3DGQzLCud5dEY",
+  authDomain: "animal-colony-project.firebaseapp.com",
+  databaseURL: "https://animal-colony-project.firebaseio.com",
+  projectId: "animal-colony-project",
+  storageBucket: "animal-colony-project.appspot.com",
+  messagingSenderId: "216559495555",
+  appId: "1:216559495555:web:05385f41426574007eaeb6",
+  measurementId: "G-NRTWN3R9CG"
 };
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 const storage = firebase.storage();
+const auth = firebase.auth();
 
-export { storage, firebase as default };
+export { storage, auth, firebase as default };

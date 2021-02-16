@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProfileProvider } from 'contexts/profile';
-import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar } from '@material-ui/core';
+import { Button, Container, CssBaseline, CardHeader, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Paper, Avatar, FormControl, Input, InputLabel, ListItemText, MenuItem, Select, Checkbox} from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -18,13 +18,13 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Add from '@material-ui/icons/Add';
 import CheckCircle from '@material-ui/icons/CheckCircle';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import Add from '@material-ui/icons/Add';
 import { Redirect } from 'react-router-dom';
 const { addNewToList } = require('components/Tags/index');
+const { getList } = require('components/Tags/index');
 
 const paginationStyle = makeStyles(theme => ({
   root: {
@@ -138,41 +138,72 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const useStylesTag = makeStyles((theme) => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+    maxWidth: 500,
+  },
+}));
 
-const Animals = () => {
+const ITEM_HEIGHT = 75;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+function getStyles(tag, tagList, theme) {
+  if(tag === undefined){
+    return;
+  }
+  return {
+    fontWeight:
+      tagList.indexOf(tag) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
+const defaultTags = getList().sort();
+
+const ResultsPage = (props) => {
   const classes = useStyles();
+  const themeTag = useTheme();
+  const classesTag = useStylesTag();
   const [page, setPage] = React.useState(0);
-  const rowsPerPage = 10;
+  const searchResults = props.location.state.results;
   const [openModal, setOpenModal] = React.useState(false);
   const [currentAnimal, setCurrentAnimal] = useState({});
   const [redirectToDetails, setRedirectTodetails] = useState(false);
-  const [redirectToAdd, setRedirectToAdd] = useState(false);
+  const [pageAnimals, setPageAnimals] = useState(searchResults.slice(0,11));
+  const [redirectToAnimals, setRedirectToAnimals] = useState(false);
   const [redirectToSearch, setRedirectToSearch] = useState(false);
   const [addDialog, setAddDialogOpen] = React.useState(false);
-  const [deleteDialog, setDeleteDialog] = React.useState(false);
+  const [selectedTags, setselectedTags] = React.useState([]);
   const [input, setInput] = useState('');
   const [newTagName, setNewTagName] = useState('');
-  const [deleteAnimalObj, setDeleteAnimalObj] = useState({});
-  const { state, getAnimals, deleteAnimal, createTag, searchAnimals} = useProfileProvider();
+  const { state, deleteAnimal, createTag, searchAnimals, addNewToTag, editAnimal} = useProfileProvider();
   const {
-    animals, accessRights, colonyId, colonySize, colonyName, geneNames
+    accessRights, colonyId, colonyName
   } = state;
 
   const permissions = accessRights ? 'Read and Write' : 'Read Only';
 
+  const openAddDialog = () => {
+    setAddDialogOpen(true);
+  };
+
   const handleChangePage = async (event, newPage) => {
-    const request = {
-      colonyId, rowsPerPage, page: newPage,
-    };
-    await getAnimals(request, accessRights, colonyName, colonySize, geneNames);
+    setPageAnimals(searchResults.slice(newPage*10, (newPage+1)*10))
     setPage(newPage);
   };
 
   const BarStyling = {width:"20rem",background:"#F2F1F9", border:"none", padding:"0.5rem"};
-
-  const openAddDialog = () => {
-    setAddDialogOpen(true);
-  };
 
   const closeAddDialog = () => {
     setAddDialogOpen(false);
@@ -195,21 +226,8 @@ const Animals = () => {
     setInput(val.target.value);
   };
 
-  const handleDeleteClose = () => {
-    console.log("cancelled delete");
-    setDeleteDialog(false);
-    setDeleteAnimalObj({});
-  }
-  const handleDeleteOpen = (animal) => {
-    console.log("handle delete open");
-    setDeleteDialog(true);
-    setDeleteAnimalObj(animal);
-  };
-
-  const deleteAndClose = () => {
-    console.log("confirmed delete for animal:", deleteAnimalObj.mouseId);
-    deleteChosenAnimal(deleteAnimalObj.animalUUID);
-    setDeleteDialog(false);
+  const handleTagChange = (event) => {
+    setselectedTags(event.target.value);
   }
 
   const deleteChosenAnimal = async (animalId) => {
@@ -218,6 +236,20 @@ const Animals = () => {
     };
     await deleteAnimal(request);
   };
+
+  const addTagToAnimal = (newTags) => {  
+    for(var i=0; i<searchResults.length; i++) {
+      if(typeof searchResults[i].tags !== "object"){
+        searchResults[i].tags = [];
+      }
+      var curr = searchResults[i];  
+      newTags.forEach(function(item){
+        if(typeof curr.tags === "object" && !curr.tags.includes(item)){
+          curr.tags.push(item);
+        }
+      });  
+    }
+  }
 
   const displayNotes = (noteObj) => {
     var result = '';
@@ -238,10 +270,11 @@ const Animals = () => {
       }}
     />);
   }
+  else if (redirectToAnimals) {
+    return <Redirect to="/dashboard/colony" />;
+  }
 
   const handleAddTagButton = async () => {
-    console.log(animals);
-
     const tagData = { tagName: newTagName };
     await createTag(tagData);
 
@@ -251,11 +284,32 @@ const Animals = () => {
   }
 
   const handleSearch = async (input) => {
-    const searchCriteria = {colonyId: colonyId, searchCriteria: {animalInfo: {mouseId: input}}};
-    var searchResults = await searchAnimals(searchCriteria);
+    const searchCriteria = {colonyId: colonyId, searchCriteria: {mouseId: input}};
+    var searchResults = await searchAnimals(searchCriteria); 
     const animal = searchResults[0];
     setCurrentAnimal(animal);
     setRedirectTodetails(true);
+  }
+
+  const handleTagAdd = async (event) => {
+    addTagToAnimal(selectedTags);
+
+    var allResultIds = [];
+    searchResults.forEach(mouse => {
+      allResultIds.push(mouse.animalUUID);
+    });
+
+    selectedTags.forEach(item => {
+      const tagData = { tagName: item, mouse: allResultIds};
+      addNewToTag(tagData);
+    });
+
+    for(var i=0; i<searchResults.length; i++) {
+      var request = {animal: searchResults[i], colonyId};
+      editAnimal(request);
+    }
+
+
   }
 
   function displayTags(tags){
@@ -265,14 +319,6 @@ const Animals = () => {
     else{
       return('');
     }
-  }
-
-  if (redirectToAdd) {
-    return (<Redirect
-      to={{
-        pathname: `/addanimal`,
-      }}
-    />);
   }
 
   if (redirectToSearch) {
@@ -288,11 +334,32 @@ const Animals = () => {
       <CssBaseline />
       <h1>Colony: {colonyName}</h1>
       <h2>Access:{permissions}</h2>
-
-      <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>
-        Add Tag
-      </Button>
-
+      <div>
+        <FormControl className={classesTag.formControl}>
+          <InputLabel
+            id="tag-label"
+           >Tags</InputLabel>
+          <Select
+            labelId="tag-label"
+            id="multiple-tag"
+            multiple  
+            value={selectedTags}
+            onChange={handleTagChange}
+            input={<Input id="select-multiple-tag"/>}
+            renderValue={(selected) => selected.join(', ')}
+            MenuProps={MenuProps}
+            > 
+            {defaultTags.map((tag) => (
+              <MenuItem key={tag} value={tag} style={getStyles(tag, selectedTags, themeTag)}>
+              <Checkbox checked={selectedTags.indexOf(tag) > -1} />
+              <ListItemText primary={tag} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button color="primary" variant="contained" onClick={handleTagAdd} startIcon={<CheckCircle />}>Apply Tag(s) to Results</Button>
+        <Button startIcon={<Add />} color="primary" variant="contained" onClick={openAddDialog}>New Tag</Button>
+      </div>
       <Dialog open={addDialog} onClose={closeAddDialog} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Tag</DialogTitle>
             <DialogContent>
@@ -308,15 +375,6 @@ const Animals = () => {
               <Button color="primary" variant="contained" onClick={handleAddTagButton} startIcon={<CheckCircle />}>Save</Button>
             </DialogActions>
           </Dialog>
-      <Button
-          color="inherit"
-          variant="outlined"
-          onClick={() => {
-          setRedirectToAdd(true);
-        }}
-        >
-          Add Animal
-        </Button>
 
       <input type="text"
         style={BarStyling}
@@ -360,7 +418,7 @@ const Animals = () => {
             </TableRow>
           </TableBody>
           <TableBody>
-            {(animals).map(animal => (
+            {(pageAnimals).map(animal => (
               <TableRow key={animal.mouseId}>
                 <TableCell
                   style={{ cursor: 'pointer', borderRight: '1px solid rgba(224, 224, 224, 1)' }}
@@ -393,11 +451,6 @@ const Animals = () => {
                   {displayTags(animal.tags)}
                 </TableCell>
                 <TableCell align="center" style={{ borderRight: '1px solid rgba(224, 224, 224, 1)' }}>
-                  {
-                    animal.fileErrors ?
-                      <ErrorOutlineIcon style={{ color: red[500] }}/>
-                      : null
-                  }
                   <Button
                     variant="outlined"
                     color="primary"
@@ -414,7 +467,7 @@ const Animals = () => {
                         className={classes.margin}
                         onClick={() => {
                           if (accessRights) {
-                            handleDeleteOpen(animal);
+                            deleteChosenAnimal(animal.animalUUID);
                           } else {
                             console.log('User does not have write access');
                           }
@@ -425,25 +478,6 @@ const Animals = () => {
                       : null
                   }
 
-                  <Dialog
-                    open={deleteDialog}
-                    onClose={handleDeleteClose}
-                  >
-                    <DialogTitle>Confirm Delete</DialogTitle>
-                    <DialogContent>
-                      <DialogContentText>
-                        Are you sure you want to delete animal {deleteAnimalObj.mouseId}?
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={deleteAndClose} color="primary">
-                        Delete
-                      </Button>
-                      <Button onClick={handleDeleteClose} color="primary" autoFocus>
-                        Cancel
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
                 </TableCell>
               </TableRow>
             ))}
@@ -454,7 +488,7 @@ const Animals = () => {
               <TablePagination
                 rowsPerPageOptions={[]}
                 colSpan={3}
-                count={colonySize}
+                count={searchResults.length}
                 rowsPerPage={10}
                 page={page}
                 SelectProps={{
@@ -467,6 +501,14 @@ const Animals = () => {
             </TableRow>
           </TableFooter>
         </Table>
+         <Button
+                  onClick={() => {
+                    setRedirectToAnimals(true);
+                  }}
+                  variant="outlined"
+                  color="primary"
+                >Back
+            </Button>
       </TableContainer>
 
       <Modal
@@ -528,13 +570,13 @@ const Animals = () => {
                   <strong>DOD Year</strong> {currentAnimal.dodYear}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>{geneNames.gene1 || 'Gene 1'}:</strong> {currentAnimal.gene1}
+                  <strong>Gene 1:</strong> {currentAnimal.gene1}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>{geneNames.gene2 || 'Gene 2'}:</strong> {currentAnimal.gene2}
+                  <strong>Gene 2:</strong> {currentAnimal.gene2}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
-                  <strong>{geneNames.gene3 || 'Gene 3'}:</strong> {currentAnimal.gene3}
+                  <strong>Gene 3:</strong> {currentAnimal.gene3}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary">
                   <strong>TOD:</strong> {currentAnimal.tod}
@@ -559,4 +601,4 @@ const Animals = () => {
   );
 };
 
-export default Animals;
+export default ResultsPage;

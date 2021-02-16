@@ -50,6 +50,7 @@ function TablePaginationActions(props) {
     onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
   };
 
+
   return (
 
     <div className={classes.root}>
@@ -140,7 +141,6 @@ const ColoniesTable = () => {
 
   const share = async () => {
     const data = { email: sharedUser, colonyId: sharedColony, accessRights: accessRightsShare };
-    console.log(data);
     await shareColony(data);
     closeShareDialog();
   };
@@ -154,11 +154,12 @@ const ColoniesTable = () => {
     setPage(newPage);
   };
 
-  const handleCellClick = async (colonyId, colonyName, colonySize, rowsPerPage, page) => {
+  const handleCellClick = async (colonyId, colonyName, colonySize, geneNames, rowsPerPage, page) => {
     const request = {
       colonyId, rowsPerPage, page,
     };
-    await getAnimals(request, true, colonyName, colonySize);
+    console.log(colonyId);
+    await getAnimals(request, true, colonyName, colonySize, geneNames);
     setRedirectToAnimals(true);
   };
 
@@ -184,7 +185,7 @@ const ColoniesTable = () => {
                 style={{ cursor: 'pointer' }}
                 component="th"
                 scope="row"
-                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, rowsPerPage, page)}
+                onClick={async () => await handleCellClick(colony.colonyId, colony.colonyName, colony.size, colony.geneNames, rowsPerPage, page)}
               >
                 <div style={{ fontWeight: 'bold', fontSize: 18 }}>{colony.colonyName}</div>
                 <p style={{ color: '#333333' }}>Size: {colony.size}</p>
@@ -212,6 +213,7 @@ const ColoniesTable = () => {
 
                   </DialogActions>
                 </Dialog>
+
                 <IconButton
                   aria-label="delete"
                   onClick={() => {
@@ -220,18 +222,24 @@ const ColoniesTable = () => {
                 >
                   <DeleteIcon />
                 </IconButton>
-                <Dialog open={deleteDialog} onClose={closeDeleteDialog} aria-labelledby="form-dialog-title">
-                  <DialogTitle id="form-dialog-title">Are you sure you want to delete?</DialogTitle>
+                <Dialog
+                  open={deleteDialog}
+                  onClose={closeDeleteDialog}
+                >
+                  <DialogTitle>Confirm Delete</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Are you sure you want to delete {deleteColony}?
+                    </DialogContentText>
+                  </DialogContent>
+                  {console.log("opened delete dialog")}
                   <DialogActions>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      onClick={() => {
-                        deleteEntry();
-                      }}
-                    >
+                    <Button onClick={deleteEntry} color="primary">
                       Delete
-                  </Button>
+                    </Button>
+                    <Button onClick={closeDeleteDialog} color="primary" autoFocus>
+                      Cancel
+                    </Button>
                   </DialogActions>
                 </Dialog>
               </TableCell>
@@ -261,4 +269,3 @@ const ColoniesTable = () => {
 };
 
 export default ColoniesTable;
-
